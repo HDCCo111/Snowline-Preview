@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SnowLine by Boss Growth Machine — Preview</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:oklch(0.18 0.04 255); --fg:oklch(0.97 0.01 230); --card:oklch(0.23 0.045 255);
+    --muted:oklch(0.27 0.05 255); --mfg:oklch(0.78 0.03 235); --ice:oklch(0.85 0.08 225);
+    --orange:oklch(0.7 0.19 45); --border:oklch(0.85 0.08 225 / 18%); --input:oklch(0.85 0.08 225 / 25%);
+    --red:oklch(0.7 0.19 22); --green:oklch(0.75 0.15 150); --yellow:oklch(0.85 0.15 90);
+  }
+  html,body{background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif}
+  .display{font-family:"Archivo Black",Archivo,sans-serif;letter-spacing:-.01em}
+  .snow-bg{background:radial-gradient(ellipse at top right,color-mix(in oklab,var(--ice) 18%,transparent),transparent 60%),var(--bg)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:1rem}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;border-radius:.75rem;font-weight:700;padding:0 1.25rem;transition:filter .15s,transform .15s}
+  .btn-orange{background:var(--orange);color:oklch(0.15 0.03 255);box-shadow:0 10px 30px -10px color-mix(in oklab,var(--orange) 60%,transparent)}
+  .btn-orange:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .btn-ghost{border:1px solid var(--input);color:var(--fg)}
+  .btn-ghost:hover{background:var(--muted)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .input{width:100%;min-height:48px;border-radius:.75rem;background:var(--bg);color:var(--fg);border:1px solid var(--input);padding:.75rem 1rem;font-size:1rem}
+  .input:focus{outline:2px solid var(--orange);outline-offset:1px}
+  .ice{color:var(--ice)} .orange{color:var(--orange)} .muted{color:var(--mfg)}
+  .chip{border:1px solid var(--input);border-radius:999px;padding:.4rem .9rem;font-size:.85rem;white-space:nowrap}
+  .chip.on{background:var(--orange);color:oklch(0.15 0.03 255);border-color:var(--orange);font-weight:700}
+  .tab{padding:.75rem 1rem;border-radius:.75rem;font-weight:600;white-space:nowrap;color:var(--mfg)}
+  .tab.on{background:var(--muted);color:var(--fg)}
+  .choice{border:2px solid var(--input);border-radius:1rem;padding:1.25rem;text-align:left;width:100%}
+  .choice.on{border-color:var(--orange);background:color-mix(in oklab,var(--orange) 10%,var(--card))}
+  .todo{border:1px dashed var(--yellow);color:var(--yellow);border-radius:.75rem;padding:.6rem .8rem;font-size:.8rem}
+  .st-New{background:oklch(0.85 0.08 225 / 20%);color:var(--ice)}
+  .st-Quoted{background:oklch(0.85 0.15 90 / 20%);color:var(--yellow)}
+  .st-DepositPaid,.st-Booked{background:oklch(0.75 0.15 150 / 20%);color:var(--green)}
+  .st-Done{background:oklch(0.78 0.03 235 / 20%);color:var(--mfg)}
+  .st-Cancelled{background:oklch(0.7 0.19 22 / 20%);color:var(--red)}
+  .pill{font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;white-space:nowrap}
+  .scroll-x{overflow-x:auto;scrollbar-width:none} .scroll-x::-webkit-scrollbar{display:none}
+  dialog::backdrop{background:rgb(0 0 0 / .6)}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Preview bar (not part of the real app) -->
+<div id="previewbar" class="sticky top-0 z-50 text-xs" style="background:oklch(0.85 0.15 90);color:oklch(0.15 0.03 255)">
+  <div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 items-center">
+    <strong>PREVIEW: sample data, nothing goes to a server</strong>
+    <a href="#/" class="underline">1. Landing page</a>
+    <a href="#/?ref=TJNY" class="underline">2. Landing via Thomas's link</a>
+    <a href="#/login" class="underline">3. Operator login</a>
+    <a href="#/dashboard" class="underline">4. Operator dashboard</a>
+    <a href="#/q/seans-plowing" class="underline">5. Homeowner quote page</a>
+    <button onclick="resetDemo()" class="underline">Reset sample data</button>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<dialog id="jobdlg" class="card p-0 w-[min(560px,94vw)] text-[var(--fg)]" style="background:var(--card)"></dialog>
+
+<script>
+/* ============ SAMPLE DATA (stands in for the database) ============ */
+const SEED = {
+  operator: {
+    business_name: "Sean's Plowing (sample)", owner_name: "Sean Dean", phone: "(513) 555-0142",
+    email: "sean@example.com", slug: "seans-plowing", deposit_payment_link: "https://example.com/deposit",
+    service_zip_codes: ["45202","45211","45238","45248"], partner_call_hours: "Mon–Fri, 1–3 pm", active: true,
+    bgm_webhook_url: ""
+  },
+  pricing: { one_car: 45, two_car: 65, three_car: 95, walkway: 20, salt: 25, rush: 30, deposit_type: "percent", deposit_value: 50 },
+  jobs: [
+    {id:101,type:"Plow Now",name:"Maria Lopez",phone:"(513) 555-0110",email:"maria@example.com",address:"412 Elm St",zip:"45202",size:"2-car",addons:["Walkway"],total:115,deposit:57.5,status:"New",created:ago(0.1),outside:false,notes:"Car leaves at 7am"},
+    {id:102,type:"Scheduled",date:"2026-11-14",name:"James Carter",phone:"(513) 555-0187",email:"jc@example.com",address:"88 Ridge Ave",zip:"45238",size:"3+ car / long",addons:["Salt / de-ice"],total:120,deposit:60,status:"Quoted",created:ago(1),outside:false,accepted:true,notes:""},
+    {id:103,type:"Plow Now",name:"Dee Harris",phone:"(513) 555-0199",email:"",address:"9 Vine St",zip:"45211",size:"1-car",addons:[],total:75,deposit:37.5,status:"Deposit Paid",created:ago(2),outside:false,notes:""},
+    {id:104,type:"Scheduled",date:"2026-11-12",name:"Tom Becker",phone:"(513) 555-0156",email:"tb@example.com",address:"230 Oak Hill Dr",zip:"45248",size:"2-car",addons:["Walkway","Salt / de-ice"],total:110,deposit:55,status:"Booked",created:ago(3),outside:false,notes:"Gate code 4412"},
+    {id:105,type:"Plow Now",name:"Ana Ruiz",phone:"(513) 555-0133",email:"",address:"17 Lake Rd",zip:"45040",size:"2-car",addons:[],total:95,deposit:47.5,status:"New",created:ago(4),outside:true,notes:""},
+    {id:106,type:"Scheduled",date:"2026-11-05",name:"Keith Moore",phone:"(513) 555-0170",email:"",address:"5 Pine Ct",zip:"45202",size:"1-car",addons:[],total:45,deposit:22.5,status:"Done",created:ago(6),outside:false,notes:""}
+  ],
+  partners: [
+    {id:201,company:"Westside Medical Plaza",contact:"Linda Park, (513) 555-0122",property:"Medical office lot (60 spaces)",location:"Cincinnati, 45238",notes:"Needs cleared by 6:30am on clinic days",created:ago(2)}
+  ],
+  feedback: [],
+  demos: []
+};
+function ago(days){return new Date(Date.now()-days*864e5).toISOString()}
+const KEY="snowline_preview_v1";
+let DB = load();
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(SEED)}catch(e){return structuredClone(SEED)}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function resetDemo(){DB=structuredClone(SEED);save();try{localStorage.removeItem("snowline_ref")}catch(e){};route();toast("Sample data reset")}
+const $=s=>document.querySelector(s);
+const money=n=>"$"+(Math.round(n*100)/100).toFixed(2).replace(/\.00$/,"");
+function toast(t){const d=document.createElement("div");d.textContent=t;d.className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 card px-4 py-3 text-sm";document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+
+/* ============ AFFILIATE REF (?ref=CODE, kept 60 days) ============ */
+function captureRef(){
+  const q=location.hash.split("?")[1]||location.search.slice(1);
+  const ref=new URLSearchParams(q).get("ref");
+  if(ref){try{localStorage.setItem("snowline_ref",JSON.stringify({code:ref.toUpperCase(),exp:Date.now()+60*864e5}))}catch(e){}}
+}
+function getRef(){try{const r=JSON.parse(localStorage.getItem("snowline_ref"));if(r&&r.exp>Date.now())return r.code}catch(e){}return ""}
+
+/* ============ ROUTER ============ */
+window.addEventListener("hashchange",route);
+function route(){
+  captureRef();
+  const h=(location.hash||"#/").slice(1).split("?")[0];
+  window.scrollTo(0,0);
+  if(h.startsWith("/q/")) return quotePage();
+  if(h==="/login") return loginPage("login");
+  if(h==="/signup") return loginPage("signup");
+  if(h.startsWith("/dashboard")) return dashboard(h.split("/")[2]||"jobs");
+  if(h==="/privacy"||h==="/terms") return comingSoon(h==="/privacy"?"Privacy Policy":"Terms of Service");
+  return landing();
+}
+
+/* ============ LANDING PAGE ============ */
+function header(right){return `<header class="border-b" style="border-color:var(--border)"><div class="max-w-6xl mx-auto px-5 h-[72px] flex items-center justify-between">
+  <a href="#/" class="flex items-center gap-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ice)" stroke-width="2"><path d="M3 17h13V7H3zM16 10h3l2 3v4h-5"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+  <span class="font-bold text-lg">SnowLine</span><span class="muted text-xs hidden sm:inline">by Boss Growth Machine</span></a>${right||""}</div></header>`}
+function footer(){return `<footer class="border-t mt-20" style="border-color:var(--border)"><div class="max-w-6xl mx-auto px-5 py-8 flex flex-wrap gap-4 justify-between text-sm muted">
+  <span>Powered by Boss Growth Machine</span><span class="flex gap-4"><a href="#/privacy" class="underline">Privacy</a><a href="#/terms" class="underline">Terms</a><a href="#/login" class="underline">Operator login</a></span></div></footer>`}
+
+function landing(){
+  const ref=getRef();
+  const features=[["Weather-triggered reminders","Customers get a nudge to book before snow hits their area.",true],["Plow now or schedule ahead","Two separate paths for urgent jobs and planned service."],["Service areas","You pick where you work, so your trucks stay close together."],["Business partner queue","Business requests wait for your partner call hours."],["Seasonal memberships","Recurring service and seasonal plans.",true],["Lead stats by area","See where your leads come from, ZIP by ZIP."],["Your QR code","Put it on your truck. Customers scan it and book."],["One inbox","QR, phone, social DMs and email all land in one place."]];
+  $("#app").innerHTML=`${header(`<a href="#demo" class="btn btn-orange text-sm">Book a demo</a>`)}
+  <main class="snow-bg">
+  <section class="max-w-6xl mx-auto px-5 pt-20 pb-24 grid md:grid-cols-2 gap-12 items-center">
+    <div><p class="ice text-sm font-bold tracking-widest uppercase">For snow plow operators</p>
+      <h1 class="display text-4xl md:text-6xl mt-4 leading-[1.05]">Keep your eyes on the road. Your AI handles every customer.</h1>
+      <p class="muted text-lg mt-6">One QR code, one phone number, one inbox. Quotes, deposits and bookings happen while you plow.</p>
+      <a href="#demo" class="btn btn-orange mt-8 text-lg px-8">Book a demo</a>
+      ${ref?`<p class="mt-4 text-sm ice">Referred by partner code <b>${ref}</b></p>`:""}</div>
+    <div class="flex justify-center"><svg viewBox="0 0 420 320" class="w-full max-w-md"><rect x="40" y="20" width="150" height="150" rx="18" fill="none" stroke="var(--ice)" stroke-width="5"/><g fill="var(--ice)"><rect x="66" y="46" width="28" height="28" rx="4"/><rect x="136" y="46" width="28" height="28" rx="4"/><rect x="101" y="81" width="28" height="28" rx="4"/><rect x="66" y="116" width="28" height="28" rx="4"/><rect x="136" y="116" width="28" height="28" rx="4"/></g><g fill="var(--ice)" opacity=".6"><circle cx="250" cy="40" r="5"/><circle cx="300" cy="75" r="5"/><circle cx="370" cy="50" r="5"/><circle cx="280" cy="130" r="5"/><circle cx="400" cy="115" r="5"/></g><path d="M40 230 l40-15 v60 l-40 10z" fill="var(--orange)"/><path d="M80 260 H330 l30-60 h40 l25 50 v20 H80z" fill="oklch(0.23 0.045 255)" stroke="var(--ice)" stroke-width="5"/><rect x="330" y="170" width="70" height="45" rx="8" fill="none" stroke="var(--ice)" stroke-width="5"/><circle cx="140" cy="285" r="22" fill="var(--bg)" stroke="var(--ice)" stroke-width="5"/><circle cx="360" cy="285" r="22" fill="var(--bg)" stroke="var(--ice)" stroke-width="5"/></svg></div>
+  </section></main>
+
+  <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">How it works</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+    ${[["They reach out","Customers scan the QR code on your truck, call, DM you or email."],["One AI answers","One AI answers every channel and sorts each contact as a homeowner or a business."],["Quote, accept, deposit","Homeowners get an instant quote, accept it and pay a deposit."],["On your route","The job lands in your dashboard, in the right area, at the right time."]].map((s,i)=>`<div class="card p-6"><div class="display text-3xl orange">0${i+1}</div><h3 class="font-bold mt-4">${s[0]}</h3><p class="muted mt-2 text-sm">${s[1]}</p></div>`).join("")}
+    </div></section>
+
+  <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">What's in the truck</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">
+    ${features.map(f=>`<div class="card p-6"><h3 class="font-bold">${f[0]}</h3><p class="muted mt-2 text-sm">${f[1]}</p>${f[2]?`<span class="pill mt-3 inline-block" style="background:var(--muted);color:var(--ice)">Coming with your Boss Growth Machine setup</span>`:""}</div>`).join("")}
+    </div></section>
+
+  <section class="max-w-6xl mx-auto px-5 py-16 grid md:grid-cols-2 gap-6">
+    <div class="card p-8"><h2 class="display text-2xl">Built for the cab</h2><p class="muted mt-3">The system answers calls and messages for you, so you never touch a phone while driving. Both hands on the wheel, blade on the pavement.</p></div>
+    <div class="card p-8"><h2 class="display text-2xl">Backed by a real team</h2><p class="muted mt-3">Behind the software is the Boss Growth Machine team. We handle setup and support, so you're not figuring it out alone.</p></div>
+  </section>
+
+  <section class="max-w-3xl mx-auto px-5 py-16"><h2 class="display text-3xl">Questions</h2><div class="mt-6 space-y-3">
+    ${[["What is the QR code for?","It goes on your truck or signs. When someone scans it, they get a quote and book without calling you."],["Can I use it with one truck?","Yes. It works for a solo operator or a multi-truck fleet."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["Do I keep my customer list?","Yes. Your customers are yours."],["Who supports me?","The Boss Growth Machine team handles setup and ongoing support."]].map(q=>`<details class="card p-5"><summary class="font-bold cursor-pointer">${q[0]}</summary><p class="muted mt-3">${q[1]}</p></details>`).join("")}
+  </div></section>
+
+  <section id="demo" class="max-w-2xl mx-auto px-5 py-16"><div class="card p-6 md:p-10" id="demobox">
+    <h2 class="display text-3xl">Book a demo</h2><p class="muted mt-2">Tell us about your operation and we'll reach out to set up a time.</p>
+    <form id="demoform" class="mt-6 grid gap-4">
+      <input class="input" name="name" placeholder="Name" required>
+      <div class="grid sm:grid-cols-2 gap-4"><input class="input" name="phone" placeholder="Phone" required><input class="input" name="email" type="email" placeholder="Email" required></div>
+      <div class="grid sm:grid-cols-2 gap-4"><input class="input" name="trucks" type="number" min="1" placeholder="Number of trucks"><input class="input" name="city" placeholder="City and state"></div>
+      <textarea class="input" name="message" rows="3" placeholder="Short message"></textarea>
+      <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" name="sms" class="mt-1 w-5 h-5"> <span>[TEXT-MESSAGE CONSENT WORDING — waiting on attorney]</span></label>
+      ${ref?`<p class="text-xs ice">Partner code ${ref} will be saved with this request.</p>`:""}
+      <button class="btn btn-orange text-lg">Request my demo</button>
+    </form></div></section>
+  ${footer()}`;
+  if(location.hash.includes("demo")) document.getElementById("demo").scrollIntoView();
+  $("#demoform").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);
+    DB.demos.push({name:f.get("name"),phone:f.get("phone"),email:f.get("email"),trucks:f.get("trucks"),city_state:f.get("city"),message:f.get("message"),sms_consent:!!f.get("sms"),ref_code:ref,created_at:new Date().toISOString()});save();
+    $("#demobox").innerHTML=`<div class="text-center py-6"><div class="display text-3xl">Thanks, we got it.</div><p class="muted mt-3">Someone from our team will be in touch.</p>
+    <div class="todo mt-6 text-left">IN THE REAL APP: this request is saved to the database${ref?` with partner code <b>${ref}</b>`:""}, then sent to the Boss Growth Machine sub-account, where the A0 workflow notifies the salesperson${ref==="TJNY"?" and texts Thomas":""}.</div></div>`;};
+}
+function comingSoon(t){$("#app").innerHTML=`${header()}<main class="max-w-2xl mx-auto px-5 py-24 text-center"><h1 class="display text-4xl">${t}</h1><p class="muted mt-4">Coming soon.</p></main>${footer()}`}
+
+/* ============ LOGIN ============ */
+function loginPage(mode){
+  $("#app").innerHTML=`${header()}<main class="snow-bg min-h-[80vh] flex items-center"><div class="max-w-md w-full mx-auto px-5 py-16"><div class="card p-8">
+    <h1 class="display text-3xl">${mode==="login"?"Operator login":"Create your operator account"}</h1>
+    <form class="mt-6 grid gap-4" onsubmit="event.preventDefault();location.hash='#/dashboard'">
+      ${mode==="signup"?`<input class="input" placeholder="Business name" required><input class="input" placeholder="Your name" required>`:""}
+      <input class="input" type="email" placeholder="Email" value="sean@example.com" required>
+      <input class="input" type="password" placeholder="Password" value="password" required>
+      <button class="btn btn-orange text-lg">${mode==="login"?"Log in":"Create account"}</button></form>
+    <p class="muted text-sm mt-5 text-center">${mode==="login"?`New operator? <a href="#/signup" class="underline ice">Create an account</a>`:`Have an account? <a href="#/login" class="underline ice">Log in</a>`}</p>
+    <p class="text-xs muted mt-4 text-center">Preview: any email and password works.</p></div></div></main>`;
+}
+
+/* ============ DASHBOARD ============ */
+const TABS=[["jobs","Jobs"],["pricing","Pricing"],["areas","Service Areas"],["partners","Partners"],["link","My Link"],["feedback","Feedback"],["settings","Settings"]];
+const STATUSES=["New","Quoted","Deposit Paid","Booked","Done","Cancelled"];
+let jobFilter="All";
+function dashboard(tab){
+  const o=DB.operator;
+  $("#app").innerHTML=`${header(`<div class="flex items-center gap-3"><span class="text-sm muted hidden sm:inline">${o.business_name}</span><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    <nav class="scroll-x flex gap-2 pb-2">${TABS.map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
+    <div id="tab" class="mt-5"></div></main>`;
+  ({jobs:tabJobs,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,feedback:tabFeedback,settings:tabSettings}[tab]||tabJobs)();
+}
+function tabJobs(){
+  const recent=DB.jobs.filter(j=>Date.now()-new Date(j.created)<30*864e5);
+  const byStatus=STATUSES.map(s=>[s,recent.filter(j=>j.status===s).length]);
+  const zips={};recent.forEach(j=>zips[j.zip]=(zips[j.zip]||0)+1);
+  const list=DB.jobs.filter(j=>jobFilter==="All"||j.status===jobFilter).sort((a,b)=>new Date(b.created)-new Date(a.created));
+  $("#tab").innerHTML=`
+  <div class="card p-5"><div class="flex justify-between items-baseline"><h2 class="font-bold">Last 30 days</h2><span class="muted text-sm">${recent.length} requests</span></div>
+    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">${byStatus.map(([s,n])=>`<div class="rounded-xl p-3 text-center" style="background:var(--muted)"><div class="display text-2xl">${n}</div><div class="text-xs muted">${s}</div></div>`).join("")}</div>
+    <div class="mt-4 flex flex-wrap gap-2 text-xs">${Object.entries(zips).sort((a,b)=>b[1]-a[1]).map(([z,n])=>`<span class="chip">ZIP ${z}: <b>${n}</b>${DB.operator.service_zip_codes.includes(z)?"":" (outside)"}</span>`).join("")}</div></div>
+  <div class="scroll-x flex gap-2 mt-5">${["All",...STATUSES].map(s=>`<button class="chip ${s===jobFilter?"on":""}" onclick="jobFilter='${s}';tabJobs()">${s}</button>`).join("")}</div>
+  <div class="mt-4 grid gap-3">${list.length?list.map(j=>`
+    <button onclick="openJob(${j.id})" class="card p-4 text-left w-full hover:brightness-110">
+      <div class="flex justify-between gap-3 items-start"><div><div class="font-bold">${j.name}</div><div class="muted text-sm">${j.address}, ${j.zip}</div></div>
+      <span class="pill st-${j.status.replace(" ","")}">${j.status}</span></div>
+      <div class="flex flex-wrap gap-2 mt-3 text-xs"><span class="chip">${j.type}${j.date?" · "+j.date:""}</span><span class="chip">${j.size}</span><span class="chip">${money(j.total)}</span>${j.outside?`<span class="pill" style="background:oklch(0.7 0.19 22 / 20%);color:var(--red)">Outside area</span>`:""}${j.accepted&&j.status==="Quoted"?`<span class="pill st-Quoted">Accepted, deposit pending</span>`:""}</div>
+    </button>`).join(""):`<p class="muted">No jobs with this status.</p>`}</div>`;
+}
+function openJob(id){
+  const j=DB.jobs.find(x=>x.id===id),d=$("#jobdlg");
+  d.innerHTML=`<div class="p-6"><div class="flex justify-between items-start"><div><h3 class="display text-2xl">${j.name}</h3><p class="muted text-sm">${j.type}${j.date?" on "+j.date:""} · requested ${new Date(j.created).toLocaleString()}</p></div><button onclick="jobdlg.close()" class="text-2xl muted px-2">×</button></div>
+  <div class="grid grid-cols-2 gap-3 mt-5 text-sm">
+    <div><div class="muted text-xs">Address</div>${j.address}, ${j.zip}${j.outside?` <span class="pill" style="background:oklch(0.7 0.19 22 / 20%);color:var(--red)">Outside area</span>`:""}</div>
+    <div><div class="muted text-xs">Driveway</div>${j.size}</div>
+    <div><div class="muted text-xs">Add-ons</div>${j.addons.join(", ")||"None"}</div>
+    <div><div class="muted text-xs">Quote / deposit</div>${money(j.total)} / ${money(j.deposit)}</div>
+    <div class="col-span-2"><div class="muted text-xs">Contact</div>${j.phone}${j.email?" · "+j.email:""}</div>
+    ${j.notes?`<div class="col-span-2"><div class="muted text-xs">Notes</div>${j.notes}</div>`:""}</div>
+  <div class="grid grid-cols-2 gap-3 mt-5"><a href="tel:${j.phone}" class="btn btn-orange">Call</a><a href="sms:${j.phone}" class="btn btn-ghost">Text</a></div>
+  <p class="muted text-xs mt-6 mb-2">Change status (one tap)</p>
+  <div class="grid grid-cols-3 gap-2">${STATUSES.map(s=>`<button onclick="setStatus(${j.id},'${s}')" class="btn ${s===j.status?"btn-orange":"btn-ghost"} text-sm px-2">${s}</button>`).join("")}</div></div>`;
+  d.showModal();
+}
+function setStatus(id,s){DB.jobs.find(x=>x.id===id).status=s;save();jobdlg.close();tabJobs();toast("Status changed to "+s)}
+
+function tabPricing(){
+  const p=DB.pricing;const row=(k,l)=>`<label class="flex items-center justify-between gap-4 py-3 border-b" style="border-color:var(--border)"><span>${l}</span><span class="flex items-center gap-1 w-32"><span class="muted">$</span><input class="input text-right" type="number" min="0" data-k="${k}" value="${p[k]}"></span></label>`;
+  $("#tab").innerHTML=`<div class="grid md:grid-cols-2 gap-5">
+  <div class="card p-5"><h2 class="font-bold text-lg">Base price per driveway</h2>${row("one_car","1-car")}${row("two_car","2-car")}${row("three_car","3+ car or long driveway")}
+    <div class="flex items-center justify-between py-3"><span>Commercial lot</span><span class="muted text-sm">Partner call, no instant price</span></div></div>
+  <div class="card p-5"><h2 class="font-bold text-lg">Add-ons</h2>${row("walkway","Walkway / sidewalk")}${row("salt","Salt / de-ice")}${row("rush","Plow Now rush fee")}
+    <h2 class="font-bold text-lg mt-6">Deposit</h2><div class="flex gap-2 mt-3"><button class="chip ${p.deposit_type==="percent"?"on":""}" onclick="DB.pricing.deposit_type='percent';save();tabPricing()">Percent</button><button class="chip ${p.deposit_type==="flat"?"on":""}" onclick="DB.pricing.deposit_type='flat';save();tabPricing()">Flat amount</button></div>
+    <label class="flex items-center justify-between gap-4 py-3"><span>${p.deposit_type==="percent"?"Percent of quote":"Flat deposit"}</span><span class="flex items-center gap-1 w-32"><span class="muted">${p.deposit_type==="percent"?"%":"$"}</span><input class="input text-right" type="number" min="0" data-k="deposit_value" value="${p.deposit_value}"></span></label></div></div>
+  <button class="btn btn-orange mt-5 w-full sm:w-auto" onclick="document.querySelectorAll('[data-k]').forEach(i=>DB.pricing[i.dataset.k]=Number(i.value));save();toast('Prices saved')">Save prices</button>
+  <p class="muted text-sm mt-3">Tip: change a price, save, then open the homeowner quote page. The quote updates right away.</p>`;
+}
+function tabAreas(){
+  const z=DB.operator.service_zip_codes;
+  $("#tab").innerHTML=`<div class="card p-5 max-w-xl"><h2 class="font-bold text-lg">ZIP codes you serve</h2><p class="muted text-sm mt-1">Requests from other ZIP codes still come in, flagged "Outside area".</p>
+  <form class="flex gap-2 mt-4" onsubmit="event.preventDefault();const v=this.zip.value.trim();if(/^\\d{5}$/.test(v)&&!DB.operator.service_zip_codes.includes(v)){DB.operator.service_zip_codes.push(v);save();tabAreas()}else toast('Enter a new 5-digit ZIP')"><input name="zip" class="input" placeholder="Add a ZIP code" inputmode="numeric"><button class="btn btn-orange">Add</button></form>
+  <div class="flex flex-wrap gap-2 mt-5">${z.map(x=>`<span class="chip flex items-center gap-2">${x}<button onclick="DB.operator.service_zip_codes=DB.operator.service_zip_codes.filter(y=>y!=='${x}');save();tabAreas()" class="muted text-lg leading-none">×</button></span>`).join("")}</div></div>`;
+}
+function tabPartners(){
+  $("#tab").innerHTML=`<div class="card p-5 mb-4"><div class="muted text-xs">Your partner call hours</div><div class="font-bold mt-1">${DB.operator.partner_call_hours}</div></div>
+  <div class="grid gap-3">${DB.partners.map(p=>`<div class="card p-5"><div class="flex justify-between"><div class="font-bold">${p.company}</div><span class="muted text-xs">${new Date(p.created).toLocaleDateString()}</span></div>
+  <div class="text-sm mt-2"><span class="muted">Contact:</span> ${p.contact}</div><div class="text-sm"><span class="muted">Property:</span> ${p.property}</div><div class="text-sm"><span class="muted">Location:</span> ${p.location}</div>${p.notes?`<div class="text-sm mt-2 muted">"${p.notes}"</div>`:""}</div>`).join("")||`<p class="muted">No business requests yet.</p>`}</div>`;
+}
+function tabLink(){
+  const url=location.origin+location.pathname+"#/q/"+DB.operator.slug;
+  $("#tab").innerHTML=`<div class="card p-6 max-w-xl"><h2 class="font-bold text-lg">Your quote link</h2>
+  <div class="flex gap-2 mt-3"><input class="input text-sm" readonly value="${url}"><button class="btn btn-ghost" onclick="navigator.clipboard&&navigator.clipboard.writeText('${url}');toast('Link copied')">Copy</button></div>
+  <h2 class="font-bold text-lg mt-6">QR code for your truck</h2><div class="mt-3 inline-block bg-white p-4 rounded-xl" id="qr"></div>
+  <div class="mt-4 flex gap-3"><button class="btn btn-orange" onclick="dlQR()">Download QR (PNG)</button><a class="btn btn-ghost" href="#/q/${DB.operator.slug}">Open my quote page</a></div>
+  <div class="todo mt-5">In the real app this link uses your published SnowLine web address, not this preview address.</div></div>`;
+  try{new QRCode(document.getElementById("qr"),{text:url,width:220,height:220})}catch(e){$("#qr").textContent="QR code loads here"}
+}
+function dlQR(){const c=document.querySelector("#qr canvas"),i=document.querySelector("#qr img");const a=document.createElement("a");a.download="snowline-qr.png";a.href=c?c.toDataURL("image/png"):(i?i.src:"");a.click()}
+function tabFeedback(){
+  $("#tab").innerHTML=`<div class="card p-6 max-w-xl"><h2 class="font-bold text-lg">Beta feedback</h2><p class="muted text-sm">Fill this out once a week and after every storm.</p>
+  <form id="fb" class="grid gap-4 mt-5"><textarea name="worked" class="input" rows="2" placeholder="What worked?"></textarea><textarea name="broke" class="input" rows="2" placeholder="What broke?"></textarea><textarea name="missing" class="input" rows="2" placeholder="What's missing?"></textarea>
+  <div><div class="text-sm mb-2">How's it going, 1 to 10?</div><div class="grid grid-cols-10 gap-1">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<label class="text-center"><input type="radio" name="score" value="${n}" class="peer hidden" required><span class="block py-3 rounded-lg border cursor-pointer peer-checked:bg-[var(--orange)] peer-checked:text-black font-bold" style="border-color:var(--input)">${n}</span></label>`).join("")}</div></div>
+  <button class="btn btn-orange">Send feedback</button></form>
+  <p class="muted text-sm mt-4">${DB.feedback.length} feedback entries sent in this preview.</p></div>`;
+  $("#fb").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);DB.feedback.push(Object.fromEntries(f));save();toast("Thanks! Feedback saved");tabFeedback()};
+}
+function tabSettings(){
+  const o=DB.operator;const f=(k,l,t)=>`<label class="grid gap-1"><span class="text-sm muted">${l}</span><input class="input" data-o="${k}" value="${o[k]||""}" ${t||""}></label>`;
+  $("#tab").innerHTML=`<div class="card p-6 max-w-xl grid gap-4"><h2 class="font-bold text-lg">Business settings</h2>
+  ${f("business_name","Business name")}${f("owner_name","Owner name")}${f("phone","Business phone")}${f("email","Email")}${f("slug","Link name (your-site.com/q/...)")}${f("partner_call_hours","Partner call hours")}
+  ${f("deposit_payment_link","Deposit payment link (from your own payment account)")}
+  ${f("bgm_webhook_url","Boss Growth Machine webhook URL",'placeholder="Paste the URL your setup specialist gives you"')}
+  <div class="todo">Until the webhook URL is filled in, jobs save in the app but don't reach your Boss Growth Machine inbox.</div>
+  <button class="btn btn-orange" onclick="document.querySelectorAll('[data-o]').forEach(i=>DB.operator[i.dataset.o]=i.value);save();toast('Settings saved')">Save settings</button></div>`;
+}
+
+/* ============ HOMEOWNER QUOTE PAGE ============ */
+let Q={};
+function quotePage(){
+  const o=DB.operator;Q={step:1,timing:null,date:"",kind:null};
+  $("#app").innerHTML=`<header class="border-b" style="border-color:var(--border)"><div class="max-w-xl mx-auto px-5 py-5"><div class="display text-2xl">${o.business_name}</div><a href="tel:${o.phone}" class="ice text-sm">${o.phone}</a></div></header>
+  <main class="max-w-xl mx-auto px-5 py-8"><div id="qs"></div><p class="text-center text-xs muted mt-12">Powered by SnowLine by Boss Growth Machine</p></main>`;
+  qStep();
+}
+function steps(n){return `<div class="flex gap-1 mb-6">${[1,2,3,4,5].map(i=>`<div class="h-1.5 flex-1 rounded-full" style="background:${i<=n?"var(--orange)":"var(--muted)"}"></div>`).join("")}</div>`}
+function qStep(){
+  const o=DB.operator,p=DB.pricing,el=$("#qs");
+  if(Q.step===1){el.innerHTML=`${steps(1)}<h1 class="display text-3xl">When do you need us?</h1><div class="grid gap-3 mt-6">
+    <button class="choice ${Q.timing==="Plow Now"?"on":""}" onclick="Q.timing='Plow Now';qStep()"><div class="font-bold text-lg">Plow Now</div><div class="muted text-sm">As soon as a truck can get there${p.rush?` (+${money(p.rush)} rush fee)`:""}</div></button>
+    <button class="choice ${Q.timing==="Scheduled"?"on":""}" onclick="Q.timing='Scheduled';qStep()"><div class="font-bold text-lg">Schedule Ahead</div><div class="muted text-sm">Pick a day</div></button></div>
+    ${Q.timing==="Scheduled"?`<input type="date" class="input mt-4" value="${Q.date}" onchange="Q.date=this.value">`:""}
+    <button class="btn btn-orange w-full mt-6" ${!Q.timing?"disabled":""} onclick="if(Q.timing==='Scheduled'&&!Q.date){toast('Pick a date');return}Q.step=2;qStep()">Next</button>`;}
+  else if(Q.step===2){el.innerHTML=`${steps(2)}<h1 class="display text-3xl">Who is this for?</h1><div class="grid gap-3 mt-6">
+    <button class="choice" onclick="Q.kind='home';Q.step=3;qStep()"><div class="font-bold text-lg">My home</div><div class="muted text-sm">Driveway, walkway, steps</div></button>
+    <button class="choice" onclick="Q.kind='biz';Q.step=3;qStep()"><div class="font-bold text-lg">A business or commercial property</div><div class="muted text-sm">Parking lots, offices, apartment complexes</div></button></div>
+    <button class="btn btn-ghost w-full mt-4" onclick="Q.step=1;qStep()">Back</button>`;}
+  else if(Q.step===3&&Q.kind==="biz"){el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Tell us about your property</h1><p class="muted mt-2">Commercial properties get a custom quote on a quick call.</p>
+    <form id="bizf" class="grid gap-4 mt-6"><input class="input" name="company" placeholder="Company name" required><input class="input" name="contact" placeholder="Your name and phone" required>
+    <input class="input" name="property" placeholder="Property type (lot size, number of spaces)"><input class="input" name="location" placeholder="Address or city and ZIP" required><textarea class="input" name="notes" rows="2" placeholder="Anything we should know?"></textarea>
+    <button class="btn btn-orange">Request a partner call</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">Back</button></form>`;
+    $("#bizf").onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));DB.partners.unshift({id:Date.now(),...f,created:new Date().toISOString()});save();
+      el.innerHTML=`${steps(5)}<div class="card p-8 text-center"><div class="display text-3xl">Got it!</div><p class="muted mt-3">${o.business_name} will reach out during partner call hours:</p><p class="font-bold text-lg mt-2">${o.partner_call_hours}</p>
+      <div class="todo mt-6 text-left">Businesses never get an instant price. This request now shows in the operator's Partners tab.</div><a href="#/dashboard/partners" class="btn btn-ghost mt-6">See it in the operator dashboard →</a></div>`;};}
+  else if(Q.step===3){el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Your details</h1>
+    <form id="homef" class="grid gap-4 mt-6"><input class="input" name="name" placeholder="Full name" required>
+    <div class="grid grid-cols-2 gap-3"><input class="input" name="phone" placeholder="Phone" required><input class="input" name="email" type="email" placeholder="Email"></div>
+    <input class="input" name="address" placeholder="Service address" required><input class="input" name="zip" placeholder="ZIP code" inputmode="numeric" pattern="\\d{5}" required>
+    <div><div class="text-sm mb-2">Driveway size</div><div class="grid grid-cols-3 gap-2">${[["1-car","one_car"],["2-car","two_car"],["3+ car / long","three_car"]].map(([l,k],i)=>`<label><input type="radio" name="size" value="${l}" class="peer hidden" ${i===1?"checked":""}><span class="choice block text-center peer-checked:border-[var(--orange)] peer-checked:bg-[color-mix(in_oklab,var(--orange)_10%,var(--card))] !p-3"><b>${l}</b><br><span class="muted text-xs">${money(p[k])}</span></span></label>`).join("")}</div></div>
+    <div><div class="text-sm mb-2">Add-ons</div><label class="flex justify-between card p-4 mb-2"><span><input type="checkbox" name="addons" value="Walkway" class="mr-2 w-4 h-4">Walkway / sidewalk</span><span class="muted">+${money(p.walkway)}</span></label>
+    <label class="flex justify-between card p-4"><span><input type="checkbox" name="addons" value="Salt / de-ice" class="mr-2 w-4 h-4">Salt / de-ice</span><span class="muted">+${money(p.salt)}</span></label></div>
+    <textarea class="input" name="notes" rows="2" placeholder="Notes (gate code, where to pile snow...)"></textarea>
+    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" name="sms" class="mt-1 w-5 h-5"><span>[TEXT-MESSAGE CONSENT WORDING — waiting on attorney]</span></label>
+    <button class="btn btn-orange">See my price</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">Back</button></form>`;
+    $("#homef").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const size=f.get("size"),addons=f.getAll("addons");
+      const base={"1-car":p.one_car,"2-car":p.two_car,"3+ car / long":p.three_car}[size];
+      const lines=[[size+" driveway",base]];addons.forEach(a=>lines.push([a,a==="Walkway"?p.walkway:p.salt]));if(Q.timing==="Plow Now"&&p.rush)lines.push(["Plow Now rush fee",p.rush]);
+      const total=lines.reduce((s,l)=>s+Number(l[1]),0);const deposit=p.deposit_type==="percent"?total*p.deposit_value/100:Math.min(p.deposit_value,total);
+      const zip=f.get("zip");const outside=!o.service_zip_codes.includes(zip);
+      Q.job={id:Date.now(),type:Q.timing,date:Q.timing==="Scheduled"?Q.date:"",name:f.get("name"),phone:f.get("phone"),email:f.get("email"),address:f.get("address"),zip,size,addons,total,deposit,status:"New",created:new Date().toISOString(),outside,notes:f.get("notes"),sms:!!f.get("sms")};
+      Q.lines=lines;DB.jobs.unshift(Q.job);save();Q.step=4;qStep();};}
+  else if(Q.step===4){const j=Q.job;el.innerHTML=`${steps(4)}<h1 class="display text-3xl">Your price</h1>
+    <div class="card p-6 mt-6">${Q.lines.map(l=>`<div class="flex justify-between py-2"><span>${l[0]}</span><span>${money(l[1])}</span></div>`).join("")}
+    <div class="flex justify-between pt-4 mt-2 border-t text-xl font-bold" style="border-color:var(--border)"><span>Total</span><span>${money(j.total)}</span></div>
+    <div class="flex justify-between mt-4 p-4 rounded-xl" style="background:color-mix(in oklab,var(--orange) 15%,var(--card))"><span class="font-bold">Deposit due now</span><span class="display text-2xl orange">${money(j.deposit)}</span></div>
+    <p class="muted text-sm mt-3">${j.type==="Scheduled"?"Scheduled for "+j.date:"Plow Now: you're added to today's route"}. Balance due after service.</p></div>
+    ${j.outside?`<div class="card p-4 mt-4" style="border-color:var(--yellow)"><b class="text-[var(--yellow)]">Heads up:</b> ZIP ${j.zip} is outside ${o.business_name}'s usual area. Your request is saved, and they'll confirm if they can serve you.</div>`:""}
+    <button class="btn btn-orange w-full mt-6 text-lg" onclick="acceptQuote()">Accept quote and pay deposit</button>`;}
+  else if(Q.step===5){const j=Q.job;el.innerHTML=`${steps(5)}<div class="card p-8 text-center"><div class="display text-3xl">You're on the list!</div>
+    <p class="muted mt-3">${o.deposit_payment_link?"Your deposit page opened in a new tab. Once it's paid, "+o.business_name+" will confirm by text.":"The operator will text you a deposit link."}</p>
+    <div class="todo mt-6 text-left">IN THE REAL APP: this job is saved, shows in the operator's dashboard as "Quoted, accepted, deposit pending", and is sent to his Boss Growth Machine inbox so the AI follows up by text. Opening the payment page never marks a deposit paid. The operator confirms that.</div>
+    <a href="#/dashboard" class="btn btn-ghost mt-6">See this job in the operator dashboard →</a></div>`;}
+}
+function acceptQuote(){Q.job.status="Quoted";Q.job.accepted=true;save();if(DB.operator.deposit_payment_link)window.open(DB.operator.deposit_payment_link,"_blank");Q.step=5;qStep()}
+
+route();
+</script>
+</body>
+</html>
