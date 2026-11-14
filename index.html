@@ -9,6 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>try{var t=localStorage.getItem("snowline_theme")||"dark";if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.classList.add("light")}catch(e){}</script>
 <style>
   :root{
     --bg:oklch(0.18 0.04 255); --fg:oklch(0.97 0.01 230); --card:oklch(0.23 0.045 255);
@@ -16,7 +19,20 @@
     --orange:oklch(0.7 0.19 45); --border:oklch(0.85 0.08 225 / 18%); --input:oklch(0.85 0.08 225 / 25%);
     --red:oklch(0.7 0.19 22); --green:oklch(0.75 0.15 150); --yellow:oklch(0.85 0.15 90);
   }
+  html.light{
+    --bg:oklch(0.98 0.006 240); --fg:oklch(0.22 0.04 255); --card:oklch(1 0 0);
+    --muted:oklch(0.94 0.012 240); --mfg:oklch(0.46 0.03 250); --ice:oklch(0.5 0.13 240);
+    --orange:oklch(0.66 0.19 45); --border:oklch(0.3 0.05 255 / 13%); --input:oklch(0.3 0.05 255 / 28%);
+    --red:oklch(0.58 0.2 25); --green:oklch(0.55 0.15 150); --yellow:oklch(0.62 0.14 75);
+  }
   html,body{background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif}
+  .leaflet-container{background:var(--muted)!important;font-family:Archivo,sans-serif}
+  .appt{border-radius:.6rem;padding:.45rem .6rem;font-size:.78rem;text-align:left;width:100%;border-left:4px solid}
+  .appt.red{background:oklch(0.7 0.19 22 / 16%);border-color:var(--red)}
+  .appt.green{background:oklch(0.75 0.15 150 / 16%);border-color:var(--green)}
+  .seg{display:inline-flex;border:1px solid var(--input);border-radius:.75rem;overflow:hidden}
+  .seg button{padding:.6rem 1rem;font-weight:600;font-size:.9rem}
+  .seg button.on{background:var(--orange);color:oklch(0.15 0.03 255)}
   .display{font-family:"Archivo Black",Archivo,sans-serif;letter-spacing:-.01em}
   .snow-bg{background:radial-gradient(ellipse at top right,color-mix(in oklab,var(--ice) 18%,transparent),transparent 60%),var(--bg)}
   .card{background:var(--card);border:1px solid var(--border);border-radius:1rem}
@@ -70,9 +86,12 @@
 const SEED = {
   operator: {
     business_name: "Sean's Plowing (sample)", owner_name: "Sean Dean", phone: "(513) 555-0142",
-    email: "sean@example.com", slug: "seans-plowing", deposit_payment_link: "https://example.com/deposit",
-    service_zip_codes: ["45202","45211","45238","45248"], partner_call_hours: "Mon–Fri, 1–3 pm", active: true,
-    bgm_webhook_url: ""
+    email: "sean@example.com", slug: "seans-plowing", state: "OH", home_base: "Cincinnati, OH",
+    deposit_payment_link: "https://pay.example.com/seans-plowing/deposit",
+    bgm_webhook_url: "https://hooks.example.com/seans-plowing/jobs",
+    service_zip_codes: ["45202","45211","45238","45248"], active: true,
+    business_hours: { Mon:["07:00","19:00"], Tue:["07:00","19:00"], Wed:["07:00","19:00"], Thu:["07:00","19:00"], Fri:["07:00","19:00"], Sat:["08:00","16:00"], Sun:null },
+    partner_days: ["Mon","Tue","Wed","Thu","Fri"], partner_start: "13:00", partner_end: "15:00", partner_slot: 30
   },
   pricing: { one_car: 45, two_car: 65, three_car: 95, walkway: 20, salt: 25, rush: 30, deposit_type: "percent", deposit_value: 50 },
   jobs: [
@@ -84,13 +103,16 @@ const SEED = {
     {id:106,type:"Scheduled",date:"2026-11-05",name:"Keith Moore",phone:"(513) 555-0170",email:"",address:"5 Pine Ct",zip:"45202",size:"1-car",addons:[],total:45,deposit:22.5,status:"Done",created:ago(6),outside:false,notes:""}
   ],
   partners: [
-    {id:201,company:"Westside Medical Plaza",contact:"Linda Park, (513) 555-0122",property:"Medical office lot (60 spaces)",location:"Cincinnati, 45238",notes:"Needs cleared by 6:30am on clinic days",created:ago(2)}
+    {id:201,company:"Westside Medical Plaza",contact:"Linda Park",phone:"(513) 555-0122",can_text:true,email:"linda@westsidemed.example",property:"Medical office lot (60 spaces)",location:"Cincinnati, 45238",notes:"Needs cleared by 6:30am on clinic days",created:ago(1),requested:slotAt(1,"13:30"),status:"requested",log:[[ago(1),"Request received from the quote page. Thank-you message sent automatically."]]},
+    {id:202,company:"Oak Hills Apartments",contact:"Marcus Reed",phone:"(513) 555-0161",can_text:false,email:"office@oakhillsapts.example",property:"Apartment complex, 2 lots + sidewalks",location:"Cincinnati, 45248",notes:"Office line is a landline",created:ago(3),requested:slotAt(2,"14:00"),status:"reschedule_sent",proposed:slotAt(3,"13:00"),log:[[ago(3),"Request received from the quote page. Thank-you message sent automatically."],[ago(2),"Operator asked to reschedule. This number can't get texts, so the message went by email to office@oakhillsapts.example."]]},
+    {id:203,company:"St. Mark Church",contact:"Rev. Alan Brooks",phone:"(513) 555-0108",can_text:true,email:"alan@stmark.example",property:"Church lot (120 spaces), Sunday mornings",location:"Cincinnati, 45211",notes:"",created:ago(5),requested:slotAt(4,"13:00"),status:"confirmed",final:slotAt(4,"13:00"),log:[[ago(5),"Request received from the quote page. Thank-you message sent automatically."],[ago(4),"Operator confirmed the call."]]}
   ],
   feedback: [],
   demos: []
 };
 function ago(days){return new Date(Date.now()-days*864e5).toISOString()}
-const KEY="snowline_preview_v1";
+function slotAt(daysAhead,hm){const d=new Date();d.setDate(d.getDate()+daysAhead);while([0,6].includes(d.getDay()))d.setDate(d.getDate()+1);const[h,m]=hm.split(":");d.setHours(+h,+m,0,0);return d.toISOString()}
+const KEY="snowline_preview_v2";
 let DB = load();
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||structuredClone(SEED)}catch(e){return structuredClone(SEED)}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
@@ -155,6 +177,23 @@ function landing(){
   <section class="max-w-6xl mx-auto px-5 py-16 grid md:grid-cols-2 gap-6">
     <div class="card p-8"><h2 class="display text-2xl">Built for the cab</h2><p class="muted mt-3">The system answers calls and messages for you, so you never touch a phone while driving. Both hands on the wheel, blade on the pavement.</p></div>
     <div class="card p-8"><h2 class="display text-2xl">Backed by a real team</h2><p class="muted mt-3">Behind the software is the Boss Growth Machine team. We handle setup and support, so you're not figuring it out alone.</p></div>
+  </section>
+
+  <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">How we compare</h2>
+    <p class="muted mt-2">Everything a plow operator needs to answer, quote and book, in one price.</p>
+    <div class="card mt-8 overflow-x-auto"><table class="w-full text-sm min-w-[760px]">
+      <thead><tr class="text-left">${["","SnowLine","Jobber","QuoteIQ","Plowdesk","Service Autopilot"].map((h,i)=>`<th class="p-4 ${i===1?"orange display text-base":"font-bold"}" ${i===1?'style="background:color-mix(in oklab,var(--orange) 10%,transparent)"':""}>${h}</th>`).join("")}</tr></thead>
+      <tbody>${[
+        ["Starting price","$98/mo, all in","$49/mo, AI desk +$29/mo","$29.99/mo; instant quotes at $299.99/mo","Free for 3 routes; $95/mo","$49/mo + $97 setup"],
+        ["QR code on the truck to instant price","✓","Online requests","Top plans only","Customer portal (paid)","Not listed"],
+        ["Deposit taken at booking","✓","✓","✓","Paid plan","✓"],
+        ["AI answers calls, texts and DMs","✓ Included","Add-on, 30 chats/mo","Add-on, per credit","Not listed","Not listed"],
+        ["\"Book before the storm\" alerts","✓","Not listed","Not listed","Weather for scheduling","Not listed"],
+        ["Business calls on a confirm/reschedule calendar","✓","Not listed","Not listed","Not listed","Not listed"],
+        ["Service area by ZIP on a map","✓","Not listed","Not listed","Not listed","Not listed"],
+        ["Works for landscaping in spring","✓","✓","✓","Snow only","✓"]
+      ].map(r=>`<tr class="border-t" style="border-color:var(--border)">${r.map((c,i)=>`<td class="p-4 ${i===0?"font-bold":i===1?"font-bold":"muted"}" ${i===1?'style="background:color-mix(in oklab,var(--orange) 10%,transparent)"':""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="muted text-xs mt-3">Competitor details come from public pricing pages and software reviews, checked November 2026. "Not listed" means we couldn't find it in their published plans. Prices change, so check each company's site.</p>
   </section>
 
   <section class="max-w-3xl mx-auto px-5 py-16"><h2 class="display text-3xl">Questions</h2><div class="mt-6 space-y-3">
@@ -251,17 +290,6 @@ function tabPricing(){
   <button class="btn btn-orange mt-5 w-full sm:w-auto" onclick="document.querySelectorAll('[data-k]').forEach(i=>DB.pricing[i.dataset.k]=Number(i.value));save();toast('Prices saved')">Save prices</button>
   <p class="muted text-sm mt-3">Tip: change a price, save, then open the homeowner quote page. The quote updates right away.</p>`;
 }
-function tabAreas(){
-  const z=DB.operator.service_zip_codes;
-  $("#tab").innerHTML=`<div class="card p-5 max-w-xl"><h2 class="font-bold text-lg">ZIP codes you serve</h2><p class="muted text-sm mt-1">Requests from other ZIP codes still come in, flagged "Outside area".</p>
-  <form class="flex gap-2 mt-4" onsubmit="event.preventDefault();const v=this.zip.value.trim();if(/^\\d{5}$/.test(v)&&!DB.operator.service_zip_codes.includes(v)){DB.operator.service_zip_codes.push(v);save();tabAreas()}else toast('Enter a new 5-digit ZIP')"><input name="zip" class="input" placeholder="Add a ZIP code" inputmode="numeric"><button class="btn btn-orange">Add</button></form>
-  <div class="flex flex-wrap gap-2 mt-5">${z.map(x=>`<span class="chip flex items-center gap-2">${x}<button onclick="DB.operator.service_zip_codes=DB.operator.service_zip_codes.filter(y=>y!=='${x}');save();tabAreas()" class="muted text-lg leading-none">×</button></span>`).join("")}</div></div>`;
-}
-function tabPartners(){
-  $("#tab").innerHTML=`<div class="card p-5 mb-4"><div class="muted text-xs">Your partner call hours</div><div class="font-bold mt-1">${DB.operator.partner_call_hours}</div></div>
-  <div class="grid gap-3">${DB.partners.map(p=>`<div class="card p-5"><div class="flex justify-between"><div class="font-bold">${p.company}</div><span class="muted text-xs">${new Date(p.created).toLocaleDateString()}</span></div>
-  <div class="text-sm mt-2"><span class="muted">Contact:</span> ${p.contact}</div><div class="text-sm"><span class="muted">Property:</span> ${p.property}</div><div class="text-sm"><span class="muted">Location:</span> ${p.location}</div>${p.notes?`<div class="text-sm mt-2 muted">"${p.notes}"</div>`:""}</div>`).join("")||`<p class="muted">No business requests yet.</p>`}</div>`;
-}
 function tabLink(){
   const url=location.origin+location.pathname+"#/q/"+DB.operator.slug;
   $("#tab").innerHTML=`<div class="card p-6 max-w-xl"><h2 class="font-bold text-lg">Your quote link</h2>
@@ -272,22 +300,209 @@ function tabLink(){
   try{new QRCode(document.getElementById("qr"),{text:url,width:220,height:220})}catch(e){$("#qr").textContent="QR code loads here"}
 }
 function dlQR(){const c=document.querySelector("#qr canvas"),i=document.querySelector("#qr img");const a=document.createElement("a");a.download="snowline-qr.png";a.href=c?c.toDataURL("image/png"):(i?i.src:"");a.click()}
-function tabFeedback(){
-  $("#tab").innerHTML=`<div class="card p-6 max-w-xl"><h2 class="font-bold text-lg">Beta feedback</h2><p class="muted text-sm">Fill this out once a week and after every storm.</p>
-  <form id="fb" class="grid gap-4 mt-5"><textarea name="worked" class="input" rows="2" placeholder="What worked?"></textarea><textarea name="broke" class="input" rows="2" placeholder="What broke?"></textarea><textarea name="missing" class="input" rows="2" placeholder="What's missing?"></textarea>
-  <div><div class="text-sm mb-2">How's it going, 1 to 10?</div><div class="grid grid-cols-10 gap-1">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<label class="text-center"><input type="radio" name="score" value="${n}" class="peer hidden" required><span class="block py-3 rounded-lg border cursor-pointer peer-checked:bg-[var(--orange)] peer-checked:text-black font-bold" style="border-color:var(--input)">${n}</span></label>`).join("")}</div></div>
-  <button class="btn btn-orange">Send feedback</button></form>
-  <p class="muted text-sm mt-4">${DB.feedback.length} feedback entries sent in this preview.</p></div>`;
-  $("#fb").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);DB.feedback.push(Object.fromEntries(f));save();toast("Thanks! Feedback saved");tabFeedback()};
+/* ---------- SERVICE AREAS (map) ---------- */
+const STATES={OH:"Ohio",NY:"New York",PA:"Pennsylvania",MI:"Michigan",IN:"Indiana",IL:"Illinois",WI:"Wisconsin",MN:"Minnesota",MA:"Massachusetts",NH:"New Hampshire",VT:"Vermont",ME:"Maine",CT:"Connecticut",NJ:"New Jersey"};
+let ZIPGEO=null,MAP=null,ZLAYER=null,LASSO=false,ZIDX={};
+async function loadZips(){if(ZIPGEO)return ZIPGEO;const r=await fetch("oh-zips.json");ZIPGEO=await r.json();ZIPGEO.features.forEach(f=>ZIDX[f.properties.zip]=f);return ZIPGEO}
+function zipStyle(z){const on=DB.operator.service_zip_codes.includes(z);const cs=getComputedStyle(document.documentElement);
+  return {color:on?cs.getPropertyValue("--orange"):cs.getPropertyValue("--ice"),weight:on?2:.6,opacity:on?1:.55,fillColor:cs.getPropertyValue("--orange"),fillOpacity:on?.45:.02}}
+function tabAreas(){
+  const o=DB.operator;
+  $("#tab").innerHTML=`<div class="grid lg:grid-cols-[1fr_320px] gap-4">
+   <div class="card p-3 sm:p-4">
+    <div class="flex flex-wrap gap-2 items-center">
+      <select id="stSel" class="input !w-auto !min-h-[44px]" onchange="if(this.value!=='OH'){toast(STATES[this.value]+' map loads in the full app. Preview has Ohio only.');this.value='OH'}">${Object.entries(STATES).map(([k,v])=>`<option value="${k}" ${k===o.state?"selected":""}>${v}</option>`).join("")}</select>
+      <div class="relative flex-1 min-w-[200px]"><input id="zsearch" class="input !min-h-[44px]" placeholder="Search a city or ZIP code" autocomplete="off" oninput="zipSearch(this.value)"><div id="zres" class="absolute z-[1000] left-0 right-0 mt-1 card hidden max-h-72 overflow-auto"></div></div>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <button id="lassoBtn" class="btn btn-ghost !min-h-[42px] text-sm" onclick="toggleLasso()">✏️ Circle an area</button>
+      <button class="btn btn-ghost !min-h-[42px] text-sm" onclick="fitSelected()">Zoom to my areas</button>
+      <button class="btn btn-ghost !min-h-[42px] text-sm" onclick="if(confirm('Remove every ZIP code from your service area?')){DB.operator.service_zip_codes=[];save();restyle();areaList()}">Clear all</button>
+    </div>
+    <p id="mapHint" class="muted text-xs mt-2">Tap a ZIP on the map to add or remove it. Pinch or scroll to zoom.</p>
+    <div id="map" class="mt-2 rounded-xl overflow-hidden" style="height:min(62vh,560px)"></div>
+   </div>
+   <div class="card p-4" id="areaList"></div>
+  </div>`;
+  areaList();
+  loadZips().then(drawMap).catch(()=>{$("#map").innerHTML=`<div class="p-6 muted text-sm">Map data couldn't load. Open the preview from its web link, not as a downloaded file.</div>`});
 }
+function drawMap(g){
+  if(MAP){try{MAP.remove()}catch(e){}MAP=null}
+  MAP=L.map("map",{preferCanvas:true,zoomSnap:.5});
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/"+(document.documentElement.classList.contains("light")?"light_all":"dark_all")+"/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",maxZoom:16}).addTo(MAP);
+  ZLAYER=L.geoJSON(g,{style:f=>zipStyle(f.properties.zip),onEachFeature:(f,l)=>{
+    l.bindTooltip(`<b>${f.properties.zip}</b> · ${f.properties.city}`,{sticky:true});
+    l.on("click",()=>{if(LASSO)return;toggleZip(f.properties.zip)});
+  }}).addTo(MAP);
+  DB.operator.service_zip_codes.length?fitSelected():MAP.fitBounds(ZLAYER.getBounds());
+}
+function restyle(){if(ZLAYER)ZLAYER.eachLayer(l=>l.setStyle(zipStyle(l.feature.properties.zip)))}
+function toggleZip(z,force){const s=DB.operator.service_zip_codes,has=s.includes(z),want=force===undefined?!has:force;
+  if(want&&!has)s.push(z);if(!want&&has)s.splice(s.indexOf(z),1);save();restyle();areaList()}
+function fitSelected(){if(!ZLAYER)return;const b=L.latLngBounds([]);ZLAYER.eachLayer(l=>{if(DB.operator.service_zip_codes.includes(l.feature.properties.zip))b.extend(l.getBounds())});b.isValid()?MAP.fitBounds(b,{padding:[20,20]}):MAP.fitBounds(ZLAYER.getBounds())}
+function zipSearch(q){
+  const box=$("#zres");q=q.trim().toLowerCase();if(!q||!ZIPGEO){box.classList.add("hidden");return}
+  const feats=ZIPGEO.features;let html="";
+  if(/^\d{3,5}$/.test(q)){feats.filter(f=>f.properties.zip.startsWith(q)).slice(0,8).forEach(f=>{const p=f.properties,on=DB.operator.service_zip_codes.includes(p.zip);
+    html+=`<div class="flex justify-between items-center gap-2 px-3 py-2 border-b" style="border-color:var(--border)"><button class="text-left flex-1" onclick="zoomZip('${p.zip}')"><b>${p.zip}</b> <span class="muted">${p.city}</span></button><button class="chip ${on?"on":""}" onclick="toggleZip('${p.zip}');zipSearch($('#zsearch').value)">${on?"Added":"Add"}</button></div>`})}
+  else{const cities={};feats.forEach(f=>{const c=f.properties.city;if(c.toLowerCase().includes(q))(cities[c]=cities[c]||[]).push(f.properties.zip)});
+    Object.entries(cities).sort((a,b)=>a[0].toLowerCase().indexOf(q)-b[0].toLowerCase().indexOf(q)||b[1].length-a[1].length).slice(0,8).forEach(([c,zs])=>{const n=zs.filter(z=>DB.operator.service_zip_codes.includes(z)).length;
+    html+=`<div class="px-3 py-2 border-b" style="border-color:var(--border)"><div class="flex justify-between items-center gap-2"><button class="text-left" onclick="zoomCity('${c}')"><b>${c}</b> <span class="muted text-xs">${zs.length} ZIP${zs.length>1?"s":""}${n?` · ${n} added`:""}</span></button>
+    <button class="chip ${n===zs.length?"on":""}" onclick="cityAll('${c}',${n!==zs.length})">${n===zs.length?"All added":"Add all"}</button></div>
+    <div class="flex flex-wrap gap-1 mt-2">${zs.map(z=>`<button class="chip !py-1 !px-2 text-xs ${DB.operator.service_zip_codes.includes(z)?"on":""}" onclick="toggleZip('${z}');zipSearch($('#zsearch').value)">${z}</button>`).join("")}</div></div>`})}
+  box.innerHTML=html||`<div class="px-3 py-3 muted text-sm">No match in ${STATES[DB.operator.state]}.</div>`;box.classList.remove("hidden");
+}
+function zoomZip(z){const l=ZLAYER&&ZLAYER.getLayers().find(l=>l.feature.properties.zip===z);if(l){MAP.fitBounds(l.getBounds(),{maxZoom:13});l.openTooltip()}$("#zres").classList.add("hidden")}
+function zoomCity(c){const b=L.latLngBounds([]);ZLAYER.eachLayer(l=>{if(l.feature.properties.city===c)b.extend(l.getBounds())});if(b.isValid())MAP.fitBounds(b,{padding:[20,20]});$("#zres").classList.add("hidden")}
+function cityAll(c,add){ZIPGEO.features.filter(f=>f.properties.city===c).forEach(f=>toggleZip(f.properties.zip,add));zipSearch($("#zsearch").value);toast(add?`Added all of ${c}`:`Removed ${c}`)}
+function toggleLasso(){LASSO=!LASSO;$("#lassoBtn").classList.toggle("btn-orange",LASSO);$("#lassoBtn").classList.toggle("btn-ghost",!LASSO);
+  $("#mapHint").textContent=LASSO?"Draw a circle around the area with your finger or mouse. Every ZIP inside gets added.":"Tap a ZIP on the map to add or remove it. Pinch or scroll to zoom.";
+  if(!MAP)return;LASSO?MAP.dragging.disable():MAP.dragging.enable();
+  const el=MAP.getContainer();el.style.touchAction=LASSO?"none":"";
+  if(LASSO){let pts=[],line=null;
+    el.onpointerdown=e=>{pts=[MAP.mouseEventToLatLng(e)];line=L.polyline(pts,{color:getComputedStyle(document.documentElement).getPropertyValue("--orange"),weight:3,dashArray:"6 6"}).addTo(MAP);el.setPointerCapture(e.pointerId)};
+    el.onpointermove=e=>{if(!line)return;pts.push(MAP.mouseEventToLatLng(e));line.setLatLngs(pts)};
+    el.onpointerup=()=>{if(!line)return;const poly=pts.map(p=>[p.lng,p.lat]);MAP.removeLayer(line);line=null;let n=0;
+      if(poly.length>4)ZLAYER.eachLayer(l=>{const c=l.getBounds().getCenter();if(inPoly([c.lng,c.lat],poly)&&!DB.operator.service_zip_codes.includes(l.feature.properties.zip)){DB.operator.service_zip_codes.push(l.feature.properties.zip);n++}});
+      save();restyle();areaList();toast(n?`Added ${n} ZIP code${n>1?"s":""}`:"No new ZIP codes inside that circle");toggleLasso()};
+  }else{el.onpointerdown=el.onpointermove=el.onpointerup=null}
+}
+function inPoly(pt,vs){let x=pt[0],y=pt[1],inside=false;for(let i=0,j=vs.length-1;i<vs.length;j=i++){const xi=vs[i][0],yi=vs[i][1],xj=vs[j][0],yj=vs[j][1];if(((yi>y)!=(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))inside=!inside}return inside}
+function areaList(){
+  const s=DB.operator.service_zip_codes,by={};s.forEach(z=>{const c=ZIDX[z]?ZIDX[z].properties.city:"";(by[c]=by[c]||[]).push(z)});
+  const el=$("#areaList");if(!el)return;
+  el.innerHTML=`<h2 class="font-bold text-lg">Your service area</h2><p class="muted text-sm">${s.length} ZIP code${s.length===1?"":"s"} in ${STATES[DB.operator.state]}. Requests from anywhere else still come in, flagged "Outside area".</p>
+  <div class="mt-4 grid gap-3">${Object.entries(by).sort().map(([c,zs])=>`<div><div class="text-sm font-bold">${c||"Loading..."}</div><div class="flex flex-wrap gap-1 mt-1">${zs.sort().map(z=>`<span class="chip !py-1 !px-2 text-xs flex items-center gap-1">${z}<button onclick="toggleZip('${z}')" class="muted">×</button></span>`).join("")}</div></div>`).join("")||`<p class="muted text-sm">Nothing yet. Search your city or circle an area on the map.</p>`}</div>`;
+}
+
+/* ---------- PARTNERS (call calendar) ---------- */
+let weekStart=startOfWeek(new Date());
+function startOfWeek(d){d=new Date(d);d.setHours(0,0,0,0);return d}
+const fmtD=iso=>new Date(iso).toLocaleDateString([], {weekday:"short",month:"short",day:"numeric"});
+const fmtT=iso=>new Date(iso).toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+const fmtDT=iso=>fmtD(iso)+" at "+fmtT(iso);
+function apptTime(p){return p.status==="confirmed"?p.final:p.status==="reschedule_sent"?p.proposed:p.requested}
+function apptColor(p){return p.status==="confirmed"?"green":"red"}
+function apptLabel(p){return {requested:"Needs your answer",reschedule_sent:"New time sent, waiting on them",confirmed:"Confirmed",rejected:"Rejected"}[p.status]}
+function tabPartners(){
+  const o=DB.operator,days=[...Array(7)].map((_,i)=>{const d=new Date(weekStart);d.setDate(d.getDate()+i);return d});
+  const live=DB.partners.filter(p=>p.status!=="rejected"),open=live.filter(p=>p.status!=="confirmed");
+  $("#tab").innerHTML=`
+  <div class="flex flex-wrap gap-3 items-center justify-between">
+    <div class="flex items-center gap-2"><button class="btn btn-ghost !min-h-[40px] px-3" onclick="weekStart.setDate(weekStart.getDate()-7);tabPartners()">◀</button>
+    <div class="font-bold">${fmtD(days[0].toISOString())} – ${fmtD(days[6].toISOString())}</div>
+    <button class="btn btn-ghost !min-h-[40px] px-3" onclick="weekStart.setDate(weekStart.getDate()+7);tabPartners()">▶</button></div>
+    <div class="flex gap-3 text-xs"><span class="flex items-center gap-1"><i class="w-3 h-3 rounded-sm inline-block" style="background:var(--red)"></i>Not confirmed</span><span class="flex items-center gap-1"><i class="w-3 h-3 rounded-sm inline-block" style="background:var(--green)"></i>Confirmed</span></div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-7 gap-2 mt-4">${days.map(d=>{const items=live.filter(p=>new Date(apptTime(p)).toDateString()===d.toDateString()).sort((a,b)=>new Date(apptTime(a))-new Date(apptTime(b)));const today=d.toDateString()===new Date().toDateString();
+    return `<div class="card p-2 min-h-[90px] ${items.length?"":"hidden sm:block"}" ${today?'style="border-color:var(--orange)"':""}><div class="text-xs font-bold ${today?"orange":"muted"} mb-2">${d.toLocaleDateString([], {weekday:"short",day:"numeric"})}</div>
+    <div class="grid gap-1">${items.map(p=>`<button class="appt ${apptColor(p)}" onclick="openPartner(${p.id})"><b>${fmtT(apptTime(p))}</b><br>${p.company}</button>`).join("")}</div></div>`}).join("")}</div>
+  ${live.filter(p=>{const t=new Date(apptTime(p));return t>=days[0]&&t<new Date(days[6].getTime()+864e5)}).length?"":`<p class="muted text-sm mt-3">No partner calls this week.</p>`}
+  <h2 class="font-bold text-lg mt-8">Needs your answer <span class="pill" style="background:oklch(0.7 0.19 22 / 20%);color:var(--red)">${open.length}</span></h2>
+  <div class="grid gap-2 mt-3">${open.map(p=>`<button class="card p-4 text-left flex justify-between gap-3 items-center" onclick="openPartner(${p.id})"><div><div class="font-bold">${p.company}</div><div class="muted text-sm">${p.property}</div><div class="text-sm mt-1">${fmtDT(apptTime(p))}</div></div><span class="pill" style="background:oklch(0.7 0.19 22 / 20%);color:var(--red)">${apptLabel(p)}</span></button>`).join("")||`<p class="muted text-sm">You're all caught up.</p>`}</div>
+  <div class="card p-4 mt-6 text-sm"><span class="muted">Partner call hours:</span> <b>${o.partner_days.join(", ")}, ${t12(o.partner_start)}–${t12(o.partner_end)}</b> · <a href="#/dashboard/settings" class="underline ice">Change</a></div>
+  ${DB.partners.some(p=>p.status==="rejected")?`<details class="mt-4"><summary class="muted text-sm cursor-pointer">Rejected requests (${DB.partners.filter(p=>p.status==="rejected").length})</summary><div class="grid gap-2 mt-2">${DB.partners.filter(p=>p.status==="rejected").map(p=>`<button class="card p-3 text-left text-sm" onclick="openPartner(${p.id})">${p.company} · ${p.property}</button>`).join("")}</div></details>`:""}`;
+}
+function t12(hm){const[h,m]=hm.split(":").map(Number);return `${(h%12)||12}${m?":"+String(m).padStart(2,"0"):""}${h<12?"am":"pm"}`}
+function slotOptions(){const o=DB.operator,out=[];const[sh,sm]=o.partner_start.split(":").map(Number),[eh,em]=o.partner_end.split(":").map(Number);for(let t=sh*60+sm;t+o.partner_slot<=eh*60+em;t+=o.partner_slot)out.push(String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0"));return out}
+function rescheduleMsg(p,newIso){const first=p.contact.replace(/^(Rev\.|Dr\.|Mr\.|Ms\.|Mrs\.)\s*/,"").split(" ")[0];
+  return `Hi ${first}, thank you so much for requesting to talk with ${DB.operator.business_name} about snow removal for ${p.property} in ${p.location} on ${fmtDT(p.requested)}. We're unable to meet at that time, but we would love to talk with you on ${fmtDT(newIso)}. Are you available then?`}
+function partnerDlg(html){const d=$("#jobdlg");d.innerHTML=`<div class="p-6 max-h-[85vh] overflow-auto">${html}</div>`;if(!d.open)d.showModal()}
+function openPartner(id){
+  const p=DB.partners.find(x=>x.id===id);
+  partnerDlg(`<div class="flex justify-between items-start gap-3"><div><h3 class="display text-2xl">${p.company}</h3><span class="pill ${p.status==="confirmed"?"st-Booked":"st-Cancelled"}">${apptLabel(p)}</span></div><button onclick="jobdlg.close()" class="text-2xl muted px-2">×</button></div>
+  <div class="grid grid-cols-2 gap-3 mt-5 text-sm">
+    <div><div class="muted text-xs">Contact</div>${p.contact}</div><div><div class="muted text-xs">Phone</div>${p.phone}${p.can_text?"":` <span class="muted">(no texts)</span>`}</div>
+    <div class="col-span-2"><div class="muted text-xs">Email</div>${p.email||"—"}</div>
+    <div class="col-span-2"><div class="muted text-xs">Property</div>${p.property}, ${p.location}</div>
+    ${p.notes?`<div class="col-span-2"><div class="muted text-xs">Notes</div>${p.notes}</div>`:""}
+    <div><div class="muted text-xs">Time they asked for</div>${fmtDT(p.requested)}</div>
+    ${p.proposed&&p.status==="reschedule_sent"?`<div><div class="muted text-xs">New time you offered</div>${fmtDT(p.proposed)}</div>`:""}
+    ${p.status==="confirmed"?`<div><div class="muted text-xs">Locked in</div><b class="text-[var(--green)]">${fmtDT(p.final)}</b></div>`:""}
+  </div>
+  <div class="grid grid-cols-2 gap-2 mt-5"><a href="tel:${p.phone}" class="btn btn-ghost">Call</a>${p.can_text?`<a href="sms:${p.phone}" class="btn btn-ghost">Text</a>`:`<a href="mailto:${p.email}" class="btn btn-ghost">Email</a>`}</div>
+  <div class="grid gap-2 mt-3">
+    ${p.status==="requested"?`<button class="btn btn-orange" style="background:var(--green)" onclick="confirmPartner(${p.id},'${p.requested}')">✓ Confirm ${fmtDT(p.requested)}</button><button class="btn btn-ghost" onclick="rejectOrReschedule(${p.id})">Reject or reschedule</button>`:""}
+    ${p.status==="reschedule_sent"?`<button class="btn btn-orange" style="background:var(--green)" onclick="confirmPartner(${p.id},'${p.proposed}')">✓ They said yes: lock in ${fmtDT(p.proposed)}</button><button class="btn btn-ghost" onclick="setFinal(${p.id})">Set a different final time</button>`:""}
+    ${p.status==="confirmed"?`<button class="btn btn-ghost" onclick="setFinal(${p.id})">Change the date</button>`:""}
+    ${p.status==="rejected"?`<button class="btn btn-ghost" onclick="p=DB.partners.find(x=>x.id===${p.id});p.status='requested';p.log.push([new Date().toISOString(),'Operator re-opened this request.']);save();openPartner(${p.id});tabPartners()">Re-open request</button>`:""}
+  </div>
+  <h4 class="font-bold mt-6 text-sm">History</h4>
+  <ol class="mt-2 grid gap-2 text-sm">${p.log.slice().reverse().map(([t,x])=>`<li class="border-l-2 pl-3" style="border-color:var(--input)"><div class="muted text-xs">${fmtDT(t)}</div>${x}</li>`).join("")}</ol>`);
+}
+function confirmPartner(id,iso){const p=DB.partners.find(x=>x.id===id);p.status="confirmed";p.final=iso;p.log.push([new Date().toISOString(),`Operator locked in the call for ${fmtDT(iso)}.`]);save();jobdlg.close();tabPartners();toast("Confirmed. It's green on your calendar.")}
+function rejectOrReschedule(id){const p=DB.partners.find(x=>x.id===id);
+  partnerDlg(`<div class="flex justify-between"><h3 class="display text-2xl">Reject or reschedule?</h3><button onclick="openPartner(${id})" class="muted">← Back</button></div>
+  <div class="grid gap-3 mt-5">
+   <button class="choice" onclick="rescheduleForm(${id})"><div class="font-bold text-lg">Reschedule</div><div class="muted text-sm">Offer ${p.contact.split(" ")[0]} a different day or time.</div></button>
+   <button class="choice" onclick="if(confirm('Reject this request? No message will be sent. They already got the thank-you.')){p=DB.partners.find(x=>x.id===${id});p.status='rejected';p.log.push([new Date().toISOString(),'Operator rejected the request. No message sent.']);save();jobdlg.close();tabPartners();toast('Rejected. Nothing was sent.')}"><div class="font-bold text-lg">Reject</div><div class="muted text-sm">Nothing gets sent. They only got the thank-you message from when they asked.</div></button>
+  </div>`)}
+function rescheduleForm(id){const p=DB.partners.find(x=>x.id===id);const d0=new Date(p.requested);d0.setDate(d0.getDate()+1);
+  partnerDlg(`<div class="flex justify-between"><h3 class="display text-2xl">Pick a new time</h3><button onclick="rejectOrReschedule(${id})" class="muted">← Back</button></div>
+  <div class="grid grid-cols-2 gap-3 mt-5"><input type="date" id="rsD" class="input" value="${d0.toISOString().slice(0,10)}" oninput="rsPreview(${id})"><select id="rsT" class="input" oninput="rsPreview(${id})">${slotOptions().map(t=>`<option value="${t}">${t12(t)}</option>`).join("")}</select></div>
+  <p class="muted text-xs mt-2">Times come from your partner call hours.</p>
+  <div class="muted text-xs mt-4 mb-1">Message that goes out for you</div><div id="rsMsg" class="card p-4 text-sm" style="background:var(--muted)"></div>
+  <div class="text-sm mt-4 font-bold">How do you want to reach them?</div>
+  <div class="grid gap-2 mt-2">
+   <button class="btn btn-orange" onclick="sendReschedule(${id},'text')">💬 Send by text${p.can_text?"":" (sends as email, no texts on this number)"}</button>
+   <button class="btn btn-ghost" onclick="sendReschedule(${id},'phone')">📞 I'll call them</button>
+  </div>
+  <p class="muted text-xs mt-2">Either way, the same message goes out by email automatically, so it's in writing.</p>`);rsPreview(id)}
+function rsIso(){const[h,m]=$("#rsT").value.split(":");const d=new Date($("#rsD").value+"T00:00");d.setHours(+h,+m);return d.toISOString()}
+function rsPreview(id){const p=DB.partners.find(x=>x.id===id);$("#rsMsg").textContent=rescheduleMsg(p,rsIso())}
+function sendReschedule(id,how){const p=DB.partners.find(x=>x.id===id),iso=rsIso(),now=new Date().toISOString();p.proposed=iso;p.status="reschedule_sent";
+  if(how==="text"){p.log.push([now,p.can_text?`Reschedule text sent to ${p.phone} offering ${fmtDT(iso)}.`:`${p.phone} can't get texts, so the text was skipped.`]);p.log.push([now,`Same message emailed to ${p.email}.`])}
+  else{p.log.push([now,`Operator chose to call. Reschedule message emailed to ${p.email} offering ${fmtDT(iso)}, so it's in writing.`])}
+  save();tabPartners();
+  if(how==="phone"){partnerDlg(`<h3 class="display text-2xl">Call ${p.contact.split(" ")[0]}</h3><p class="muted text-sm mt-1">The email already went out. If you agree on a different time on the call, set it below.</p>
+   <a href="tel:${p.phone}" class="btn btn-orange w-full mt-5">📞 Call ${p.phone}</a>
+   <div class="card p-4 mt-4 text-sm" style="background:var(--muted)"><div class="muted text-xs mb-1">What to say</div>${rescheduleMsg(p,iso)}</div>
+   <div class="grid gap-2 mt-4"><button class="btn btn-ghost" style="border-color:var(--green)" onclick="confirmPartner(${id},'${iso}')">✓ They said yes to ${fmtDT(iso)}</button><button class="btn btn-ghost" onclick="setFinal(${id})">We agreed on a different time</button><button class="btn btn-ghost" onclick="jobdlg.close()">No answer, I'll try later</button></div>`)}
+  else{jobdlg.close();toast(p.can_text?"Text and email sent":"Email sent (no texts on this number)")}}
+function setFinal(id){const p=DB.partners.find(x=>x.id===id),base=new Date(apptTime(p));
+  partnerDlg(`<div class="flex justify-between"><h3 class="display text-2xl">Set the final time</h3><button onclick="openPartner(${id})" class="muted">← Back</button></div>
+  <div class="grid grid-cols-2 gap-3 mt-5"><input type="date" id="rsD" class="input" value="${base.toISOString().slice(0,10)}"><select id="rsT" class="input">${slotOptions().map(t=>`<option value="${t}">${t12(t)}</option>`).join("")}<option value="custom">Other time...</option></select></div>
+  <button class="btn btn-orange w-full mt-5" style="background:var(--green)" onclick="if($('#rsT').value==='custom'){const t=prompt('Time (24h, like 16:30)');if(!/^\\d{1,2}:\\d{2}$/.test(t||''))return;$('#rsT').insertAdjacentHTML('beforeend','<option value='+t+' selected>'+t+'</option>')}confirmPartner(${id},rsIso())">✓ Lock it in</button>`)}
+
+/* ---------- FEEDBACK ---------- */
+function tabFeedback(){
+  $("#tab").innerHTML=`<div class="card p-6 max-w-xl"><h2 class="font-bold text-lg">Feedback</h2><p class="muted text-sm">Tell us what's working and what isn't. We read every one.</p>
+  <form id="fb" class="grid gap-4 mt-5"><textarea name="worked" class="input" rows="2" placeholder="What's working?"></textarea><textarea name="broke" class="input" rows="2" placeholder="What isn't working?"></textarea><textarea name="missing" class="input" rows="2" placeholder="What do you wish it did?"></textarea>
+  <div><div class="text-sm mb-2">How's it going, 1 to 10?</div><div class="grid grid-cols-10 gap-1">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<label class="text-center"><input type="radio" name="score" value="${n}" class="peer hidden" required><span class="block py-3 rounded-lg border cursor-pointer peer-checked:bg-[var(--orange)] peer-checked:text-black font-bold" style="border-color:var(--input)">${n}</span></label>`).join("")}</div></div>
+  <button class="btn btn-orange">Send feedback</button></form></div>`;
+  $("#fb").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);DB.feedback.push(Object.fromEntries(f));save();toast("Thanks! Feedback sent");tabFeedback()};
+}
+
+/* ---------- SETTINGS ---------- */
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+function getTheme(){try{return localStorage.getItem("snowline_theme")||"dark"}catch(e){return "dark"}}
+function setTheme(t){try{localStorage.setItem("snowline_theme",t)}catch(e){}const light=t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches);document.documentElement.classList.toggle("light",light);tabSettings()}
 function tabSettings(){
-  const o=DB.operator;const f=(k,l,t)=>`<label class="grid gap-1"><span class="text-sm muted">${l}</span><input class="input" data-o="${k}" value="${o[k]||""}" ${t||""}></label>`;
-  $("#tab").innerHTML=`<div class="card p-6 max-w-xl grid gap-4"><h2 class="font-bold text-lg">Business settings</h2>
-  ${f("business_name","Business name")}${f("owner_name","Owner name")}${f("phone","Business phone")}${f("email","Email")}${f("slug","Link name (your-site.com/q/...)")}${f("partner_call_hours","Partner call hours")}
-  ${f("deposit_payment_link","Deposit payment link (from your own payment account)")}
-  ${f("bgm_webhook_url","Boss Growth Machine webhook URL",'placeholder="Paste the URL your setup specialist gives you"')}
-  <div class="todo">Until the webhook URL is filled in, jobs save in the app but don't reach your Boss Growth Machine inbox.</div>
-  <button class="btn btn-orange" onclick="document.querySelectorAll('[data-o]').forEach(i=>DB.operator[i.dataset.o]=i.value);save();toast('Settings saved')">Save settings</button></div>`;
+  const o=DB.operator,th=getTheme();const f=(k,l,t)=>`<label class="grid gap-1"><span class="text-sm muted">${l}</span><input class="input" data-o="${k}" value="${o[k]||""}" ${t||""}></label>`;
+  const conn=(label,val)=>`<div class="flex justify-between items-center gap-3 py-3 border-b" style="border-color:var(--border)"><div><div class="text-sm">${label}</div><div class="muted text-xs truncate max-w-[220px] sm:max-w-sm">${val}</div></div><span class="pill st-Booked whitespace-nowrap">✓ Connected</span></div>`;
+  $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
+  <div class="grid gap-5">
+   <div class="card p-6"><h2 class="font-bold text-lg">Appearance</h2><div class="seg mt-3">${[["dark","Dark"],["light","Light"],["system","Match my phone"]].map(([k,l])=>`<button class="${th===k?"on":""}" onclick="setTheme('${k}')">${l}</button>`).join("")}</div></div>
+   <div class="card p-6 grid gap-4"><h2 class="font-bold text-lg">Business info</h2>
+    ${f("business_name","Business name")}${f("owner_name","Owner name")}${f("phone","Business phone")}${f("email","Email")}${f("home_base","Home base (city, state)")}${f("slug","Link name (your-site.com/q/...)")}
+    <button class="btn btn-orange" onclick="document.querySelectorAll('[data-o]').forEach(i=>DB.operator[i.dataset.o]=i.value);save();toast('Saved')">Save</button></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Payments and inbox</h2><p class="muted text-sm">Your setup team connects these for you before your first login.</p>
+    ${conn("Deposit payment link",o.deposit_payment_link)}${conn("Your Boss Growth Machine inbox",o.bgm_webhook_url)}
+    <button class="btn btn-ghost w-full mt-4" onclick="toast('Request sent to your setup team')">Request a change</button></div>
+  </div>
+  <div class="grid gap-5">
+   <div class="card p-6"><h2 class="font-bold text-lg">Business hours</h2><p class="muted text-sm">When customers can book scheduled work. Plow Now requests still come in anytime.</p>
+    <div class="grid gap-2 mt-4">${DAYS.map(d=>{const h=o.business_hours[d];return `<div class="grid grid-cols-[52px_1fr_1fr_auto] gap-2 items-center"><b class="text-sm">${d}</b>
+     <input type="time" class="input !min-h-[42px] !py-1" value="${h?h[0]:""}" ${h?"":"disabled"} onchange="DB.operator.business_hours['${d}'][0]=this.value;save()">
+     <input type="time" class="input !min-h-[42px] !py-1" value="${h?h[1]:""}" ${h?"":"disabled"} onchange="DB.operator.business_hours['${d}'][1]=this.value;save()">
+     <button class="chip ${h?"on":""}" onclick="DB.operator.business_hours['${d}']=${h?"null":'["08:00","17:00"]'};save();tabSettings()">${h?"Open":"Closed"}</button></div>`}).join("")}</div></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Partner call hours</h2><p class="muted text-sm">Business owners can only request calls inside these hours.</p>
+    <div class="flex flex-wrap gap-1 mt-4">${DAYS.map(d=>`<button class="chip ${o.partner_days.includes(d)?"on":""}" onclick="const a=DB.operator.partner_days;a.includes('${d}')?a.splice(a.indexOf('${d}'),1):a.push('${d}');a.sort((x,y)=>DAYS.indexOf(x)-DAYS.indexOf(y));save();tabSettings()">${d}</button>`).join("")}</div>
+    <div class="grid grid-cols-3 gap-2 mt-3"><label class="text-xs muted">From<input type="time" class="input !min-h-[42px] mt-1" value="${o.partner_start}" onchange="DB.operator.partner_start=this.value;save()"></label>
+     <label class="text-xs muted">To<input type="time" class="input !min-h-[42px] mt-1" value="${o.partner_end}" onchange="DB.operator.partner_end=this.value;save()"></label>
+     <label class="text-xs muted">Call length<select class="input !min-h-[42px] mt-1" onchange="DB.operator.partner_slot=+this.value;save()">${[15,30,45,60].map(n=>`<option ${o.partner_slot===n?"selected":""} value="${n}">${n} min</option>`).join("")}</select></label></div></div>
+  </div></div>`;
 }
 
 /* ============ HOMEOWNER QUOTE PAGE ============ */
@@ -310,13 +525,22 @@ function qStep(){
     <button class="choice" onclick="Q.kind='home';Q.step=3;qStep()"><div class="font-bold text-lg">My home</div><div class="muted text-sm">Driveway, walkway, steps</div></button>
     <button class="choice" onclick="Q.kind='biz';Q.step=3;qStep()"><div class="font-bold text-lg">A business or commercial property</div><div class="muted text-sm">Parking lots, offices, apartment complexes</div></button></div>
     <button class="btn btn-ghost w-full mt-4" onclick="Q.step=1;qStep()">Back</button>`;}
-  else if(Q.step===3&&Q.kind==="biz"){el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Tell us about your property</h1><p class="muted mt-2">Commercial properties get a custom quote on a quick call.</p>
-    <form id="bizf" class="grid gap-4 mt-6"><input class="input" name="company" placeholder="Company name" required><input class="input" name="contact" placeholder="Your name and phone" required>
-    <input class="input" name="property" placeholder="Property type (lot size, number of spaces)"><input class="input" name="location" placeholder="Address or city and ZIP" required><textarea class="input" name="notes" rows="2" placeholder="Anything we should know?"></textarea>
-    <button class="btn btn-orange">Request a partner call</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">Back</button></form>`;
-    $("#bizf").onsubmit=e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));DB.partners.unshift({id:Date.now(),...f,created:new Date().toISOString()});save();
-      el.innerHTML=`${steps(5)}<div class="card p-8 text-center"><div class="display text-3xl">Got it!</div><p class="muted mt-3">${o.business_name} will reach out during partner call hours:</p><p class="font-bold text-lg mt-2">${o.partner_call_hours}</p>
-      <div class="todo mt-6 text-left">Businesses never get an instant price. This request now shows in the operator's Partners tab.</div><a href="#/dashboard/partners" class="btn btn-ghost mt-6">See it in the operator dashboard →</a></div>`;};}
+  else if(Q.step===3&&Q.kind==="biz"){
+    const days=[];for(let d=new Date(),i=0;days.length<10&&i<30;i++){d=new Date();d.setDate(d.getDate()+1+i);const dn=d.toLocaleDateString("en-US",{weekday:"short"});if(o.partner_days.includes(dn))days.push(d)}
+    el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Book a quick call</h1><p class="muted mt-2">Commercial properties get a custom quote on a short call with ${o.business_name}.</p>
+    <form id="bizf" class="grid gap-4 mt-6"><input class="input" name="company" placeholder="Company name" required><input class="input" name="contact" placeholder="Your name" required>
+    <div class="grid grid-cols-2 gap-3"><input class="input" name="phone" placeholder="Phone" required><input class="input" name="email" type="email" placeholder="Email" required></div>
+    <label class="flex gap-3 text-sm items-center"><input type="checkbox" name="can_text" checked class="w-5 h-5"> This number can get text messages</label>
+    <input class="input" name="property" placeholder="Property type (lot size, number of spaces)" required><input class="input" name="location" placeholder="Address or city and ZIP" required>
+    <div><div class="text-sm mb-2">Pick a time for the call</div><div class="grid grid-cols-2 gap-3"><select class="input" name="day" required>${days.map(d=>`<option value="${d.toISOString().slice(0,10)}">${d.toLocaleDateString([], {weekday:"short",month:"short",day:"numeric"})}</option>`).join("")}</select>
+    <select class="input" name="time" required>${slotOptions().map(t=>`<option value="${t}">${t12(t)}</option>`).join("")}</select></div></div>
+    <textarea class="input" name="notes" rows="2" placeholder="Anything we should know?"></textarea>
+    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" name="sms" class="mt-1 w-5 h-5"><span>[TEXT-MESSAGE CONSENT WORDING, waiting on attorney]</span></label>
+    <button class="btn btn-orange">Request this call</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">Back</button></form>`;
+    $("#bizf").onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target),f=Object.fromEntries(fd);const[h,m]=f.time.split(":");const when=new Date(f.day+"T00:00");when.setHours(+h,+m);
+      DB.partners.unshift({id:Date.now(),company:f.company,contact:f.contact,phone:f.phone,email:f.email,can_text:!!fd.get("can_text"),property:f.property,location:f.location,notes:f.notes,created:new Date().toISOString(),requested:when.toISOString(),status:"requested",log:[[new Date().toISOString(),"Request received from the quote page. Thank-you message sent automatically."]]});save();
+      el.innerHTML=`${steps(5)}<div class="card p-8 text-center"><div class="display text-3xl">Request sent!</div><p class="muted mt-3">You asked for a call on</p><p class="font-bold text-lg mt-1">${fmtDT(when.toISOString())}</p><p class="muted mt-3">${o.business_name} will confirm the time with you shortly.</p>
+      <div class="todo mt-6 text-left">IN THE REAL APP: a thank-you text and email go out right away, and this shows up red on the operator's partner calendar until they confirm it.</div><a href="#/dashboard/partners" class="btn btn-ghost mt-6">See it on the operator's calendar →</a></div>`;};}
   else if(Q.step===3){el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Your details</h1>
     <form id="homef" class="grid gap-4 mt-6"><input class="input" name="name" placeholder="Full name" required>
     <div class="grid grid-cols-2 gap-3"><input class="input" name="phone" placeholder="Phone" required><input class="input" name="email" type="email" placeholder="Email"></div>
