@@ -178,10 +178,12 @@ function route(){
   const h=(location.hash||"#/").slice(1).split("?")[0];
   window.scrollTo(0,0);
   if(h.startsWith("/mow")){setBrand("mow");return landing()}
-  if(!h.startsWith("/dashboard")&&!h.startsWith("/q/")&&h!=="/login"&&h!=="/signup"&&h!=="/start"&&h!=="/kids")setBrand("plow");
+  if(!h.startsWith("/dashboard")&&!h.startsWith("/q/")&&h!=="/login"&&h!=="/signup"&&h!=="/start"&&h!=="/kids"&&!h.startsWith("/blog"))setBrand("plow");
   if(h.startsWith("/q/")) return quotePage();
   if(h==="/start") return startPage();
   if(h==="/kids") return kidsPage();
+  if(h==="/blog") return blogIndex();
+  if(h.startsWith("/blog/")) return blogPost(h.split("/")[2]);
   if(h==="/login") return loginPage("login");
   if(h==="/signup") return loginPage("signup");
   if(h.startsWith("/dashboard")) return dashboard(h.split("/")[2]||"jobs");
@@ -196,28 +198,34 @@ function header(right){return `<header class="border-b" style="border-color:var(
   <a href="#${BR.key==="mow"?"/mow":"/"}" class="flex items-center gap-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ice)" stroke-width="2">${BR.key==="mow"?ICON_MOW:ICON_TRUCK}</svg>
   <span class="font-bold text-lg">${BR.name}</span><span class="muted text-xs hidden sm:inline">by Boss Growth Machine</span></a>${right||""}</div></header>`}
 function footer(){return `<footer class="border-t mt-20" style="border-color:var(--border)"><div class="max-w-6xl mx-auto px-5 py-8 flex flex-wrap gap-4 justify-between text-sm muted">
-  <span>${BR.name} · Powered by Boss Growth Machine</span><span class="flex gap-4"><a href="#${BR.key==="mow"?"/":"/mow"}" class="underline">${BR.key==="mow"?"Snow removal? PlowCall":"Lawn care? MowCall"}</a><a href="#/kids" class="underline">For parents: Junior Boss</a><a href="#/privacy" class="underline">Privacy</a><a href="#/terms" class="underline">Terms</a><a href="#/login" class="underline">Operator login</a></span></div></footer>`}
+  <span>${BR.name} · Powered by Boss Growth Machine</span><span class="flex gap-4"><a href="#${BR.key==="mow"?"/":"/mow"}" class="underline">${BR.key==="mow"?"Snow removal? PlowCall":"Lawn care? MowCall"}</a><a href="#/blog" class="underline">Field Guide</a><a href="#/kids" class="underline">For parents: Junior Boss</a><a href="#/privacy" class="underline">Privacy</a><a href="#/terms" class="underline">Terms</a><a href="#/login" class="underline">Operator login</a></span></div></footer>`}
 function heroArt(){
   if(BR.key==="mow")return `<svg viewBox="0 0 420 320" class="w-full max-w-md"><rect x="40" y="20" width="150" height="150" rx="18" fill="none" stroke="var(--ice)" stroke-width="5"/><g fill="var(--ice)"><rect x="66" y="46" width="28" height="28" rx="4"/><rect x="136" y="46" width="28" height="28" rx="4"/><rect x="101" y="81" width="28" height="28" rx="4"/><rect x="66" y="116" width="28" height="28" rx="4"/><rect x="136" y="116" width="28" height="28" rx="4"/></g><g stroke="var(--orange)" stroke-width="5" stroke-linecap="round">${[...Array(14)].map((_,i)=>`<path d="M${30+i*28} 305 l${i%2?6:-6} -${22+(i%3)*8}"/>`).join("")}</g><path d="M120 250 H300 l40 -70 h40" fill="none" stroke="var(--ice)" stroke-width="6" stroke-linecap="round"/><path d="M130 250 v-50 h120 l40 50z" fill="var(--card)" stroke="var(--ice)" stroke-width="5"/><circle cx="160" cy="262" r="22" fill="var(--bg)" stroke="var(--ice)" stroke-width="5"/><circle cx="290" cy="262" r="22" fill="var(--bg)" stroke="var(--ice)" stroke-width="5"/></svg>`;
   return `<svg viewBox="0 0 420 320" class="w-full max-w-md"><rect x="40" y="20" width="150" height="150" rx="18" fill="none" stroke="var(--ice)" stroke-width="5"/><g fill="var(--ice)"><rect x="66" y="46" width="28" height="28" rx="4"/><rect x="136" y="46" width="28" height="28" rx="4"/><rect x="101" y="81" width="28" height="28" rx="4"/><rect x="66" y="116" width="28" height="28" rx="4"/><rect x="136" y="116" width="28" height="28" rx="4"/></g><g fill="var(--ice)" opacity=".6"><circle cx="250" cy="40" r="5"/><circle cx="300" cy="75" r="5"/><circle cx="370" cy="50" r="5"/><circle cx="280" cy="130" r="5"/><circle cx="400" cy="115" r="5"/></g><path d="M40 230 l40-15 v60 l-40 10z" fill="var(--orange)"/><path d="M80 260 H330 l30-60 h40 l25 50 v20 H80z" fill="var(--card)" stroke="var(--ice)" stroke-width="5"/><rect x="330" y="170" width="70" height="45" rx="8" fill="none" stroke="var(--ice)" stroke-width="5"/><circle cx="140" cy="285" r="22" fill="var(--bg)" stroke="var(--ice)" stroke-width="5"/><circle cx="360" cy="285" r="22" fill="var(--bg)" stroke="var(--ice)" stroke-width="5"/></svg>`;
 }
 /* ---------- PLANS ---------- */
+const PHONE_FAQ=[
+ ["Do I need an EIN?","Not to use the app. Calls work on any plan with a business line. Texting is the part that needs carrier approval: with an EIN we register you as a standard business. No EIN? We can register you as a sole proprietor (one number, lower daily text limit). An EIN is free from the IRS and takes about 10 minutes online. <a class='underline ice' href='#/blog/ein'>Read: EINs and business texting, explained</a>"],
+ ["Can I keep my current business phone number?","Yes. We can move (port) your existing business number into your account so your customers keep calling the number they know, or forward it to your new line. Porting usually takes a couple of weeks, and your old number keeps working until it's done."],
+ ["Can the AI use my personal cell number?","It can. We can forward calls and messages to your personal cell. But using a personal number for business means that business activity is tied to you personally, not to a business entity like an LLC that helps separate business risk from your personal assets. We recommend a dedicated business line. This isn't legal advice, so talk to an attorney or accountant about what's right for you. <a class='underline ice' href='#/blog/phone-liability'>Read: personal vs. business phone lines</a>"],
+ ["Do I need a business phone number at all?","Not on Starter: customers reach you on your own phone and the AI handles your website chat and email. On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
 const PLANS={
- starter:{name:"Starter",tag:"Side hustle or just starting",price:48,setup:0,
+ starter:{name:"Starter",tag:"Side hustle, first business or Junior Boss",price:48,setup:0,
   bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers call and text your own phone","No business phone line or EIN needed"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
- payg:{name:"Pay as you go",tag:"Pay only for the AI you use",price:78,setup:148,
+ payg:{name:"Pay as you go",tag:"1 truck, a smaller customer list",price:78,setup:148,
   bullets:["Everything in Starter","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
   fine:"Calls work the day your line is set up. Texting turns on after carrier approval."},
- solo:{name:"Monthly Solo",tag:"1–2 trucks, covered all month",price:148,setup:298,season:698,best:true,
-  bullets:["Everything in Pay as you go","500 AI texts + 100 AI call minutes included","Done text + automated call after every job","Book-before-the-storm alerts","Custom branding, approved by you","Extra AI use billed at Pay-as-you-go rates"],
+ solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,setup:298,season:698,best:true,
+  bullets:["Everything in Pay as you go","500 AI texts + 100 AI call minutes included","Done text + automated call after every job","Book-before-the-storm alerts","Custom branding, approved by you","Second truck? Add one for $148/mo"],
   fine:"Season prepay Nov–Mar: $698 and setup is free."},
- crew:{name:"Monthly Crew",tag:"Up to 10 trucks",price:398,setup:298,season:1898,
-  bullets:["Everything in Monthly Solo","1,250 AI texts + 250 AI call minutes included","Up to 10 trucks and drivers","Business call calendar for commercial work","Priority support","Extra AI use billed at Pay-as-you-go rates"],
+ crew:{name:"Monthly Crew",tag:"3 trucks included",price:398,setup:298,season:1898,
+  bullets:["Everything in Monthly Solo","3 trucks and drivers included","1,500 AI texts + 300 AI call minutes included","+$148/mo per extra truck (adds 500 AI texts + 100 AI minutes)","Business call calendar for commercial work","Priority support","Extra AI use billed at Pay-as-you-go rates"],
   fine:"Season prepay Nov–Mar: $1,898 and setup is free."}
 };
 let planTab="monthly";
-function paygCost(jobs){const texts=jobs*6,mins=jobs*1.5;return 78+texts*0.08+mins*0.38}
+function paygCost(jobs){return 78+jobs*6*0.08+jobs*1.5*0.38}
+function fleetPrice(t){return t<=1?148:t===2?296:398+(t-3)*148}
 function pricingSection(){
   const shown=planTab==="payg"?["starter","payg"]:["solo","crew"];
   return `<section id="pricing" class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">Pricing that moves with your season</h2>
@@ -232,24 +240,28 @@ function pricingSection(){
     ${!p.season?`<p class="muted text-xs mt-4">${p.fine}</p>`:""}
     <a href="#/start?plan=${k}" class="btn btn-orange mt-5">Get started</a></div>`}).join("")}</div>
   <div class="card p-6 mt-6"><div class="font-bold">Which plan saves you more?</div>
+    <label class="text-sm muted block mt-3">Trucks: <b id="trucksN" class="text-[var(--fg)]">1</b></label>
+    <input id="trucksR" type="range" min="1" max="10" value="1" class="w-full mt-2" oninput="calcPlan($('#jobsR').value)">
     <label class="text-sm muted block mt-3">Jobs you expect this month: <b id="jobsN" class="text-[var(--fg)]">40</b></label>
-    <input type="range" min="5" max="150" value="40" class="w-full mt-2" oninput="calcPlan(this.value)">
+    <input id="jobsR" type="range" min="5" max="400" value="40" class="w-full mt-2" oninput="calcPlan(this.value)">
     <p id="calcOut" class="mt-3 text-sm"></p></div>
-  <div class="card p-5 mt-4 text-sm" style="border-color:var(--yellow)"><b>Business phone lines, read this first.</b> <span class="muted">On Pay as you go, Solo and Crew, your business number takes calls (and the AI answers them) the same day it's set up. Texting is different: U.S. carriers must approve every business that texts. With an <b>EIN</b>, we register you as a standard business. No EIN? We can register you as a <b>sole proprietor</b> (one number, lower daily text limit). Approval usually takes 3–7 business days, and texts can't go out until it's done. Starter has no business line, so customers reach you on your own phone.</span></div>
+  <div class="card p-5 mt-4 text-sm" style="border-color:var(--yellow)"><b>Business phone lines, read this first.</b> <span class="muted">On Pay as you go, Solo and Crew, your business number takes calls (and the AI answers them) the same day it's set up. Texting is different: U.S. carriers must approve every business that texts. With an <b>EIN</b>, we register you as a standard business. No EIN? We can register you as a <b>sole proprietor</b> (one number, lower daily text limit). Approval usually takes 3–7 business days, and texts can't go out until it's done. Starter has no business line, so customers reach you on your own phone. <a class="underline ice" href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Phone number and EIN questions →</a></span></div>
   <div class="card p-5 mt-4 text-sm"><b>What's the setup fee for?</b> <span class="muted">We want your custom branding perfect before you launch, and you approve it. It also covers registering your business phone line with the carriers. Your dashboard is live within 24 hours of finishing your setup form.</span></div>
   </section>`;
 }
 function refreshPricing(){const el=$("#pricing");if(el){el.outerHTML=pricingSection();calcPlan(40)}}
-function calcPlan(n){n=+n;const j=$("#jobsN");if(j)j.textContent=n;const pg=paygCost(n),o=$("#calcOut");if(!o)return;
-  const best=pg<148?`<b>Pay as you go</b> (about $${Math.round(pg)} this month)`:n<=120?`<b>Monthly Solo</b> ($148, Pay as you go would be about $${Math.round(pg)})`:`<b>Monthly Crew</b> ($398 for up to 10 trucks, Pay as you go would be about $${Math.round(pg)})`;
-  o.innerHTML=`At ${n} jobs, your best deal is ${best}. Estimate assumes about 6 AI texts and 1.5 AI call minutes per job.`}
+function calcPlan(n){n=+n;const t=+(($("#trucksR")||{}).value||1);const o=$("#calcOut");if(!o)return;$("#jobsN").textContent=n;$("#trucksN").textContent=t;
+  const texts=Math.round(n*6),mins=Math.round(n*1.5);let msg;
+  if(t===1){const pg=paygCost(n);msg=pg<148?`<b>Pay as you go</b> at about $${Math.round(pg)} this month. Monthly Solo would be $148.`:`<b>Monthly Solo</b> at $148. Pay as you go would run about $${Math.round(pg)}.`}
+  else msg=t===2?`<b>Monthly Solo + 1 extra truck</b> at $296/mo.`:`<b>Monthly Crew</b> at $${fleetPrice(t)}/mo for ${t} trucks${t>3?` (3 included + ${t-3} extra at $148)`:""}.`;
+  o.innerHTML=`${n} jobs this month is about <b>${texts.toLocaleString()} AI texts</b> and <b>${mins.toLocaleString()} AI call minutes</b> for the month. Your best deal: ${msg}`}
 
 /* ---------- LANDING ---------- */
 let slideIdx=0,slideTimer=null;
 function heroSlides(){const B=BR;return [
   `<div class="flex justify-center items-center h-full">${heroArt()}</div>`,
-  `<div class="h-full rounded-2xl flex flex-col justify-end p-6" style="background:linear-gradient(160deg,color-mix(in oklab,var(--ice) 25%,var(--card)),var(--card));min-height:300px"><div class="pill self-start" style="background:var(--muted)">Real photo goes here</div><div class="font-bold text-lg mt-3">${B.key==="mow"?"QR code on the trailer, crew mowing in the background":"QR code on the truck, plow blade down in the snow"}</div><div class="muted text-sm">Swap in a real shot from Sean's truck or a customer's crew.</div></div>`,
-  `<div class="h-full rounded-2xl flex flex-col justify-end p-6" style="background:linear-gradient(160deg,color-mix(in oklab,var(--orange) 22%,var(--card)),var(--card));min-height:300px"><div class="pill self-start" style="background:var(--muted)">Real photo goes here</div><div class="font-bold text-lg mt-3">Homeowner on the porch scanning the QR code and paying the deposit</div><div class="muted text-sm">Shows customers what it looks like from their side.</div></div>`]}
+  `<img src="https://dnznrvs05pmza.cloudfront.net/gemini/gemini-nano-banana-2.1/images/65528371-3c55-4fce-8b8d-3af1c65261f4/011e8c93-7aef-4e2c-8879-c971281d7617/Photorealistic_early_morning_winter_scene_in_a_snowy_Ohio_su.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiMzBlMWNmYTY4MDMzZWZmMyIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5NDc4MzUyNn0.ivOxVhj_8eNpf-MIe5tXTXb5GfQlyPDyiPzRxltXW7o" alt="Plow operator smiling at a new booking on his phone beside his truck" class="w-full h-full object-cover rounded-2xl" style="min-height:300px;aspect-ratio:4/3">`,
+  `<img src="https://dnznrvs05pmza.cloudfront.net/gemini/gemini-nano-banana-2.1/images/d746732f-54c4-4485-a2a5-82e8af076967/c4871220-e689-4b02-8596-25601ed33f8c/Photorealistic_winter_scene_shot_from_inside_a_pickup_truck_.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiMzIxNjc5ZDU1MTE1YzM3NiIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5NDc5NDU4MX0.0j6D0E_W9Vj9M-LhRVFzYj6XRDL5s3r8WTShdSesPoc" alt="Plow operator clearing a driveway at night with his job list on the dashboard" class="w-full h-full object-cover rounded-2xl" style="min-height:300px;aspect-ratio:4/3">`]}
 function showSlide(i){const s=heroSlides();slideIdx=(i+s.length)%s.length;const el=$("#slide");if(!el)return clearInterval(slideTimer);el.innerHTML=s[slideIdx];document.querySelectorAll(".dot").forEach((d,k)=>d.style.background=k===slideIdx?"var(--orange)":"var(--muted)")}
 function landing(){
   const ref=getRef(),B=BR,hl='style="background:color-mix(in oklab,var(--orange) 10%,transparent)"';
@@ -279,10 +291,10 @@ function landing(){
     <div class="card mt-8 overflow-x-auto"><table class="w-full text-sm min-w-[760px]">
       <thead><tr class="text-left">${["",...B.compare.cols].map((h,i)=>`<th class="p-4 ${i===1?"orange display text-base":"font-bold"}" ${i===1?hl:""}>${h}</th>`).join("")}</tr></thead>
       <tbody>${B.compare.rows.map(r=>`<tr class="border-t" style="border-color:var(--border)">${r.map((c,i)=>`<td class="p-4 align-top" ${i===1?hl:""}>${cell(c,i)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
-    <p class="muted text-xs mt-3">✗ means we couldn't find it in their published plans. Competitor details come from public pricing pages and software reviews, checked November 2026. Prices change, so check each company's site.</p>
+    <p class="muted text-xs mt-3">✗ means we couldn't find it in their published plans. Competitor details come from public pricing pages and software reviews, checked November 2026.</p>
   </section>
-  <section class="max-w-3xl mx-auto px-5 py-16"><h2 class="display text-3xl">Questions</h2><div class="mt-6 space-y-3">
-    ${B.faq.map(q=>`<details class="card p-5"><summary class="font-bold cursor-pointer">${q[0]}</summary><p class="muted mt-3">${q[1]}</p></details>`).join("")}</div></section>
+  <section id="faq" class="max-w-3xl mx-auto px-5 py-16"><h2 class="display text-3xl">Questions</h2><div class="mt-6 space-y-3">
+    ${[...PHONE_FAQ,...B.faq].map(q=>`<details class="card p-5"><summary class="font-bold cursor-pointer">${q[0]}</summary><p class="muted mt-3">${q[1]}</p></details>`).join("")}</div></section>
   ${footer()}`;
   showSlide(0);clearInterval(slideTimer);slideTimer=setInterval(()=>showSlide(slideIdx+1),5000);calcPlan(40);
   if(location.hash.includes("demo"))document.getElementById("demo").scrollIntoView();
@@ -373,6 +385,70 @@ function kidsPage(){
   ${footer()}`;
 }
 
+/* ---------- CUSTOMER VIEW (operator test drive) ---------- */
+function customerMsgs(){const o=DB.operator,first="Jordan",sample={name:"Jordan Lee",type:"Scheduled",address:"412 Elm St"};
+ return [
+  ["First reply (every new customer)",aiNotice(o,first)],
+  ["Instant price",`${o.business_name}: Your price for a 2-car driveway is $65. Deposit to lock your spot: $32.50. Book here: ${BR.domain}/q/${o.slug}`],
+  ["Booking confirmed",`${o.business_name}: You're booked! We'll be there tomorrow morning. Reply here anytime if something changes.`],
+  ["Storm alert (opted-in customers)",`${o.business_name}: Snow is expected in your area tomorrow. Book now and you go first on our route: ${BR.domain}/q/${o.slug} Reply STOP to opt out.`],
+  ["On the way",`${o.business_name}: Your driver is on the way, about 15 minutes out.`],
+  ["Job done (text)",doneMsg(sample)],
+  ["Job done (automated call script)",`Hi, this is the assistant for ${o.business_name}. Your snow removal at 412 Elm St is done. Take a look when you can, and if anything needs a touch-up, just reply to our text. Thanks for choosing us!`],
+  ["Reschedule (business call)",rescheduleMsg({contact:"Linda Park",property:"Medical office lot (60 spaces)",location:"Cincinnati, 45238",requested:slotAt(1,"13:30")},slotAt(2,"13:00"))],
+  ["Business request received",`${o.business_name}: Thanks for requesting a call about your property! We'll confirm your time shortly. Our crew is out working, so our AI assistant helps us reply fast, and a real person approves every conversation.`]]}
+function tabPreview(){const m=customerMsgs();
+  $("#tab").innerHTML=`<div class="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
+   <div><h2 class="font-bold text-lg">See what your customers see</h2><p class="muted text-sm mt-1">Every message the system sends for you, with your business name. Tap one to see it on the phone, or play the whole journey.</p>
+    <div class="flex flex-wrap gap-2 mt-4"><button class="btn btn-orange !min-h-[42px] text-sm" onclick="playJourney()">▶ Play the whole customer journey</button><a href="#/q/${DB.operator.slug}" class="btn btn-ghost !min-h-[42px] text-sm">Try my quote page as a customer</a><button class="btn btn-ghost !min-h-[42px] text-sm" onclick="toast('Test texts sent to your cell')">Text these to my phone</button></div>
+    <div class="grid gap-2 mt-4">${m.map(([t,b],i)=>`<button class="card p-4 text-left" onclick="showMsg(${i})"><div class="font-bold text-sm">${t}</div><div class="muted text-sm mt-1 line-clamp-2">${b}</div></button>`).join("")}</div>
+    <div class="todo mt-4">IN THE REAL APP: "Text these to my phone" sends each message to the operator's cell from their business line (after texting is approved), so they get the exact customer experience.</div></div>
+   <div class="rounded-[2rem] p-3 w-full max-w-[320px] mx-auto lg:sticky lg:top-16" style="background:#111;border:2px solid #333"><div class="rounded-[1.5rem] p-3 flex flex-col" style="background:#f2f2f7;min-height:520px;color:#111">
+    <div class="text-center text-xs text-gray-500 mb-2">${DB.operator.business_name}</div><div id="sms" class="flex-1 grid gap-2 content-start text-[13px] overflow-auto" style="max-height:470px"></div><div id="smsBtns"></div></div></div></div>`;
+  showMsg(0)}
+function showMsg(i){$("#sms").innerHTML="";const[t,b]=customerMsgs()[i];const l=document.createElement("div");l.className="text-[10px] text-gray-500 text-center";l.textContent=t;$("#sms").appendChild(l);smsBubble("in",b)}
+function playJourney(){const m=customerMsgs().filter((_,i)=>![7,8].includes(i));$("#sms").innerHTML="";let i=0;const step=()=>{if(!$("#sms")||i>=m.length)return;const l=document.createElement("div");l.className="text-[10px] text-gray-500 text-center mt-1";l.textContent=m[i][0];$("#sms").appendChild(l);smsBubble("in",m[i][1]);i++;setTimeout(step,1300)};step()}
+
+/* ---------- BLOG ---------- */
+const POSTS=[
+ {slug:"ein",tag:"Getting set up",title:"EINs and business texting, explained in plain English",excerpt:"Why carriers ask who you are before your business can text customers, and what to do if you don't have an EIN yet.",
+  body:`<p>Every business that texts customers in the U.S. has to register with the cell phone carriers first. It's how they keep spam off people's phones. Calls don't need it, which is why your business line can take calls the same day it's set up.</p>
+  <h3>What's an EIN?</h3><p>An Employer Identification Number is a free ID number from the IRS for your business, like a Social Security number for your company. You don't need employees to get one. Most people can apply online in about 10 minutes.</p>
+  <h3>No EIN? You still have options</h3><p>We can register you as a sole proprietor using your own information. You get one business number and a lower daily text limit, which is plenty for most operators starting out. You can switch to a standard registration later.</p>
+  <h3>How long does approval take?</h3><p>Usually 3–7 business days. Your dashboard, quote page and calls all work in the meantime. Texting turns on the moment you're approved.</p>`},
+ {slug:"phone-liability",tag:"Getting set up",title:"Personal cell or business line? What to know before you decide",excerpt:"You can forward everything to your personal phone. Here's why most operators shouldn't.",
+  body:`<p>Yes, the AI can forward calls and messages to your personal cell. Plenty of people start that way. But it's worth knowing what you're signing up for.</p>
+  <h3>Your number becomes your business</h3><p>Every customer, every invoice dispute and every after-hours text lands on the same phone your family calls. When you sell or step back from the business, that number is hard to untangle.</p>
+  <h3>Liability follows the name on the account</h3><p>When business runs through your personal number and personal name, it's tied to you, not to a business entity. An LLC is designed to help separate business risk from your personal assets. A dedicated business line under your business name keeps that line clean.</p>
+  <h3>Our take</h3><p>Use a business line from day one if you can. It's included on every plan except Starter. This isn't legal advice. Talk to an attorney or accountant about the right setup for you.</p>`},
+ {slug:"junior-boss",tag:"For parents",title:"Junior Boss: how a snow shovel and a phone can teach your kid business",excerpt:"What your child controls, what you control, and the ages we recommend.",
+  body:`<p>Shoveling driveways and mowing lawns are some of the oldest first businesses there are. PlowCall and MowCall make them real businesses, with prices, bookings and earnings, while you keep the keys.</p>
+  <h3>You hold the account</h3><p>Payments go to your bank. You approve prices, neighborhoods and new customers, and you can see every message. Your child's personal number is never shared, because the AI answers customers for them.</p>
+  <h3>They run the work</h3><p>Your kid shows up, marks jobs done, snaps before-and-after photos and watches their earnings climb toward a goal you set together.</p>
+  <h3>What age?</h3><p>10–12 for supervised shoveling with neighbors you know. 12+ for push mowers, per pediatric safety guidance. 16+ for riding mowers and snow blowers. <a class="underline ice" href="#/kids">See the full parents' guide →</a></p>`},
+ {slug:"affiliate",tag:"Earn more",title:"Earn while you plow: how the affiliate program works",excerpt:"Refer other operators and earn a full month of their plan, every time.",
+  body:`<p>Every PlowCall and MowCall account comes with an affiliate link. Share it with other operators, landscapers or side hustlers you know.</p>
+  <h3>What you earn</h3><p>One full month of whatever plan your referral signs up for: $48, $78, $148 or $398. Season prepays pay out right away.</p>
+  <h3>When you get paid</h3><p>After your referral's third monthly payment clears. That keeps the program fair and sustainable, and it means you're rewarded for referring operators who stick around.</p>
+  <h3>Where to share</h3><p>Equipment dealers, salt suppliers, landscaping supply yards and local Facebook groups are where operators hang out. Tell them what it did for your phone during the last storm.</p>`},
+ {slug:"winter-to-spring",tag:"All year",title:"From plow to mower: how your account switches seasons",excerpt:"Same customers, same app, new services. Here's what changes when the snow melts.",
+  body:`<p>Snow season ends. Your customers don't. When spring comes, your PlowCall account switches to MowCall with one tap.</p>
+  <h3>What stays the same</h3><p>Your customer list, your QR codes, your dashboard, your AI assistant and your phone number.</p>
+  <h3>What changes</h3><p>Your services and prices switch to mowing, cleanups and yard work. Storm alerts become rain-delay alerts. Seasonal snow memberships become weekly or every-other-week mowing plans.</p>
+  <h3>Your plan moves with you</h3><p>Slow stretch between seasons? Drop to Pay as you go or Starter. Busy again? Go back to Monthly. Change anytime, month to month.</p>`},
+ {slug:"ai-honest",tag:"How it works",title:"Why we tell your customers you use AI",excerpt:"Being upfront builds trust, keeps you safe and still gets the job booked.",
+  body:`<p>Every customer gets one clear message the first time they reach you: you're out working with your hands full, so an AI assistant helps you reply fast, and a real person monitors and approves every conversation.</p>
+  <h3>It builds trust</h3><p>People don't mind AI. They mind being tricked. Saying it upfront and following through with fast, accurate answers makes you look more professional, not less.</p>
+  <h3>It keeps you safe</h3><p>Automated texts and calls only go to people who gave consent, and anyone can reply STOP at any time.</p>
+  <h3>It still gets the job booked</h3><p>Customers who want a person can book a quick call, and the job stays on schedule unless they ask to wait.</p>`}];
+function blogIndex(){
+  $("#app").innerHTML=`${header()}<main class="max-w-5xl mx-auto px-5 py-16"><h1 class="display text-4xl md:text-5xl">The ${BR.name} Field Guide</h1><p class="muted mt-3 max-w-2xl">Straight answers for operators, side hustlers and parents.</p>
+   <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">${POSTS.map(p=>`<a href="#/blog/${p.slug}" class="card p-6 block hover:brightness-110"><span class="pill" style="background:var(--muted);color:var(--ice)">${p.tag}</span><h2 class="font-bold text-lg mt-3">${p.title}</h2><p class="muted text-sm mt-2">${p.excerpt}</p><span class="orange text-sm font-bold mt-4 inline-block">Read →</span></a>`).join("")}</div></main>${footer()}`}
+function blogPost(slug){const p=POSTS.find(x=>x.slug===slug);if(!p)return blogIndex();
+  $("#app").innerHTML=`${header()}<main class="max-w-2xl mx-auto px-5 py-16"><a href="#/blog" class="muted text-sm">← Field Guide</a><span class="pill ml-3" style="background:var(--muted);color:var(--ice)">${p.tag}</span>
+   <h1 class="display text-3xl md:text-4xl mt-4">${p.title}</h1><article class="mt-8 grid gap-4 leading-relaxed [&_h3]:font-bold [&_h3]:text-xl [&_h3]:mt-4 [&_p]:muted">${p.body}</article>
+   <div class="card p-6 mt-12"><div class="font-bold">Ready to try it?</div><div class="flex flex-wrap gap-3 mt-3"><a href="#/" class="btn btn-orange">Watch the demo</a><a href="#/start?plan=starter" class="btn btn-ghost">Start from $48/mo</a></div></div></main>${footer()}`}
+
 /* ---------- SETUP FORM (after purchase) ---------- */
 function startPage(){
   const q=new URLSearchParams(location.hash.split("?")[1]||"");const k=PLANS[q.get("plan")]?q.get("plan"):"solo",p=PLANS[k];const phone=k!=="starter";
@@ -427,7 +503,7 @@ function loginPage(mode){
 }
 
 /* ============ DASHBOARD ============ */
-const TABS=[["jobs","Jobs"],["pricing","Pricing"],["areas","Service Areas"],["partners","Calls"],["link","My Link"],["feedback","Feedback"],["settings","Settings"]];
+const TABS=[["jobs","Jobs"],["pricing","Pricing"],["areas","Service Areas"],["partners","Calls"],["link","My Link"],["preview","Customer View"],["feedback","Feedback"],["settings","Settings"]];
 const STATUSES=["New","Quoted","Deposit Paid","Booked","Done","Cancelled"];
 let jobFilter="All";
 function dashboard(tab){
@@ -436,7 +512,7 @@ function dashboard(tab){
   <main class="max-w-5xl mx-auto px-4 py-6">
     <nav class="scroll-x flex gap-2 pb-2">${TABS.map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
     <div id="tab" class="mt-5"></div></main>`;
-  ({jobs:tabJobs,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,feedback:tabFeedback,settings:tabSettings}[tab]||tabJobs)();
+  ({jobs:tabJobs,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,settings:tabSettings}[tab]||tabJobs)();
 }
 function tabJobs(){
   const recent=DB.jobs.filter(j=>Date.now()-new Date(j.created)<30*864e5);
@@ -685,6 +761,7 @@ function setFinal(id){const p=DB.partners.find(x=>x.id===id),base=new Date(apptT
 function tabFeedback(){
   $("#tab").innerHTML=`<div class="card p-6 max-w-xl"><h2 class="font-bold text-lg">Feedback</h2><p class="muted text-sm">Tell us what's working and what isn't. We read every one.</p>
   <form id="fb" class="grid gap-4 mt-5"><textarea name="worked" class="input" rows="2" placeholder="What's working?"></textarea><textarea name="broke" class="input" rows="2" placeholder="What isn't working?"></textarea><textarea name="missing" class="input" rows="2" placeholder="What do you wish it did?"></textarea>
+  <label class="grid gap-1"><span class="text-sm font-bold">Do you offer other services or products?</span><span class="muted text-xs">Salting contracts, gutter cleaning, holiday lights, firewood? Tell us and we'll add them to your dashboard and quote page.</span><textarea name="services" class="input" rows="2" placeholder="List them here"></textarea></label>
   <div><div class="text-sm mb-2">How's it going, 1 to 10?</div><div class="grid grid-cols-10 gap-1">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<label class="text-center"><input type="radio" name="score" value="${n}" class="peer hidden" required><span class="block py-3 rounded-lg border cursor-pointer peer-checked:bg-[var(--orange)] peer-checked:text-black font-bold" style="border-color:var(--input)">${n}</span></label>`).join("")}</div></div>
   <button class="btn btn-orange">Send feedback</button></form></div>`;
   $("#fb").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);DB.feedback.push(Object.fromEntries(f));save();toast("Thanks! Feedback sent");tabFeedback()};
