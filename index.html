@@ -219,10 +219,10 @@ const PHONE_FAQ=[
  ["What if a storm misses or I can't make it?","Tap \"Can't make it\" on the job. Your customer picks: roll their deposit to the next service, or get an automatic refund to their card. You never handle refunds by hand. Customers can cancel free until you tap \"On the way.\" After that, your trip fee comes out of their deposit."],
  ["Will my customers sign a waiver?","Yes. Every booking includes your service terms and liability waiver, branded with your business name: marking driveway edges, hidden objects, refreezing, and reporting damage within 24 hours. You can add an \"Insured\" badge once you upload your insurance certificate."],
  ["Is there an App Store app?","Every plan includes your own branded customer app that installs from your quote page in one tap, with no app store needed. Want your own listing in the App Store and Google Play? That's a paid add-on, and Apple and Google charge their own yearly developer fees in your business name."],
- ["Do I need a business phone number at all?","Not on Starter: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (we'll suggest it when you pass 20 jobs a month). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
+ ["Do I need a business phone number at all?","Not on Starter: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Starter covers up to 100 jobs a month; past that, you'll move up to Starter Plus or a plan with a business line). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
 const PLANS={
  starter:{name:"Starter",tag:"Side hustle, first business or Junior Boss",price:48,setup:0,
-  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed"],
+  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","Up to 100 jobs a month"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
  payg:{name:"Pay as you go",tag:"1 truck, a smaller customer list",price:78,setup:148,
   bullets:["Everything in Starter","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
@@ -548,7 +548,13 @@ function tabJobs(){
   const byStatus=STATUSES.map(s=>[s,recent.filter(j=>j.status===s).length]);
   const zips={};recent.forEach(j=>zips[j.zip]=(zips[j.zip]||0)+1);
   const list=DB.jobs.filter(j=>jobFilter==="All"||j.status===jobFilter).sort((a,b)=>new Date(b.created)-new Date(a.created));
-  $("#tab").innerHTML=`
+  const month=DB.jobs.filter(j=>{const d=new Date(j.created),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}).length;
+  const isStarter=(DB.operator.plan||"starter")==="starter";
+  const upsell=isStarter&&month>=80?`<div class="card p-5 mb-4" style="border-color:var(--orange)"><b>${month>=100?"You've hit 100 jobs this month. Nice work!":"You're at "+month+" of 100 jobs this month."}</b>
+   <p class="muted text-sm mt-1">${month>=100?"New requests still come in and nobody gets turned away, but you'll need to move up to keep booking past 100.":"Starter covers up to 100 jobs a month. Move up before you hit the limit."}</p>
+   <div class="grid gap-2 mt-3"><button class="btn btn-orange w-full" onclick="toast('Starter Plus: $118/mo. Up to 250 jobs a month, same phone and setup you have now.')">Starter Plus: $118/mo · up to 250 jobs, keep your current setup</button>
+   <button class="btn btn-ghost w-full" onclick="toast('Monthly Solo: $148/mo + business line and AI calls/texts.')">Monthly Solo: $148/mo · adds your business line and phone AI</button></div></div>`:"";
+  $("#tab").innerHTML=`${upsell}
   <div class="card p-5"><div class="flex justify-between items-baseline"><h2 class="font-bold">Last 30 days</h2><span class="muted text-sm">${recent.length} requests</span></div>
     <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">${byStatus.map(([s,n])=>`<div class="rounded-xl p-3 text-center" style="background:var(--muted)"><div class="display text-2xl">${n}</div><div class="text-xs muted">${s}</div></div>`).join("")}</div>
     <div class="mt-4 flex flex-wrap gap-2 text-xs">${Object.entries(zips).sort((a,b)=>b[1]-a[1]).map(([z,n])=>`<span class="chip">ZIP ${z}: <b>${n}</b>${DB.operator.service_zip_codes.includes(z)?"":" (outside)"}</span>`).join("")}</div></div>
@@ -835,11 +841,10 @@ function tabSettings(){
     <div class="text-sm font-bold mt-5">Busy month? Add more anytime</div>
     <div class="grid gap-2 mt-2">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Storm Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
     <p class="muted text-xs mt-2">Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute. Change plans anytime.</p></div>
-   <div class="card p-6" style="border-color:var(--orange)"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>from $48/mo</b></div>
+   <div class="card p-6" style="border-color:var(--orange)"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>$48/mo</b></div>
     <p class="muted text-sm mt-1">Most happy customers never leave a review because nobody asks. Your AI asks every customer after every job, by text and email, with a one-tap link to your Google reviews. Then it reminds them once if they haven't.</p>
     <ul class="muted text-xs mt-3 grid gap-1 list-disc pl-5"><li>Every customer gets the same ask. Google and the FTC don't allow only asking happy customers.</li><li>Unhappy replies come straight to your Inbox so you can make it right.</li><li>See requests sent and reviews gained each month.</li></ul>
-    <div class="grid gap-2 mt-4 text-sm"><div class="flex justify-between"><span>Review Booster: up to 100 jobs a month</span><b>$48/mo</b></div><div class="flex justify-between"><span>Review Booster Plus: up to 250 jobs a month</span><b>$98/mo</b></div><div class="flex justify-between"><span>Review Booster Pro: over 250 jobs a month</span><b>$148/mo</b></div></div>
-    <p class="muted text-xs mt-2">Pass your limit and every customer still gets asked that month. We'll suggest moving up for next month.</p>
+    <p class="muted text-xs mt-3">Every completed job, every customer, no monthly limit.</p>
     <button class="btn btn-orange w-full mt-4" onclick="toast('Review Booster added. Your AI starts asking after your next completed job.')">Add Review Booster</button></div>
    <div class="card p-6"><h2 class="font-bold text-lg">Phone and texting status</h2><p class="muted text-sm mt-1">Carriers approve business texting, usually within 2 business days and up to 7. Your AI works the whole time.</p>
     ${trackerRow("Business line and AI calls","Live",true)}${trackerRow("Texting: business registration","Approved",true)}${trackerRow("Texting: campaign review","In review, usually 2 business days",false)}${trackerRow("Texting live","We'll text you the moment it's on",false)}
