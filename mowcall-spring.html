@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" class="mow">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MowCall spring changes · Preview</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>try{var t=localStorage.getItem("snowline_theme")||"dark";if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.classList.add("light")}catch(e){}</script>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0}
+  button{background:transparent;color:inherit;font:inherit;border:0;cursor:pointer}
+  a{color:inherit}
+  :root{
+    --bg:oklch(0.18 0.04 255); --fg:oklch(0.97 0.01 230); --card:oklch(0.23 0.045 255);
+    --muted:oklch(0.27 0.05 255); --mfg:oklch(0.78 0.03 235);
+    --orange:oklch(0.74 0.17 140); --ice:oklch(0.86 0.09 155);
+    --border:oklch(0.85 0.08 225 / 18%); --input:oklch(0.85 0.08 225 / 25%);
+    --red:oklch(0.7 0.19 22); --green:oklch(0.75 0.15 150); --yellow:oklch(0.85 0.15 90);
+  }
+  html.light{
+    --bg:oklch(0.98 0.006 240); --fg:oklch(0.22 0.04 255); --card:oklch(1 0 0);
+    --muted:oklch(0.94 0.012 240); --mfg:oklch(0.46 0.03 250);
+    --orange:oklch(0.6 0.16 145); --ice:oklch(0.48 0.12 155);
+    --border:oklch(0.3 0.05 255 / 13%); --input:oklch(0.3 0.05 255 / 28%);
+    --red:oklch(0.58 0.2 25); --green:oklch(0.55 0.15 150); --yellow:oklch(0.62 0.14 75);
+  }
+  html,body{background:var(--bg);color:var(--fg);font-family:Archivo,system-ui,sans-serif}
+  .display{font-family:"Archivo Black",Archivo,sans-serif;letter-spacing:-.01em}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:1rem}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;border-radius:.75rem;font-weight:700;padding:0 1.1rem;transition:filter .15s}
+  .btn-sm{min-height:40px;padding:0 .8rem;font-size:.9rem}
+  .btn-orange{background:var(--orange);color:oklch(0.15 0.03 255)}
+  .btn-orange:hover{filter:brightness(1.08)}
+  .btn-ghost{border:1px solid var(--input);color:var(--fg)}
+  .btn-ghost:hover{background:var(--muted)}
+  .btn-red{border:1px solid var(--red);color:var(--red)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .input{width:100%;min-height:48px;border-radius:.75rem;background:var(--bg);color:var(--fg);border:1px solid var(--input);padding:.75rem 1rem;font-size:1rem}
+  .input:focus{outline:2px solid var(--orange);outline-offset:1px}
+  .muted{color:var(--mfg)} .ice{color:var(--ice)} .orange{color:var(--orange)}
+  .tab{padding:.7rem 1rem;border-radius:.75rem;font-weight:600;white-space:nowrap;color:var(--mfg)}
+  .tab.on{background:var(--muted);color:var(--fg)}
+  .chip{border:1px solid var(--input);border-radius:999px;padding:.45rem .95rem;font-size:.9rem;white-space:nowrap}
+  .chip.on{background:var(--orange);color:oklch(0.15 0.03 255);border-color:var(--orange);font-weight:700}
+  .choice{border:2px solid var(--input);border-radius:1rem;padding:1rem;text-align:left;width:100%}
+  .choice.on{border-color:var(--orange);background:color-mix(in oklab,var(--orange) 10%,var(--card))}
+  .pill{font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;white-space:nowrap}
+  .p-green{background:oklch(0.75 0.15 150 / 20%);color:var(--green)}
+  .p-yellow{background:oklch(0.85 0.15 90 / 20%);color:var(--yellow)}
+  .p-red{background:oklch(0.7 0.19 22 / 20%);color:var(--red)}
+  .p-ice{background:oklch(0.86 0.09 155 / 18%);color:var(--ice)}
+  .p-muted{background:var(--muted);color:var(--mfg)}
+  .todo{border:1px dashed var(--yellow);color:var(--yellow);border-radius:.75rem;padding:.6rem .8rem;font-size:.8rem}
+  .scroll-x{overflow-x:auto;scrollbar-width:none} .scroll-x::-webkit-scrollbar{display:none}
+  .bubble{max-width:85%;padding:.55rem .8rem;border-radius:1rem;font-size:.9rem;line-height:1.35}
+  .bubble.in{background:#e5e5ea;color:#111;border-bottom-left-radius:.3rem}
+  .meter{height:10px;border-radius:999px;background:var(--muted);overflow:hidden}
+  .meter>div{height:100%;background:var(--orange)}
+  dialog::backdrop{background:rgb(0 0 0 / .6)}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60}
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="sticky top-0 z-50 text-xs" style="background:oklch(0.85 0.15 90);color:oklch(0.15 0.03 255)">
+  <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 items-center">
+    <strong>MOWCALL SPRING CHANGES PREVIEW · sample data, nothing is sent</strong>
+    <a href="#/route" class="underline">1. Today's route</a>
+    <a href="#/customers" class="underline">2. Customers + cap</a>
+    <a href="#/settings" class="underline">3. Operator settings</a>
+    <a href="#/quote" class="underline">4. Homeowner quote (EN/ES)</a>
+    <a href="#/texts" class="underline">5. Customer texts</a>
+    <a href="index.html#/mow" class="underline">Back to full preview</a>
+    <button onclick="resetDemo()" class="underline">Reset sample data</button>
+  </div>
+</div>
+
+<div id="app" class="max-w-5xl mx-auto px-4 py-6"></div>
+
+<dialog id="dlg" class="card p-0 w-[min(560px,94vw)]" style="background:var(--card);color:var(--fg)"><div id="dlgBody" class="p-6"></div></dialog>
+<div id="toast"></div>
+
+<script>
+/* ===================== SAMPLE DATA ===================== */
+const $=s=>document.querySelector(s);
+const money=n=>"$"+Number(n).toFixed(0);
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat"];
+const SEED={
+ op:{business:"Sean's Lawn & Snow",plan:"starter",payMode:"choose",defaultPay:"per_visit",ach:true,
+     prices:{small:35,medium:45,large:60},tallFee:25,tallInches:6,firstCut:20,spanish:true,notice:24},
+ customers:[
+  {id:1,name:"Dana Price",addr:"412 Oak Ridge Dr",size:"medium",freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Gate code 4417. Friendly dog (Bo), keep gate shut.",status:"active"},
+  {id:2,name:"Luis Ramírez",addr:"88 Willow Ct",size:"large",freq:"weekly",day:"Tue",pay:"monthly",lang:"es",notes:"Perro en el patio de atrás. Bolsas de basura en la acera los martes.",status:"active"},
+  {id:3,name:"Marcy Hill",addr:"1503 Birch Ln",size:"small",freq:"biweekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Side gate sticks. Lift and push.",status:"active"},
+  {id:4,name:"Greg & Tasha Moore",addr:"27 Cedar Pt",size:"medium",freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"",status:"active"},
+  {id:5,name:"Rosa Delgado",addr:"640 Maple Ave",size:"medium",freq:"biweekly",day:"Tue",pay:"monthly",lang:"es",notes:"Mover la manguera antes de cortar.",status:"active"},
+  {id:6,name:"Ken Whitfield",addr:"9 Pine Hollow",size:"large",freq:"weekly",day:"Wed",pay:"per_visit",lang:"en",notes:"Paused for vacation until the 20th.",status:"paused"}
+ ],
+ extraActive:25,
+ route:{day:"Tue",stops:[1,2,3,4,5],state:{}},
+ texts:[]
+};
+let DB;
+function load(){try{DB=JSON.parse(localStorage.getItem("mowspring_demo"))}catch(e){}if(!DB)DB=JSON.parse(JSON.stringify(SEED))}
+function save(){localStorage.setItem("mowspring_demo",JSON.stringify(DB))}
+function resetDemo(){localStorage.removeItem("mowspring_demo");load();toast("Sample data reset");route()}
+function toast(m){const t=$("#toast");t.innerHTML=`<div class="card px-4 py-3 text-sm font-semibold shadow-xl">${m}</div>`;clearTimeout(t._h);t._h=setTimeout(()=>t.innerHTML="",3200)}
+function openDlg(html){$("#dlgBody").innerHTML=html;$("#dlg").showModal()}
+function closeDlg(){$("#dlg").close()}
+
+const PLANS={starter:{name:"Starter",price:48,cap:35},plus:{name:"Starter Plus",price:118,cap:80},solo:{name:"Monthly Solo",price:148,cap:null}};
+const activeCount=()=>DB.customers.filter(c=>c.status==="active").length+DB.extraActive;
+const cust=id=>DB.customers.find(c=>c.id===id);
+const visitPrice=c=>DB.op.prices[c.size];
+const FREQ={weekly:"Weekly",biweekly:"Every other week",once:"One time"};
+const PAY={per_visit:"Autopay after each visit",monthly:"Flat monthly"};
+const monthlyFor=c=>Math.round(visitPrice(c)*(c.freq==="weekly"?52:26)/12);
+
+/* ===================== CUSTOMER TEXT TEMPLATES ===================== */
+const T={
+ en:{
+  aiNote:b=>`${b} uses an AI assistant to text and answer calls so the crew can stay on the job. A person on our team checks every conversation.`,
+  rain:(n,b,d)=>`Hi ${n}, it's ${b}. Rain today, so your mow moves to ${d}. Nothing for you to do. Reply CHANGE if that day doesn't work.`,
+  omw:(n,b)=>`Hi ${n}, ${b} is on the way. About 15 minutes out. Please make sure the gate is unlocked and pets are inside.`,
+  done:(n,b,a,l)=>`Done! Your lawn at ${a} is mowed and edged. See the photo: ${l} . ${b}`,
+  skip:(n,b)=>`Hi ${n}, we skipped your mow today because the ground was too wet. You won't be charged for today. See you next visit. ${b}`,
+  paid:(a)=>`Payment received: ${a} by bank (ACH). Thank you!`
+ },
+ es:{
+  aiNote:b=>`${b} usa un asistente de IA para enviar mensajes y contestar llamadas, así el equipo puede seguir trabajando. Una persona de nuestro equipo revisa cada conversación.`,
+  rain:(n,b,d)=>`Hola ${n}, le escribe ${b}. Hoy llueve, así que su corte de césped pasa al ${d}. No tiene que hacer nada. Responda CAMBIAR si ese día no le funciona.`,
+  omw:(n,b)=>`Hola ${n}, ${b} va en camino. Llegamos en unos 15 minutos. Por favor deje la reja abierta y las mascotas adentro.`,
+  done:(n,b,a,l)=>`¡Listo! Su césped en ${a} ya está cortado y bordeado. Vea la foto: ${l} . ${b}`,
+  skip:(n,b)=>`Hola ${n}, hoy no cortamos su césped porque el suelo estaba muy mojado. No se le cobrará por hoy. Nos vemos en la próxima visita. ${b}`,
+  paid:(a)=>`Pago recibido: ${a} por banco (ACH). ¡Gracias!`
+ }
+};
+const DAY_ES={Mon:"lunes",Tue:"martes",Wed:"miércoles",Thu:"jueves",Fri:"viernes",Sat:"sábado"};
+const DAY_EN={Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
+function logText(c,kind,body){DB.texts.unshift({to:c.name,lang:c.lang,kind,body,at:new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})});DB.texts=DB.texts.slice(0,30);save()}
+const photoLink=id=>`mowcall.com/p/${(id*7919).toString(36)}`;
+
+/* ===================== SHELL ===================== */
+const TABS=[["route","Today's route"],["customers","Customers"],["settings","Settings"],["quote","Homeowner quote"],["texts","Customer texts"]];
+function shell(tab,inner){
+ return `<div class="flex items-center justify-between gap-3 mb-4">
+  <div><div class="text-xs muted">MowCall · operator view</div><div class="display text-2xl">${DB.op.business}</div></div>
+  <span class="pill p-ice">${PLANS[DB.op.plan].name} · ${money(PLANS[DB.op.plan].price)}/mo</span></div>
+  <nav class="scroll-x flex gap-2 pb-3">${TABS.map(t=>`<a href="#/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
+  ${capBanner()}${inner}`;
+}
+function capBanner(){
+ const p=PLANS[DB.op.plan];if(!p.cap)return "";
+ const n=activeCount();if(n<p.cap-5)return "";
+ const full=n>=p.cap;
+ return `<div class="card p-4 mb-4" style="border-color:${full?"var(--red)":"var(--yellow)"}">
+  <div class="font-bold">${full?`You're at ${p.cap} active customers, the ${p.name} limit.`:`Heads-up: ${n} of ${p.cap} active customers on ${p.name}.`}</div>
+  <p class="muted text-sm mt-1">${full?"New requests still come in and get answered. To book more recurring customers, upgrade.":"Paused and one-time customers don't count toward your limit."}</p>
+  <div class="flex flex-wrap gap-2 mt-3">${DB.op.plan==="starter"?`<button class="btn btn-sm btn-orange" onclick="upgrade('plus')">Starter Plus $118/mo · up to 80 customers</button>`:""}
+  <button class="btn btn-sm btn-ghost" onclick="upgrade('solo')">Monthly Solo $148/mo · no limit, business line + phone AI</button></div></div>`;
+}
+function upgrade(p){DB.op.plan=p;save();toast(`Switched to ${PLANS[p].name} (preview only, no charge)`);route()}
+
+/* ===================== 1. TODAY'S ROUTE ===================== */
+function viewRoute(){
+ const r=DB.route;
+ const stops=r.stops.map(cust).filter(c=>c&&c.status==="active");
+ const st=id=>r.state[id]||"scheduled";
+ const badge={scheduled:["Scheduled","p-muted"],omw:["On the way","p-yellow"],done:["Done · billed","p-green"],skipped:["Skipped · not billed","p-ice"],missed:["Missed · reschedule","p-red"],moved:["Moved (rain)","p-ice"]};
+ const doneCount=stops.filter(c=>st(c.id)==="done").length;
+ const earned=stops.filter(c=>st(c.id)==="done").reduce((s,c)=>s+(c.pay==="per_visit"?visitPrice(c):0),0);
+ return shell("route",`
+ <div class="card p-5">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+   <div><div class="display text-xl">${DAY_EN[r.day]}'s route</div><div class="muted text-sm">${stops.length} stops · ${doneCount} done · ${money(earned)} charged by autopay so far</div></div>
+   <button class="btn btn-red" onclick="rainDlg()">🌧 Rain delay: move today</button>
+  </div>
+  <div class="grid gap-3 mt-4">
+  ${stops.map((c,i)=>{const s=st(c.id),[bt,bc]=badge[s];return `<div class="card p-4" style="background:var(--bg)">
+   <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${i+1}. ${c.name} ${c.lang==="es"?'<span class="pill p-muted">ES</span>':""}</div>
+    <div class="muted text-sm">${c.addr} · ${c.size} yard · ${FREQ[c.freq]} · ${PAY[c.pay]}${c.pay==="monthly"?` (${money(monthlyFor(c))}/mo)`:` (${money(visitPrice(c))}/visit)`}</div></div>
+    <span class="pill ${bc} self-start">${bt}</span></div>
+   ${c.notes?`<div class="text-sm mt-2"><span class="muted">Property notes:</span> ${c.notes}</div>`:""}
+   <div class="flex flex-wrap gap-2 mt-3">
+    <button class="btn btn-sm btn-ghost" ${s!=="scheduled"?"disabled":""} onclick="act(${c.id},'omw')">On the way</button>
+    <button class="btn btn-sm btn-orange" ${["done","skipped","moved"].includes(s)?"disabled":""} onclick="doneDlg(${c.id})">Done + photo</button>
+    <button class="btn btn-sm btn-ghost" ${["done","skipped","moved"].includes(s)?"disabled":""} onclick="act(${c.id},'skipped')">Skip (too wet, no charge)</button>
+    <button class="btn btn-sm btn-ghost" ${["done","skipped","moved","missed"].includes(s)?"disabled":""} onclick="act(${c.id},'missed')">Missed</button>
+   </div></div>`}).join("")}
+  </div>
+  <p class="muted text-xs mt-4"><b>Skipped</b> = weather or ground made it unsafe; customer isn't charged and the plan keeps going. <b>Missed</b> = we didn't make it; the job goes back on the schedule. Only <b>Done</b> triggers autopay for per-visit customers.</p>
+  <div class="todo mt-3">Real build: these buttons send an event to Boss Growth Machine, which sends the text in the customer's language (consent, opt-outs and 9am–8pm quiet hours apply) and runs the ACH charge. Lovable only adds the buttons and the webhook.</div>
+ </div>`);
+}
+function act(id,kind){
+ const c=cust(id),b=DB.op.business,L=T[c.lang];
+ DB.route.state[id]=kind;
+ if(kind==="omw")logText(c,"On the way",L.omw(c.name.split(" ")[0],b));
+ if(kind==="skipped")logText(c,"Skipped",L.skip(c.name.split(" ")[0],b));
+ save();toast(kind==="omw"?`"On the way" text sent to ${c.name}`:kind==="skipped"?`Skipped. ${c.name} gets a no-charge text`:`Marked missed. Back on the schedule.`);route();
+}
+function doneDlg(id){const c=cust(id);
+ openDlg(`<div class="display text-xl">Mark done: ${c.name}</div>
+ <p class="muted text-sm mt-1">Snap a photo. The customer gets a text with a link to it (a link, not a picture message, so texts stay cheap).</p>
+ <label class="choice mt-4 flex items-center gap-3 cursor-pointer"><input type="checkbox" id="ph" checked> <span>📷 Photo taken (sample)</span></label>
+ <div class="text-sm mt-3">${c.pay==="per_visit"?`Autopay will charge <b>${money(visitPrice(c))}</b> by bank (ACH).`:`Flat monthly customer: no charge today (billed ${money(monthlyFor(c))} on the 1st).`}</div>
+ <div class="flex gap-2 mt-5"><button class="btn btn-orange flex-1" onclick="markDone(${id})">Mark done</button><button class="btn btn-ghost" onclick="closeDlg()">Cancel</button></div>`)}
+function markDone(id){const c=cust(id),b=DB.op.business,L=T[c.lang];
+ DB.route.state[id]="done";
+ logText(c,"Done",L.done(c.name.split(" ")[0],b,c.addr,photoLink(id)));
+ if(c.pay==="per_visit")logText(c,"Payment",L.paid(money(visitPrice(c))));
+ save();closeDlg();toast(`Done. ${c.name} got the photo link${c.pay==="per_visit"?" and the autopay receipt":""}`);route()}
+function rainDlg(){
+ const left=DB.route.stops.map(cust).filter(c=>c&&c.status==="active"&&["scheduled","omw"].includes(DB.route.state[c.id]||"scheduled"));
+ if(!left.length)return toast("No stops left to move today");
+ openDlg(`<div class="display text-xl">Rain delay</div>
+ <p class="muted text-sm mt-1">Move the ${left.length} stops you haven't finished. Each customer gets one text in their language.</p>
+ <div class="text-sm font-semibold mt-4">Move them to</div>
+ <div class="flex flex-wrap gap-2 mt-2" id="rdays">${DAYS.filter(d=>d!==DB.route.day).map((d,i)=>`<button class="chip ${i===1?"on":""}" onclick="document.querySelectorAll('#rdays .chip').forEach(x=>x.classList.remove('on'));this.classList.add('on')" data-d="${d}">${DAY_EN[d]}</button>`).join("")}</div>
+ <div class="card p-3 mt-4 text-sm" style="background:var(--bg)"><div class="muted text-xs mb-1">Sample text (English)</div>${T.en.rain("Dana",DB.op.business,"Wednesday")}</div>
+ <div class="flex gap-2 mt-5"><button class="btn btn-orange flex-1" onclick="doRain()">Move ${left.length} stops + text customers</button><button class="btn btn-ghost" onclick="closeDlg()">Cancel</button></div>`)}
+function doRain(){
+ const d=document.querySelector("#rdays .chip.on").dataset.d;
+ const left=DB.route.stops.map(cust).filter(c=>c&&c.status==="active"&&["scheduled","omw"].includes(DB.route.state[c.id]||"scheduled"));
+ left.forEach(c=>{DB.route.state[c.id]="moved";logText(c,"Rain delay",T[c.lang].rain(c.name.split(" ")[0],DB.op.business,c.lang==="es"?DAY_ES[d]:DAY_EN[d]))});
+ save();closeDlg();toast(`${left.length} stops moved to ${DAY_EN[d]}. Customers texted.`);route()}
+
+/* ===================== 2. CUSTOMERS + CAP ===================== */
+function viewCustomers(){
+ const p=PLANS[DB.op.plan],n=activeCount();
+ return shell("customers",`
+ <div class="card p-5">
+  <div class="flex flex-wrap justify-between gap-3 items-end">
+   <div><div class="display text-xl">Recurring customers</div><div class="muted text-sm">${p.cap?`${n} of ${p.cap} active on ${p.name}`:`${n} active · no limit on ${p.name}`}</div></div>
+   <button class="btn btn-sm btn-ghost" onclick="addSample()">+ Add a sample customer</button>
+  </div>
+  ${p.cap?`<div class="meter mt-3"><div style="width:${Math.min(100,n/p.cap*100)}%"></div></div>`:""}
+  <p class="muted text-xs mt-2">The limit counts <b>active recurring customers</b>, not visits. Paused customers and one-time jobs don't count. Showing 6 of ${n+DB.customers.filter(c=>c.status!=="active").length} (sample data includes ${DB.extraActive} more active customers not listed).</p>
+  <div class="grid gap-3 mt-4">${DB.customers.map(c=>`<div class="card p-4" style="background:var(--bg)">
+   <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${c.name} ${c.lang==="es"?'<span class="pill p-muted">Español</span>':""}</div>
+   <div class="muted text-sm">${c.addr} · ${c.size} yard · ${FREQ[c.freq]} on ${DAY_EN[c.day]}s</div>
+   <div class="text-sm mt-1">${PAY[c.pay]}: <b>${c.pay==="monthly"?money(monthlyFor(c))+"/mo":money(visitPrice(c))+"/visit"}</b> · ACH</div></div>
+   <span class="pill ${c.status==="active"?"p-green":"p-yellow"} self-start">${c.status==="active"?"Active":"Paused"}</span></div>
+   <div class="flex flex-wrap gap-2 mt-3">
+    <button class="btn btn-sm btn-ghost" onclick="togglePause(${c.id})">${c.status==="active"?"Pause (vacation/drought)":"Resume"}</button>
+    ${DB.op.payMode==="choose"?`<button class="btn btn-sm btn-ghost" onclick="togglePay(${c.id})">Switch to ${c.pay==="monthly"?"per-visit":"flat monthly"}</button>`:""}
+   </div></div>`).join("")}</div>
+ </div>`);
+}
+function togglePause(id){const c=cust(id);c.status=c.status==="active"?"paused":"active";save();toast(c.status==="paused"?`${c.name} paused. Plan kept, no charges, doesn't count toward your limit.`:`${c.name} resumed`);route()}
+function togglePay(id){const c=cust(id);c.pay=c.pay==="monthly"?"per_visit":"monthly";save();route()}
+function addSample(){const p=PLANS[DB.op.plan];if(p.cap&&activeCount()>=p.cap){toast("At your limit. Upgrade to add more recurring customers.");return}DB.extraActive++;save();toast("Sample customer added");route()}
+
+/* ===================== 3. SETTINGS ===================== */
+function viewSettings(){const o=DB.op,num=(k,v,w="24")=>`<input class="input !min-h-[42px] !w-${w} inline-block" type="number" min="0" value="${v}" onchange="setNum('${k}',this.value)">`;
+ return shell("settings",`
+ <div class="grid md:grid-cols-2 gap-4">
+  <div class="card p-5"><div class="display text-lg">How recurring customers pay</div>
+   <p class="muted text-sm mt-1">Bank payment (ACH) is the default because it costs the least. Cards only if you turn them on.</p>
+   ${[["per_visit","Autopay after each visit","Charged when you tap Done. Skipped visits are never charged."],["monthly","Flat monthly","Same amount on the 1st of each month in season. Easier for customers to budget."],["choose","Let each customer pick","The quote page offers both. You can switch any customer later."]].map(x=>`<button class="choice mt-3 ${o.payMode===x[0]?"on":""}" onclick="DB.op.payMode='${x[0]}';save();route()"><div class="font-bold">${x[1]}</div><div class="muted text-sm">${x[2]}</div></button>`).join("")}
+  </div>
+  <div class="card p-5"><div class="display text-lg">Prices per mow</div>
+   <div class="grid gap-3 mt-3 text-sm">${["small","medium","large"].map(s=>`<div class="flex items-center justify-between gap-3"><span class="capitalize">${s} yard</span><span>$ ${num("prices."+s,o.prices[s])}</span></div>`).join("")}</div>
+   <div class="display text-lg mt-6">Tall grass and first cut</div>
+   <div class="grid gap-3 mt-3 text-sm">
+    <div class="flex items-center justify-between gap-3"><span>Tall-grass fee if over ${o.tallInches} inches</span><span>$ ${num("tallFee",o.tallFee)}</span></div>
+    <div class="flex items-center justify-between gap-3"><span>First-cut fee (new customers)</span><span>$ ${num("firstCut",o.firstCut)}</span></div></div>
+   <p class="muted text-xs mt-2">Both fees are shown on the quote page <b>before</b> the customer books. No surprise charges.</p>
+  </div>
+  <div class="card p-5"><div class="display text-lg">Spanish</div>
+   <button class="choice mt-3 ${o.spanish?"on":""}" onclick="DB.op.spanish=!DB.op.spanish;save();route()"><div class="font-bold">${o.spanish?"On":"Off"}: quote page, customer pages and AI replies in Spanish</div><div class="muted text-sm">Customers pick English or Español. Texts go out in the language they picked.</div></button>
+  </div>
+  <div class="card p-5"><div class="display text-lg">Your plan</div>
+   ${Object.entries(PLANS).map(([k,p])=>`<button class="choice mt-3 ${o.plan===k?"on":""}" onclick="upgrade('${k}')"><div class="flex justify-between"><b>${p.name}</b><b>${money(p.price)}/mo</b></div><div class="muted text-sm">${p.cap?`Up to ${p.cap} active recurring customers`:"No customer limit · business line + phone AI"}</div></button>`).join("")}
+   <p class="muted text-xs mt-2">Change plans anytime as your season changes.</p>
+  </div>
+ </div>`);
+}
+function setNum(k,v){const parts=k.split(".");if(parts.length===2)DB.op[parts[0]][parts[1]]=Number(v);else DB.op[k]=Number(v);save()}
+
+/* ===================== 4. HOMEOWNER QUOTE ===================== */
+const Q={lang:"en",step:1,size:"medium",freq:"weekly",tall:false,pay:"per_visit",notes:"",gate:"",pets:"",name:"",addr:""};
+const QT={
+ en:{title:"Get your lawn price",sub:b=>`Instant price from ${b}. No phone call needed.`,addr:"Property address",size:"Yard size",sizes:{small:"Small (up to ¼ acre)",medium:"Medium (¼–½ acre)",large:"Large (½–1 acre)"},
+  freq:"How often?",freqs:{weekly:"Weekly",biweekly:"Every other week",once:"One time"},tall:t=>`Is the grass over ${t} inches right now?`,yes:"Yes",no:"No",
+  fees:"Fees, shown before you book",tallFee:"Tall-grass fee (first visit only)",firstCut:"First-cut fee (first visit only)",perVisit:"Per mow",
+  pay:"How do you want to pay?",pays:{per_visit:"Pay after each mow",monthly:"Same amount every month"},bank:"Paid by bank (ACH). Skipped visits are never charged.",
+  notes:"Anything we should know?",gate:"Gate code",pets:"Pets in the yard?",other:"Other notes (trash cans, hoses, sprinklers)",
+  next:"See my price",book:"Book my plan",back:"Back",total:"Your price",first:"First visit total",monthly:"Monthly",
+  ai:"Heads-up: we use an AI assistant to text and answer calls so our crew can stay on the job. A person on our team checks every conversation.",
+  doneT:"You're booked!",doneS:d=>`Your first mow is scheduled. You'll get a text when we're on the way and a photo when we're done. Cancel or pause free with ${d} hours' notice.`,name:"Your name"},
+ es:{title:"Precio para su césped",sub:b=>`Precio al instante de ${b}. No necesita llamar.`,addr:"Dirección de la propiedad",size:"Tamaño del jardín",sizes:{small:"Pequeño (hasta ¼ de acre)",medium:"Mediano (¼ a ½ acre)",large:"Grande (½ a 1 acre)"},
+  freq:"¿Con qué frecuencia?",freqs:{weekly:"Cada semana",biweekly:"Cada dos semanas",once:"Una sola vez"},tall:t=>`¿El césped mide más de ${t} pulgadas ahora?`,yes:"Sí",no:"No",
+  fees:"Cargos, antes de reservar",tallFee:"Cargo por césped alto (solo la primera visita)",firstCut:"Cargo del primer corte (solo la primera visita)",perVisit:"Por corte",
+  pay:"¿Cómo quiere pagar?",pays:{per_visit:"Pagar después de cada corte",monthly:"La misma cantidad cada mes"},bank:"Pago por banco (ACH). Nunca se cobran las visitas canceladas por el clima.",
+  notes:"¿Algo que debamos saber?",gate:"Código de la reja",pets:"¿Mascotas en el jardín?",other:"Otras notas (botes de basura, mangueras, rociadores)",
+  next:"Ver mi precio",book:"Reservar mi plan",back:"Atrás",total:"Su precio",first:"Total de la primera visita",monthly:"Mensual",
+  ai:"Aviso: usamos un asistente de IA para enviar mensajes y contestar llamadas, así nuestro equipo puede seguir trabajando. Una persona de nuestro equipo revisa cada conversación.",
+  doneT:"¡Reservado!",doneS:d=>`Su primer corte está programado. Le enviaremos un mensaje cuando vayamos en camino y una foto al terminar. Cancele o pause gratis con ${d} horas de aviso.`,name:"Su nombre"}
+};
+function viewQuote(){
+ const o=DB.op,L=QT[Q.lang];
+ const per=o.prices[Q.size],first=per+(Q.tall?o.tallFee:0)+(Q.freq!=="once"?o.firstCut:0);
+ const mo=Math.round(per*(Q.freq==="weekly"?52:26)/12);
+ const payOpts=o.payMode==="choose"?["per_visit","monthly"]:[o.payMode];
+ if(!payOpts.includes(Q.pay))Q.pay=payOpts[0];
+ const langToggle=o.spanish?`<div class="inline-flex border rounded-xl overflow-hidden" style="border-color:var(--input)">${["en","es"].map(l=>`<button class="px-4 py-2 font-semibold ${Q.lang===l?"btn-orange":""}" onclick="Q.lang='${l}';route()">${l==="en"?"English":"Español"}</button>`).join("")}</div>`:"";
+ let body="";
+ if(Q.step===1)body=`
+  <label class="text-sm font-semibold">${L.addr}</label><input class="input mt-1" value="${Q.addr}" placeholder="123 Main St" oninput="Q.addr=this.value">
+  <div class="text-sm font-semibold mt-5">${L.size}</div><div class="grid gap-2 mt-2">${Object.entries(L.sizes).map(([k,v])=>`<button class="choice ${Q.size===k?"on":""}" onclick="Q.size='${k}';route()"><div class="flex justify-between"><span class="font-semibold">${v}</span><b>${money(o.prices[k])}</b></div></button>`).join("")}</div>
+  <div class="text-sm font-semibold mt-5">${L.freq}</div><div class="flex flex-wrap gap-2 mt-2">${Object.entries(L.freqs).map(([k,v])=>`<button class="chip ${Q.freq===k?"on":""}" onclick="Q.freq='${k}';route()">${v}</button>`).join("")}</div>
+  <div class="text-sm font-semibold mt-5">${L.tall(o.tallInches)}</div><div class="flex gap-2 mt-2"><button class="chip ${Q.tall?"on":""}" onclick="Q.tall=true;route()">${L.yes}</button><button class="chip ${!Q.tall?"on":""}" onclick="Q.tall=false;route()">${L.no}</button></div>
+  <div class="card p-4 mt-5" style="background:var(--bg)"><div class="font-bold">${L.fees}</div>
+   <div class="flex justify-between text-sm mt-2"><span>${L.perVisit}</span><b>${money(per)}</b></div>
+   ${Q.freq!=="once"?`<div class="flex justify-between text-sm mt-1"><span>${L.firstCut}</span><b>${money(o.firstCut)}</b></div>`:""}
+   ${Q.tall?`<div class="flex justify-between text-sm mt-1"><span>${L.tallFee}</span><b>${money(o.tallFee)}</b></div>`:""}
+  </div>
+  <button class="btn btn-orange w-full mt-5" onclick="Q.step=2;route()">${L.next}</button>`;
+ if(Q.step===2)body=`
+  <div class="card p-4" style="background:var(--bg)"><div class="muted text-sm">${L.total}</div>
+   <div class="display text-3xl mt-1">${money(per)} <span class="text-base muted">/ ${L.perVisit.toLowerCase()}</span></div>
+   <div class="text-sm mt-1">${L.first}: <b>${money(first)}</b>${Q.freq!=="once"?` · ${L.monthly}: <b>${money(mo)}</b>`:""}</div></div>
+  ${Q.freq!=="once"?`<div class="text-sm font-semibold mt-5">${L.pay}</div><div class="grid gap-2 mt-2">${payOpts.map(k=>`<button class="choice ${Q.pay===k?"on":""}" onclick="Q.pay='${k}';route()"><div class="flex justify-between"><span class="font-semibold">${L.pays[k]}</span><b>${k==="monthly"?money(mo):money(per)}</b></div></button>`).join("")}</div><p class="muted text-xs mt-2">${L.bank}</p>`:""}
+  <div class="text-sm font-semibold mt-5">${L.notes}</div>
+  <div class="grid gap-2 mt-2"><input class="input" placeholder="${L.name}" value="${Q.name}" oninput="Q.name=this.value"><input class="input" placeholder="${L.gate}" value="${Q.gate}" oninput="Q.gate=this.value"><input class="input" placeholder="${L.pets}" value="${Q.pets}" oninput="Q.pets=this.value"><textarea class="input" rows="2" placeholder="${L.other}" oninput="Q.notes=this.value">${Q.notes}</textarea></div>
+  <p class="muted text-xs mt-4">${L.ai}</p>
+  <div class="flex gap-2 mt-5"><button class="btn btn-ghost" onclick="Q.step=1;route()">${L.back}</button><button class="btn btn-orange flex-1" onclick="bookQuote()">${L.book}</button></div>`;
+ if(Q.step===3)body=`<div class="text-center py-6"><div class="text-5xl">✅</div><div class="display text-2xl mt-3">${L.doneT}</div><p class="muted mt-2">${L.doneS(o.notice)}</p>
+  <button class="btn btn-ghost mt-5" onclick="Object.assign(Q,{step:1,tall:false,name:'',addr:'',gate:'',pets:'',notes:''});route()">${Q.lang==="es"?"Empezar de nuevo":"Start over"}</button></div>`;
+ return `<div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div class="text-xs muted">Homeowner view · what customers see after scanning the QR code</div><a href="#/route" class="underline text-sm">Back to operator view</a></div>
+ <div class="max-w-lg mx-auto card p-6">
+  <div class="flex justify-between items-start gap-3"><div><div class="display text-2xl">${L.title}</div><div class="muted text-sm mt-1">${L.sub(o.business)}</div></div>${langToggle}</div>
+  <div class="mt-5">${body}</div>
+ </div>
+ <div class="todo max-w-lg mx-auto mt-4">Preview only: no booking is saved and no payment is taken. In the real build, Book adds the customer to your Customers list, counts toward your plan limit, and the deposit/ACH setup runs through your own payment link.</div>`;
+}
+function bookQuote(){
+ const o=DB.op,p=PLANS[o.plan];
+ if(Q.freq!=="once"&&p.cap&&activeCount()>=p.cap){Q.step=3;route();toast("Operator note: you're at your plan limit, so this request goes to your inbox until you upgrade.");return}
+ if(Q.freq!=="once"){const id=Date.now()%100000;DB.customers.push({id,name:Q.name||(Q.lang==="es"?"Cliente nuevo":"New customer"),addr:Q.addr||"(sample address)",size:Q.size,freq:Q.freq,day:"Wed",pay:Q.pay,lang:Q.lang,notes:[Q.gate&&`Gate ${Q.gate}`,Q.pets,Q.notes].filter(Boolean).join(". "),status:"active"});save()}
+ Q.step=3;route()}
+
+/* ===================== 5. CUSTOMER TEXTS ===================== */
+function viewTexts(){
+ const b=DB.op.business;
+ const samples=DB.texts.length?DB.texts:[];
+ const lib=[["English",[["AI notice (once, up front)",T.en.aiNote(b)],["Rain delay",T.en.rain("Dana",b,"Wednesday")],["On the way",T.en.omw("Dana",b)],["Done + photo link",T.en.done("Dana",b,"412 Oak Ridge Dr",photoLink(1))],["Skipped (no charge)",T.en.skip("Dana",b)]]],
+  ["Español",[["Aviso de IA (una vez)",T.es.aiNote(b)],["Retraso por lluvia",T.es.rain("Luis",b,"miércoles")],["En camino",T.es.omw("Luis",b)],["Listo + foto",T.es.done("Luis",b,"88 Willow Ct",photoLink(2))],["Visita cancelada (sin cargo)",T.es.skip("Luis",b)]]]];
+ return shell("texts",`
+ <div class="grid md:grid-cols-2 gap-4">
+  ${lib.map(([lang,items])=>`<div class="card p-5"><div class="display text-lg">${lang}</div>
+   <div class="rounded-2xl p-4 mt-3 grid gap-3" style="background:#fff">${items.map(([k,v])=>`<div><div class="text-[11px] text-gray-500 mb-1">${k}</div><div class="bubble in">${v}</div></div>`).join("")}</div></div>`).join("")}
+ </div>
+ <div class="card p-5 mt-4"><div class="display text-lg">Sent in this preview</div>
+  ${samples.length?`<div class="grid gap-2 mt-3">${samples.map(t=>`<div class="text-sm card p-3" style="background:var(--bg)"><div class="muted text-xs">${t.at} · to ${t.to} · ${t.kind} · ${t.lang==="es"?"Español":"English"}</div><div class="mt-1">${t.body}</div></div>`).join("")}</div>`:`<p class="muted text-sm mt-2">Nothing yet. Tap buttons on <a class="underline" href="#/route">Today's route</a> to see the texts each customer would get.</p>`}
+ </div>
+ <div class="todo mt-4">Spanish wording is a draft and should be checked by a native speaker before launch.</div>`);
+}
+
+/* ===================== ROUTER ===================== */
+function route(top){
+ const h=(location.hash||"#/route").slice(2).split("?")[0]||"route";
+ const v={route:viewRoute,customers:viewCustomers,settings:viewSettings,quote:viewQuote,texts:viewTexts}[h]||viewRoute;
+ $("#app").innerHTML=v();if(top===true)window.scrollTo(0,0);
+}
+load();addEventListener("hashchange",()=>route(true));route(true);
+</script>
+</body>
+</html>
