@@ -158,7 +158,7 @@ const BRANDS={
    ["Your own branded customer app","✓|free install link, no app store needed","✗|web client portal","✗","✗|web customer portal (paid)","✗"],
    ["Business calls on a confirm/reschedule calendar","✓","✗","✗","✗","✗"],
    ["Same account runs your lawn season","✓|MowCall","✓","✓","✗|snow only","✓"]]},
-  faq:[["What is the QR code for?","It goes on your truck or signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can drive safe, and that a person on your team monitors and approves every conversation."],["Can I use it with one truck?","Yes. It works for a solo operator or a fleet."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about spring?","The same account switches to MowCall for mowing and yard work, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Starter plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account. See our Junior Boss page for parents."],["Can I change plans when the season changes?","Yes, anytime, month to month. Busy winter? Go Monthly. Slow stretch? Drop to Pay as you go or Starter. We'd rather you never pay for more than you use."]]},
+  faq:[["What is the QR code for?","It goes on your truck or signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can drive safe, and that a person on your team monitors and approves every conversation."],["Can I use it with one truck?","Yes. It works for a solo operator or a fleet."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about spring?","The same account switches to MowCall for mowing and yard work, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Junior Boss plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account. See our Junior Boss page for parents."],["Can I change plans when the season changes?","Yes, anytime, month to month. Busy winter? Go Monthly. Slow stretch? Drop to Pay as you go or Junior Boss. We'd rather you never pay for more than you use."]]},
  mow:{key:"mow",name:"MowCall",domain:"mowcall.com",who:"lawn care and landscaping crews",
   headline:"Keep the mower running. Your AI handles every customer.",
   sub:"One QR code, one phone number, one inbox. Quotes, deposits and recurring mows get booked while you work.",
@@ -174,7 +174,7 @@ const BRANDS={
    ["Your own branded customer app","✓|free install link, no app store needed","✗|web client portal","✗","✗","✗"],
    ["Business calls on a confirm/reschedule calendar","✓","✗","✗","✗","✗"],
    ["Same account runs your snow season","✓|PlowCall","✗","✓","✗","✓"]]},
-  faq:[["What is the QR code for?","It goes on your trailer, truck or yard signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can stay on the job, and that a person on your team monitors and approves every conversation."],["Can I use it as a one-person crew?","Yes. It works for a solo operator or multiple crews."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about winter?","The same account switches to PlowCall for snow removal, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Starter plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account."],["Can I change plans when the season changes?","Yes, anytime, month to month. We'd rather you never pay for more than you use."]]}
+  faq:[["What is the QR code for?","It goes on your trailer, truck or yard signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can stay on the job, and that a person on your team monitors and approves every conversation."],["Can I use it as a one-person crew?","Yes. It works for a solo operator or multiple crews."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about winter?","The same account switches to PlowCall for snow removal, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Junior Boss plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account."],["Can I change plans when the season changes?","Yes, anytime, month to month. We'd rather you never pay for more than you use."]]}
 };
 let BR=BRANDS.plow;
 function setBrand(k){BR=BRANDS[k];document.documentElement.classList.toggle("mow",k==="mow");document.title=BR.name+" by Boss Growth Machine";}
@@ -204,7 +204,11 @@ const ICON_TRUCK=`<path d="M3 17h13V7H3zM16 10h3l2 3v4h-5"/><circle cx="7" cy="1
 const ICON_MOW=`<path d="M4 15h12l2-5h3"/><path d="M6 15V9h7l3 6"/><circle cx="7" cy="18" r="2"/><circle cx="16" cy="18" r="2"/>`;
 function header(right){return `<header class="border-b" style="border-color:var(--border)"><div class="max-w-6xl mx-auto px-5 h-[72px] flex items-center justify-between">
   <a href="#${BR.key==="mow"?"/mow":"/"}" class="flex items-center gap-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ice)" stroke-width="2">${BR.key==="mow"?ICON_MOW:ICON_TRUCK}</svg>
-  <span class="font-bold text-lg">${BR.name}</span><span class="muted text-xs hidden sm:inline">by Boss Growth Machine</span></a>${right||""}</div></header>`}
+  <span class="font-bold text-lg">${BR.name}</span><span class="muted text-xs hidden sm:inline">by Boss Growth Machine</span></a><div class="flex items-center gap-2">${right||""}<button aria-label="Menu" aria-expanded="false" class="btn btn-ghost min-h-[44px] w-[44px] !px-0" onclick="toggleMenu(this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div></div>
+  <nav id="sitemenu" class="hidden border-t" style="border-color:var(--border);background:var(--card)"><div class="max-w-6xl mx-auto px-5 py-4 grid gap-1 sm:grid-cols-2 lg:grid-cols-3 text-base">${MENU().map(m=>`<a href="${m[1]}" onclick="closeMenu()" class="px-3 py-3 rounded-xl hover:brightness-125 flex justify-between items-center" style="background:var(--muted)"><span><b>${m[0]}</b><span class="muted text-sm block">${m[2]}</span></span><span class="muted">→</span></a>`).join("")}</div></nav></header>`}
+function MENU(){return [["PlowCall","#/","Snow removal software"],["MowCall","#/mow","Lawn care software"],["Pricing","#"+(BR.key==="mow"?"/mow":"/")+"?pricing","Plans from $48/mo"],["Junior Boss","#/kids","For parents: your kid's first business"],["Field Guide","#/blog","Straight answers for operators"],["Operator login","#/login","Already have an account?"]]}
+function toggleMenu(b){const m=$("#sitemenu");if(!m)return;const open=m.classList.toggle("hidden")===false;b.setAttribute("aria-expanded",open)}
+function closeMenu(){const m=$("#sitemenu");if(m)m.classList.add("hidden")}
 function footer(){return `<footer class="border-t mt-20" style="border-color:var(--border)"><div class="max-w-6xl mx-auto px-5 py-8 flex flex-wrap gap-4 justify-between text-sm muted">
   <span>${BR.name} · Powered by Boss Growth Machine</span><span class="flex gap-4"><a href="#${BR.key==="mow"?"/":"/mow"}" class="underline">${BR.key==="mow"?"Snow removal? PlowCall":"Lawn care? MowCall"}</a><a href="#/blog" class="underline">Field Guide</a><a href="#/kids" class="underline">For parents: Junior Boss</a><a href="#/privacy" class="underline">Privacy</a><a href="#/terms" class="underline">Terms</a><a href="#/login" class="underline">Operator login</a></span></div></footer>`}
 function heroArt(){
@@ -220,15 +224,15 @@ const PHONE_FAQ=[
  ["What if a storm misses or I can't make it?","Tap \"Can't make it\" on the job. Your customer picks: roll their deposit to the next service, or get an automatic refund to their card. You never handle refunds by hand. Customers can cancel free until you tap \"On the way.\" After that, your trip fee comes out of their deposit."],
  ["Will my customers sign a waiver?","Yes. Every booking includes your service terms and liability waiver, branded with your business name: marking driveway edges, hidden objects, refreezing, and reporting damage within 24 hours. You can add an \"Insured\" badge once you upload your insurance certificate."],
  ["Is there an App Store app?","Every plan includes your own branded customer app that installs from your quote page in one tap, with no app store needed. Want your own listing in the App Store and Google Play? That's a paid add-on, and Apple and Google charge their own yearly developer fees in your business name."],
- ["Do I need a business phone number at all?","Not on Starter: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Starter covers __CAPLOW__; past that, you'll move up to Starter Plus or a plan with a business line). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
+ ["Do I need a business phone number at all?","Not on Junior Boss: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Junior Boss covers __CAPLOW__; past that, you'll move up to Junior Boss Plus or a plan with a business line). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
 function capLine(){return BR.key==="mow"?"Up to 35 active recurring customers":"Up to 100 jobs a month"}
 function capFix(t){return String(t).replace("__CAP__",capLine()).replace("__CAPLOW__",BR.key==="mow"?"up to 35 active recurring customers":"up to 100 jobs a month")}
 const PLANS={
- starter:{name:"Starter",tag:"Side hustle, first business or Junior Boss",price:48,setup:0,
+ starter:{name:"Junior Boss",tag:"Side hustle, first business, or a kid running their own business",kids:true,price:48,setup:0,
   bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","__CAP__"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
  payg:{name:"Pay as you go",tag:"1 truck, a smaller customer list",price:78,setup:148,
-  bullets:["Everything in Starter","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
+  bullets:["Everything in Junior Boss","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
   fine:"Calls work the day your line is set up. Texting turns on after carrier approval."},
  solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,setup:298,season:698,best:true,
   bullets:["Everything in Pay as you go","500 AI texts + 100 AI call minutes included","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-storm alerts","Custom branding, approved by you","Second truck? Add one for $148/mo"],
@@ -258,9 +262,10 @@ function pricingSection(){
     <div class="muted text-xs mt-1">${p.setup?`$${p.setup} one-time setup`:"No setup fee"}${p.season?` · ${p.fine}`:""}</div>
     <ul class="mt-5 grid gap-2 text-sm flex-1">${p.bullets.map(b=>`<li class="flex gap-2"><span class="orange">✓</span>${capFix(b)}</li>`).join("")}</ul>
     ${!p.season?`<p class="muted text-xs mt-4">${p.fine}</p>`:""}
-    <a href="#/start?plan=${k}" class="btn btn-orange mt-5">Get started</a></div>`}).join("")}</div>
+    <a href="#/start?plan=${k}" class="btn btn-orange mt-5">Get started</a>${p.kids?`<a href="#/kids" class="btn btn-ghost mt-2">For parents: see the Junior Boss page →</a>`:""}</div>`}).join("")}</div>
+  <div class="card p-5 mt-5 flex flex-wrap gap-4 items-center justify-between"><div><div class="font-bold">Junior Boss · $48/mo, no setup fee</div><div class="muted text-sm">For side hustles, first businesses and kids running their own business. Parents hold the account.</div></div><div class="flex flex-wrap gap-2"><a href="#/kids" class="btn btn-ghost">For parents →</a><a href="#/start?plan=starter" class="btn btn-orange">Start Junior Boss</a></div></div>
 
-  <div class="card p-5 mt-4 text-sm" style="border-color:var(--yellow)"><b>Business phone lines, read this first.</b> <span class="muted">On Pay as you go, Solo and Crew, your business number takes calls (and the AI answers them) the same day it's set up. Texting is different: U.S. carriers must approve every business that texts. With an <b>EIN</b>, we register you as a standard business. No EIN? We can register you as a <b>sole proprietor</b> (one number, lower daily text limit). Approval usually takes about 2 business days (up to 7). Until then, your AI covers reminders by call and everything else by email. Starter has no business line, so customers reach you on your own phone. <a class="underline ice" href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Phone number and EIN questions →</a></span></div>
+  <div class="card p-5 mt-4 text-sm" style="border-color:var(--yellow)"><b>Business phone lines, read this first.</b> <span class="muted">On Pay as you go, Solo and Crew, your business number takes calls (and the AI answers them) the same day it's set up. Texting is different: U.S. carriers must approve every business that texts. With an <b>EIN</b>, we register you as a standard business. No EIN? We can register you as a <b>sole proprietor</b> (one number, lower daily text limit). Approval usually takes about 2 business days (up to 7). Until then, your AI covers reminders by call and everything else by email. Junior Boss has no business line, so customers reach you on your own phone. <a class="underline ice" href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Phone number and EIN questions →</a></span></div>
   <p class="muted text-xs mt-3">One AI text = one AI reply up to 320 characters (2 standard text segments). One AI call minute = one minute your AI is on a call. Regular texts and calls you send yourself are included.</p>
   <div class="card p-5 mt-4 text-sm"><b>What's the setup fee for?</b> <span class="muted">We want your custom branding perfect before you launch, and you approve it. It also covers registering your business phone line with the carriers. Your dashboard is live within 24 hours of finishing your setup form.</span></div>
   </section>`;
@@ -373,7 +378,7 @@ function kidsPage(){
     ${card("You, the parent (account holder)",`<ul class="grid gap-2 list-disc pl-5"><li>Own the account and sign the terms</li><li>Payments and deposits go to <b>your</b> bank or Stripe account</li><li>Approve prices before they go live</li><li>Pick the neighborhoods (ZIP codes) they can work in</li><li>Set work hours, like after school and weekends only</li><li>Approve every new customer before the first job</li><li>See every message, job and dollar from your own login</li></ul>`)}
     ${card("Your kid (the Junior Boss)",`<ul class="grid gap-2 list-disc pl-5"><li>Shows up and does the work</li><li>Marks jobs "on the way" and "done" from their own login</li><li>Snaps before-and-after photos</li><li>Sets goals and watches their earnings grow</li><li>Learns pricing, customer service and showing up on time</li><li>Can't change prices, payouts or service areas without you</li></ul>`)}
    </div>
-   <div class="card p-6 mt-5 text-sm"><b>Customer messages stay safe.</b> <span class="muted">Customers book through your Junior Boss's page and the AI assistant answers them, so your child's personal number is never shared. On Starter, anything that needs a person comes to your phone, not theirs.</span></div></section>
+   <div class="card p-6 mt-5 text-sm"><b>Customer messages stay safe.</b> <span class="muted">Customers book through your Junior Boss's page and the AI assistant answers them, so your child's personal number is never shared. On Junior Boss, anything that needs a person comes to your phone, not theirs.</span></div></section>
   <section class="max-w-5xl mx-auto px-5 py-12"><h2 class="display text-3xl">What age is right?</h2>
    <div class="grid md:grid-cols-3 gap-5 mt-6">
     ${card("10–12: Shovel squad","Shoveling walkways and small driveways for neighbors you already know, with a parent or older sibling nearby. You handle almost everything in the app. Great first taste of earning.")}
@@ -395,7 +400,7 @@ function kidsPage(){
     ${card("Goals with a finish line","Pick a goal together. The dashboard shows how many more driveways or lawns until they hit it.")}
    </div></section>
   <section class="max-w-3xl mx-auto px-5 py-12"><div class="card p-8 text-center"><h2 class="display text-3xl">Start their first business this weekend</h2>
-   <p class="muted mt-3">Starter plan, $48/mo, no setup fee, no business phone line needed. Cancel or pause anytime, like when school gets busy.</p>
+   <p class="muted mt-3">Junior Boss plan, $48/mo, no setup fee, no business phone line needed. Cancel or pause anytime, like when school gets busy.</p>
    <a href="#/start?plan=starter" class="btn btn-orange text-lg mt-6">Start a Junior Boss account</a></div></section>
   ${footer()}`;
 }
@@ -440,7 +445,7 @@ const POSTS=[
   body:`<p>Yes, the AI can forward calls and messages to your personal cell. Plenty of people start that way. But it's worth knowing what you're signing up for.</p>
   <h3>Your number becomes your business</h3><p>Every customer, every invoice dispute and every after-hours text lands on the same phone your family calls. When you sell or step back from the business, that number is hard to untangle.</p>
   <h3>Liability follows the name on the account</h3><p>When business runs through your personal number and personal name, it's tied to you, not to a business entity. An LLC is designed to help separate business risk from your personal assets. A dedicated business line under your business name keeps that line clean.</p>
-  <h3>Our take</h3><p>Use a business line from day one if you can. It's included on every plan except Starter. This isn't legal advice. Talk to an attorney or accountant about the right setup for you.</p>`},
+  <h3>Our take</h3><p>Use a business line from day one if you can. It's included on every plan except Junior Boss. This isn't legal advice. Talk to an attorney or accountant about the right setup for you.</p>`},
  {slug:"junior-boss",tag:"For parents",title:"Junior Boss: how a snow shovel and a phone can teach your kid business",excerpt:"What your child controls, what you control, and the ages we recommend.",
   body:`<p>Shoveling driveways and mowing lawns are some of the oldest first businesses there are. PlowCall and MowCall make them real businesses, with prices, bookings and earnings, while you keep the keys.</p>
   <h3>You hold the account</h3><p>Payments go to your bank. You approve prices, neighborhoods and new customers, and you can see every message. Your child's personal number is never shared, because the AI answers customers for them.</p>
@@ -455,57 +460,85 @@ const POSTS=[
   body:`<p>Snow season ends. Your customers don't. When spring comes, your PlowCall account switches to MowCall with one tap.</p>
   <h3>What stays the same</h3><p>Your customer list, your QR codes, your dashboard, your AI assistant and your phone number.</p>
   <h3>What changes</h3><p>Your services and prices switch to mowing, cleanups and yard work. Storm alerts become rain-delay alerts. Seasonal snow memberships become weekly or every-other-week mowing plans.</p>
-  <h3>Your plan moves with you</h3><p>Slow stretch between seasons? Drop to Pay as you go or Starter. Busy again? Go back to Monthly. Change anytime, month to month.</p>`},
+  <h3>Your plan moves with you</h3><p>Slow stretch between seasons? Drop to Pay as you go or Junior Boss. Busy again? Go back to Monthly. Change anytime, month to month.</p>`},
  {slug:"ai-honest",tag:"How it works",title:"Why we tell your customers you use AI",excerpt:"Being upfront builds trust, keeps you safe and still gets the job booked.",
   body:`<p>Every customer gets one clear message the first time they reach you: you're out working with your hands full, so an AI assistant helps you reply fast, and a real person monitors and approves every conversation.</p>
   <h3>It builds trust</h3><p>People don't mind AI. They mind being tricked. Saying it upfront and following through with fast, accurate answers makes you look more professional, not less.</p>
   <h3>It keeps you safe</h3><p>Automated texts and calls only go to people who gave consent, and anyone can reply STOP at any time.</p>
   <h3>It still gets the job booked</h3><p>Customers who want a person can book a quick call, and the job stays on schedule unless they ask to wait.</p>`}];
 function blogIndex(){
-  $("#app").innerHTML=`${header()}<main class="max-w-5xl mx-auto px-5 py-16"><h1 class="display text-4xl md:text-5xl">The ${BR.name} Field Guide</h1><p class="muted mt-3 max-w-2xl">Straight answers for operators, side hustlers and parents.</p>
+  $("#app").innerHTML=`${header()}<div class="relative"><img src="https://dnznrvs05pmza.cloudfront.net/gemini/gemini-nano-banana-2.1/images/c34c216a-94ed-409b-91b6-1548436a0562/98a54fa8-0863-482f-8e9c-db1aa46720f2/Photo_realistic_wide_banner_photo__a_snow_plow_operator_in_a.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiZjZlYjBjYTZhY2Y4ODEyMyIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5NDg1MjEzNH0.dPLg4Tn5RHAVdYsv1I3qj2WRNtMX-HMMKYVxpXDCj70" alt="A snow plow operator in his truck cab reading the Field Guide on his phone" class="w-full h-[260px] md:h-[380px] object-cover" onerror="this.parentElement.style.display='none'"><div class="absolute inset-0" style="background:linear-gradient(to top,var(--bg),transparent 60%)"></div></div><main class="max-w-5xl mx-auto px-5 pb-16 -mt-16 relative"><h1 class="display text-4xl md:text-5xl">The ${BR.name} Field Guide</h1><p class="muted mt-3 max-w-2xl">Straight answers for operators, side hustlers and parents.</p>
    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">${POSTS.map(p=>`<a href="#/blog/${p.slug}" class="card p-6 block hover:brightness-110"><span class="pill" style="background:var(--muted);color:var(--ice)">${p.tag}</span><h2 class="font-bold text-lg mt-3">${p.title}</h2><p class="muted text-sm mt-2">${p.excerpt}</p><span class="orange text-sm font-bold mt-4 inline-block">Read →</span></a>`).join("")}</div></main>${footer()}`}
 function blogPost(slug){const p=POSTS.find(x=>x.slug===slug);if(!p)return blogIndex();
   $("#app").innerHTML=`${header()}<main class="max-w-2xl mx-auto px-5 py-16"><a href="#/blog" class="muted text-sm">← Field Guide</a><span class="pill ml-3" style="background:var(--muted);color:var(--ice)">${p.tag}</span>
    <h1 class="display text-3xl md:text-4xl mt-4">${p.title}</h1><article class="mt-8 grid gap-4 leading-relaxed [&_h3]:font-bold [&_h3]:text-xl [&_h3]:mt-4 [&_p]:muted">${p.body}</article>
-   <div class="card p-6 mt-12"><div class="font-bold">Ready to try it?</div><div class="flex flex-wrap gap-3 mt-3"><a href="#/" class="btn btn-orange">Watch the demo</a><a href="#/start?plan=starter" class="btn btn-ghost">Start from $48/mo</a></div></div></main>${footer()}`}
+   <div class="card p-6 mt-12"><div class="font-bold">Ready to try it?</div><div class="flex flex-wrap gap-3 mt-3"><a href="#/" class="btn btn-orange">Watch the demo</a><a href="#/start?plan=starter" class="btn btn-ghost">Junior Boss from $48/mo</a></div></div></main>${footer()}`}
 
-/* ---------- SETUP FORM (after purchase) ---------- */
+/* ---------- SIGN-UP FLOW: plan -> business -> brand links -> checkout -> create account -> thank you ---------- */
+let SU={step:1,plan:"solo",billing:"monthly",d:{}};
+function suField(k,ph,type,req){return `<input class="input" name="${k}" placeholder="${ph}" ${type?`type="${type}"`:""} ${req?"required":""} value="${(SU.d[k]||"").replace(/"/g,"&quot;")}">`}
+function suSave(f){new FormData(f).forEach((v,k)=>{if(typeof v==="string")SU.d[k]=v})}
+function suBack(){if(SU.step<=1){location.hash=BR.key==="mow"?"#/mow?pricing":"#/?pricing";return}SU.step--;window.scrollTo(0,0);startStep()}
 function startPage(){
-  const q=new URLSearchParams(location.hash.split("?")[1]||"");const k=PLANS[q.get("plan")]?q.get("plan"):"solo",p=PLANS[k];const phone=k!=="starter";
-  $("#app").innerHTML=`${header()}<main class="max-w-2xl mx-auto px-5 py-10">
-  <div class="card p-6"><div class="muted text-xs">Your plan</div><div class="flex justify-between items-baseline mt-1"><div class="font-bold text-xl">${p.name}</div><div><span class="display text-2xl">$${p.price}</span><span class="muted">/mo</span></div></div>
-   <div class="muted text-sm">${p.setup?`+ $${p.setup} one-time setup`:"No setup fee"}. Change plans anytime.</div>
-   <div class="todo mt-3">IN THE REAL APP: secure checkout (bank account preferred, card accepted) happens first, then this setup form.</div></div>
-  <h1 class="display text-3xl mt-8">Let's get you set up</h1><p class="muted mt-2">Fill this out once and we handle the rest. Your dashboard is live within 24 hours.${phone?" Your business phone can take calls the same day. Texting turns on after the carriers approve your registration, usually 3–7 business days.":""}</p>
-  <form id="setupf" class="grid gap-6 mt-6">
-   <fieldset class="card p-5 grid gap-3"><legend class="font-bold px-1">Your business</legend>
-    <input class="input" placeholder="Legal business name (or your full name)" required><input class="input" placeholder="Business name customers see (if different)">
-    <div class="grid grid-cols-2 gap-3"><input class="input" placeholder="Owner name" required><input class="input" placeholder="Cell phone" required></div>
-    <input class="input" type="email" placeholder="Email" required><input class="input" placeholder="Business address (street, city, state, ZIP)" required>
-    ${phone?`<div><div class="text-sm mb-2">Do you have an EIN (business tax ID)?</div><div class="grid grid-cols-2 gap-2"><label class="choice flex gap-2"><input type="radio" name="ein" value="yes" required onchange="$('#einBox').innerHTML='<input class=&quot;input&quot; placeholder=&quot;EIN (XX-XXXXXXX)&quot; required>'"> Yes</label><label class="choice flex gap-2"><input type="radio" name="ein" value="no" onchange="$('#einBox').innerHTML='<div class=&quot;text-sm p-3 rounded-xl&quot; style=&quot;background:color-mix(in oklab,var(--yellow) 14%,var(--card))&quot;>No problem. We can register your line as a sole proprietor (one phone number, lower daily text limit), or you can start on Starter and add the phone line once you have an EIN. We\\'ll help you either way.</div>'"> No</label></div><div id="einBox" class="mt-2"></div></div>`:""}
-    <label class="text-sm muted">Proof of insurance (optional now)<input type="file" class="input mt-1"></label></fieldset>
-   <fieldset class="card p-5 grid gap-3"><legend class="font-bold px-1">Your brand</legend>
-    <label class="text-sm muted">Logo<input type="file" accept="image/*" class="input mt-1"></label>
-    <div class="grid grid-cols-2 gap-3"><label class="text-sm muted">Main color<input type="color" value="#ff7a1a" class="input mt-1 !p-1"></label><label class="text-sm muted">Accent color<input type="color" value="#9fd8f5" class="input mt-1 !p-1"></label></div>
-    <input class="input" placeholder="Facebook / Instagram / Google Business links"><p class="muted text-xs">We build your branded pages and app, then send them to you to approve before launch.</p></fieldset>
-   <fieldset class="card p-5 grid gap-3"><legend class="font-bold px-1">Your services and prices</legend>
-    <div class="grid grid-cols-3 gap-2 text-sm">${["1-car","2-car","3+ car / long"].map(x=>`<label class="muted">${x}<input class="input mt-1" type="number" placeholder="$"></label>`).join("")}</div>
-    <div class="grid grid-cols-3 gap-2 text-sm">${["Walkway","Salt / de-ice","Rush fee"].map(x=>`<label class="muted">${x}<input class="input mt-1" type="number" placeholder="$"></label>`).join("")}</div>
-    <input class="input" placeholder="Cities or ZIP codes you serve (you can fine-tune on the map later)" required>
-    <input class="input" placeholder="Business hours (e.g. Mon–Sat 7am–7pm)"><input class="input" placeholder="Hours you'll take calls (e.g. weekdays 1–3pm)"></fieldset>
-   <fieldset class="card p-5 grid gap-3"><legend class="font-bold px-1">Getting paid</legend>
-    <div class="grid gap-2"><label class="choice flex gap-2"><input type="radio" name="pay" checked> Connect my Stripe account (we'll send a secure link)</label><label class="choice flex gap-2"><input type="radio" name="pay"> I don't have one yet, help me set it up</label></div><p class="muted text-xs mt-2">Under 18? Payment accounts have to belong to an adult, so the parent or guardian connects their own account as the account holder.</p></fieldset>
-   ${phone?`<fieldset class="card p-5 grid gap-3"><legend class="font-bold px-1">Past customers (optional)</legend>
-    <p class="muted text-sm">Upload customers who already said yes to texts or calls from you. Our AI only reaches out to people who gave consent.</p><input type="file" accept=".csv" class="input"></fieldset>`:""}
-   <fieldset class="card p-5 grid gap-3"><legend class="font-bold px-1">Last thing</legend>
-    <input class="input" placeholder="Referral code (if someone sent you)" value="${getRef()}">
-    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" checked class="mt-1 w-5 h-5"><span>Make me an affiliate too. I'll earn one month of my referral's plan for every operator I refer, paid after their 3rd monthly payment clears (or right away on a season prepay).</span></label>
-    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" required class="mt-1 w-5 h-5"><span>I agree to the Terms [waiting on attorney]. I'm 18 or older, or a parent/guardian signing up for my child's business.</span></label></fieldset>
-   <button class="btn btn-orange text-lg">Submit setup</button></form></main>${footer()}`;
-  $("#setupf").onsubmit=e=>{e.preventDefault();window.scrollTo(0,0);$("#app").innerHTML=`${header()}<main class="max-w-xl mx-auto px-5 py-20 text-center"><div class="display text-4xl">You're in!</div>
-   <p class="muted mt-4">We're building your branded ${BR.name} setup now. You'll get your login and branding preview to approve within 24 hours.</p>
-   <div class="card p-6 mt-8 text-left text-sm"><div class="font-bold mb-2">What happens next</div><ol class="grid gap-2 list-decimal pl-5"><li>Within 24 hours: your dashboard, quote page, QR code and customer app, branded for you to approve.</li>${phone?"<li>Same day: your business phone number is set up and the AI can answer calls.</li><li>Usually 3–7 business days: carriers approve your texting registration, then texting turns on.</li>":"<li>Want a business phone line and AI calls later? Upgrade anytime.</li>"}<li>Your affiliate link arrives with your login.</li></ol></div>
-   <a href="#/dashboard" class="btn btn-orange mt-8">Preview the operator dashboard →</a></main>${footer()}`};
+  const q=new URLSearchParams(location.hash.split("?")[1]||"");const k=PLANS[q.get("plan")]?q.get("plan"):"solo";
+  if(SU.plan!==k){SU={step:1,plan:k,billing:"monthly",d:{}}}
+  startStep();
+}
+function suSteps(){const names=["Your business","Your links","Checkout","Your account"];return `<div class="flex gap-1 mt-2">${names.map((n,i)=>`<div class="flex-1"><div class="h-1.5 rounded-full" style="background:${i<SU.step?"var(--orange)":"var(--muted)"}"></div><div class="text-[11px] muted mt-1 hidden sm:block">${n}</div></div>`).join("")}</div>`}
+function dueToday(){const p=PLANS[SU.plan];if(SU.billing==="season"&&p.season)return {today:p.season,lines:[[`${p.name} season prepay (Nov–Mar)`,p.season],["One-time setup","Free"]],next:null};
+  return {today:p.price+(p.setup||0),lines:[[`${p.name}, first month`,p.price],...(p.setup?[["One-time setup",p.setup]]:[])],next:p.price}}
+function fmtDate(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})}
+function startStep(){
+  const p=PLANS[SU.plan],phone=SU.plan!=="starter",d=SU.d;
+  const back=`<button type="button" class="btn btn-ghost" onclick="suBack()">← Back</button>`;
+  const planBox=`<div class="card p-5"><div class="flex justify-between items-baseline"><div><div class="muted text-xs">Your plan</div><div class="font-bold text-lg">${p.name}</div></div><div><span class="display text-2xl">$${p.price}</span><span class="muted">/mo</span></div></div>
+    <div class="flex justify-between items-center mt-2 text-sm"><span class="muted">${p.setup?`+ $${p.setup} one-time setup`:"No setup fee"}</span><a href="#${BR.key==="mow"?"/mow":"/"}?pricing" class="underline ice">Change plan</a></div>${p.kids?`<a href="#/kids" class="underline ice text-sm mt-2 inline-block">How Junior Boss works for parents →</a>`:""}</div>`;
+  let body="";
+  if(SU.step===1) body=`${planBox}
+   <h1 class="display text-3xl mt-8">Tell us about your business</h1><p class="muted mt-2">Two quick steps, then checkout. Prices, service areas and payments come after, inside your dashboard.</p>
+   <form id="suf" class="card p-5 grid gap-3 mt-6">
+    ${suField("legal","Legal business name (or your full name)","",1)}${suField("dba","Business name customers see (if different)")}
+    <div class="grid sm:grid-cols-2 gap-3">${suField("owner","Owner name","",1)}${suField("cell","Cell phone","tel",1)}</div>
+    ${suField("email","Email","email",1)}${suField("addr","Business address (street, city, state, ZIP)","",1)}
+    ${phone?`<div><div class="text-sm mb-2">Do you have an EIN (business tax ID)?</div><div class="grid grid-cols-2 gap-2"><label class="choice flex gap-2"><input type="radio" name="ein" value="yes" ${d.ein==="yes"?"checked":""} required> Yes</label><label class="choice flex gap-2"><input type="radio" name="ein" value="no" ${d.ein==="no"?"checked":""}> No</label></div><p class="muted text-xs mt-2">No EIN? No problem. We can register your line as a sole proprietor, or you can start on Junior Boss and add the phone line later.</p></div>`:""}
+    <div class="flex gap-3 justify-between mt-2">${back}<button class="btn btn-orange">Next: your links →</button></div></form>`;
+  if(SU.step===2) body=`${planBox}
+   <h1 class="display text-3xl mt-8">Your brand and links</h1><p class="muted mt-2">We use these to build your branded pages and app. Skip any you don't have.</p>
+   <form id="suf" class="card p-5 grid gap-3 mt-6">
+    <label class="text-sm muted">Logo (optional now)<input type="file" accept="image/*" class="input mt-1"></label>
+    <div class="grid grid-cols-2 gap-3"><label class="text-sm muted">Main color<input type="color" name="c1" value="${d.c1||"#ff7a1a"}" class="input mt-1 !p-1"></label><label class="text-sm muted">Accent color<input type="color" name="c2" value="${d.c2||"#9fd8f5"}" class="input mt-1 !p-1"></label></div>
+    <label class="text-sm">Website<span class="muted"> (optional)</span>${suField("web","https://yourbusiness.com","url")}</label>
+    <label class="text-sm">Facebook page<span class="muted"> (optional)</span>${suField("fb","https://facebook.com/yourbusiness","url")}</label>
+    <label class="text-sm">Instagram<span class="muted"> (optional)</span>${suField("ig","https://instagram.com/yourbusiness","url")}</label>
+    <label class="text-sm">Google Business Profile<span class="muted"> (optional)</span>${suField("gbp","Link to your Google Business Profile","url")}</label>
+    ${suField("ref","Referral code (if someone sent you)")}
+    <div class="flex gap-3 justify-between mt-2">${back}<button class="btn btn-orange">Next: checkout →</button></div></form>`;
+  if(SU.step===3){const t=dueToday(),nx=new Date(Date.now()+30*864e5);
+   body=`<h1 class="display text-3xl">Checkout</h1>
+   ${p.season?`<div class="grid grid-cols-2 gap-2 mt-6"><button type="button" class="choice ${SU.billing==="monthly"?"on":""}" onclick="SU.billing='monthly';startStep()"><b>Pay monthly</b><div class="muted text-xs">$${p.price}/mo, cancel anytime</div></button><button type="button" class="choice ${SU.billing==="season"?"on":""}" onclick="SU.billing='season';startStep()"><b>Prepay the season</b><div class="muted text-xs">$${p.season}, setup free</div></button></div>`:""}
+   <div class="card p-6 mt-6"><div class="grid gap-2 text-sm">${t.lines.map(l=>`<div class="flex justify-between"><span>${l[0]}</span><span>${typeof l[1]==="number"?"$"+l[1]:l[1]}</span></div>`).join("")}</div>
+    <div class="mt-4 p-4 rounded-xl flex justify-between items-baseline" style="background:color-mix(in oklab,var(--orange) 16%,var(--card))"><b class="text-lg">Due today</b><span class="display text-3xl orange">$${t.today}</span></div>
+    ${t.next?`<div class="mt-3 p-4 rounded-xl flex justify-between items-baseline" style="background:var(--muted)"><span><b>Next payment</b><span class="muted text-sm block">${fmtDate(nx)}, then every month</span></span><span class="display text-2xl">$${t.next}</span></div>
+    <p class="muted text-xs mt-3">Today you pay $${t.today}${p.setup?` (your first month plus the one-time $${p.setup} setup)`:" for your first month"}. Your next charge is $${t.next} on ${fmtDate(nx)}. Cancel anytime before then and you won't be charged again.</p>`
+    :`<p class="muted text-xs mt-3">Today you pay $${t.today} for the whole season (November through March). Nothing else is due this season. Full refund within 7 days; after that, unused months roll over to your next season.</p>`}</div>
+   <div class="card p-5 mt-4 grid gap-3"><div class="font-bold">Pay with</div><label class="choice flex gap-2"><input type="radio" name="pm" checked> Bank account (preferred)</label><label class="choice flex gap-2"><input type="radio" name="pm"> Card</label>
+    <div class="todo">IN THE REAL APP: secure checkout here (bank account first, card accepted). Show the same "Due today" and "Next payment" lines on the payment screen and the receipt.</div></div>
+   <form id="suf" class="mt-4 grid gap-3"><label class="flex gap-3 text-sm muted items-start"><input type="checkbox" required class="mt-1 w-5 h-5"><span>I agree to the Terms [waiting on attorney]. I'm 18 or older, or a parent or guardian signing up for my child's business.</span></label>
+    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" name="aff" checked class="mt-1 w-5 h-5"><span>Make me an affiliate too. I'll earn one month of my referral's plan for every operator I refer, paid after their 3rd monthly payment clears (or right away on a season prepay).</span></label>
+    <div class="flex gap-3 justify-between mt-2">${back}<button class="btn btn-orange text-lg">Pay $${t.today} today</button></div></form>`}
+  if(SU.step===4) body=`<div class="card p-5 text-sm" style="border-color:var(--green,#22c55e)"><b>Payment received. Thank you!</b> <span class="muted">Your receipt is on its way to ${d.email||"your email"}.</span></div>
+   <h1 class="display text-3xl mt-8">Create your operator account</h1><p class="muted mt-2">This is how you'll log in to your dashboard.</p>
+   <form id="suf" class="card p-5 grid gap-3 mt-6">${suField("email","Email","email",1)}<input class="input" type="password" placeholder="Create a password" required minlength="8">
+    <button class="btn btn-orange text-lg mt-2">Create my account</button></form>`;
+  if(SU.step===5){const ready=new Date(Date.now()+24*36e5);
+   body=`<div class="text-center"><div class="display text-4xl">You're in, ${(d.owner||"Boss").split(" ")[0]}!</div><p class="muted mt-4">We're building your branded ${BR.name} setup now.</p></div>
+   <div class="card p-6 mt-8"><div class="muted text-xs">Your custom setup will be ready by</div><div class="display text-2xl mt-1">${ready.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})} at ${ready.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}</div><p class="muted text-sm mt-2">Or sooner. We'll text and email you the moment it's live.</p></div>
+   <div class="card p-6 mt-4 text-sm"><div class="font-bold mb-2">While we build it, finish your setup</div><p class="muted">Your dashboard walks you through your services and prices, service area, hours, getting paid and past customers. Or just talk to your AI and it fills everything in for you.</p>
+    <a href="#/dashboard/setup" class="btn btn-orange mt-4 w-full">Start my setup →</a></div>
+   <div class="card p-6 mt-4 text-sm"><div class="font-bold mb-2">What happens next</div><ol class="grid gap-2 list-decimal pl-5"><li>By ${ready.toLocaleDateString("en-US",{weekday:"short"})}: your dashboard, quote page, QR code and customer app, branded for you to approve.</li>${phone?"<li>Same day: your business phone number is set up and the AI can answer calls.</li><li>Usually about 2 business days (up to 7): carriers approve your texting, then texting turns on.</li>":"<li>Want a business phone line and AI calls later? Upgrade anytime.</li>"}<li>Your affiliate link arrives with your login.</li></ol>
+    <div class="todo mt-3">IN THE REAL APP: Boss Growth Machine sends the "your setup is scheduled" text and email right away, then the nurture emails until launch.</div></div>`;}
+  $("#app").innerHTML=`${header()}<main class="max-w-2xl mx-auto px-5 py-10">${SU.step<5?suSteps():""}<div class="mt-6">${body}</div></main>${footer()}`;
+  const f=$("#suf");if(f)f.onsubmit=e=>{e.preventDefault();suSave(f);if(SU.step===4){DB.operator.onboard=DB.operator.onboard||{};save()}SU.step++;window.scrollTo(0,0);startStep()};
 }
 function comingSoon(t){$("#app").innerHTML=`${header()}<main class="max-w-2xl mx-auto px-5 py-24 text-center"><h1 class="display text-4xl">${t}</h1><p class="muted mt-4">Coming soon.</p></main>${footer()}`}
 
@@ -530,15 +563,16 @@ function dashboard(tab){
   const o=DB.operator;
   $("#app").innerHTML=`${header(`<div class="flex items-center gap-3"><span class="text-sm muted hidden sm:inline">${o.business_name}</span><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
   <main class="max-w-5xl mx-auto px-4 py-6">
-    <nav class="scroll-x flex gap-2 pb-2">${TABS.map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
-    <div id="tab" class="mt-5"></div></main>`;
-  ({jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings,plan:tabPlan}[tab]||tabJobs)();
+    <nav class="scroll-x flex gap-2 pb-2">${(obDone()<OB.length?[["setup",`Finish setup (${obDone()}/${OB.length})`],...TABS]:[...TABS,["setup","Setup"]]).map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
+    <div id="tab" class="mt-5"></div></main>
+  <button onclick="talkDlg()" class="btn btn-orange fixed bottom-5 right-5 z-40 shadow-lg rounded-full">🎙️ Talk to your AI</button>`;
+  ({setup:tabSetup,jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings,plan:tabPlan}[tab]||tabJobs)();
 }
-function planLabel(){const k=DB.operator.plan||"starter";return ({starter:"Starter · $48",starterplus:"Starter Plus · $118",payg:"Pay as you go · $78",solo:"Monthly Solo · $148",crew:"Monthly Crew · $398"})[k]||"Starter · $48"}
+function planLabel(){const k=DB.operator.plan||"starter";return ({starter:"Junior Boss · $48",starterplus:"Junior Boss Plus · $118",payg:"Pay as you go · $78",solo:"Monthly Solo · $148",crew:"Monthly Crew · $398"})[k]||"Junior Boss · $48"}
 function tabPlan(){
   const o=DB.operator,cur=o.plan||"starter",mow=BR.key==="mow";
-  const opts=[["starter","Starter",48,mow?"Up to 35 active recurring customers. No business line.":"Up to 100 jobs a month. No business line."],
-   ["starterplus","Starter Plus",118,mow?"Up to 80 active recurring customers. Same setup as Starter, no business line or phone AI.":"Up to 250 jobs a month. Same setup as Starter, no business line or phone AI."],
+  const opts=[["starter","Junior Boss",48,mow?"Up to 35 active recurring customers. No business line.":"Up to 100 jobs a month. No business line."],
+   ["starterplus","Junior Boss Plus",118,mow?"Up to 80 active recurring customers. Same setup as Junior Boss, no business line or phone AI.":"Up to 250 jobs a month. Same setup as Junior Boss, no business line or phone AI."],
    ["payg","Pay as you go",78,"Your own business line. AI texts 8¢, AI call minutes 38¢."],
    ["solo","Monthly Solo",148,"Business line, 500 AI texts + 100 AI call minutes a month, no customer limit."],
    ["crew","Monthly Crew",398,"3 trucks, 1,500 AI texts + 300 AI call minutes, business call calendar."]];
@@ -559,6 +593,44 @@ function tabPlan(){
     <button class="btn btn-ghost w-full mt-4" onclick="toast('We will send you add-on pricing.')">Get add-on pricing</button></div>
   </div></div>`;
 }
+
+/* ---------- ONBOARDING WALKTHROUGH (inside dashboard, after checkout) ---------- */
+const OB=[["services","Services and prices","What you offer and what you charge."],["areas","Service area","The ZIP codes and cities you cover."],["hours","Business hours and call hours","When you work and when you take calls."],["paid","Getting paid","Connect where deposits go."],["customers","Past customers","Upload your client list so your CRM is ready on day one."],["insurance","Insurance (optional)","Earns the Insured badge on your quote page."]];
+function obState(){DB.operator.onboard=DB.operator.onboard||{};return DB.operator.onboard}
+function obDone(){const o=obState();return OB.filter(x=>o[x[0]]).length}
+let obOpen=null;
+function tabSetup(){const o=obState(),done=obDone();if(!obOpen)obOpen=(OB.find(x=>!o[x[0]])||OB[0])[0];
+  $("#tab").innerHTML=`<div class="card p-6" style="border-color:var(--orange)"><div class="flex justify-between items-baseline"><h2 class="display text-2xl">Finish your setup</h2><span class="muted text-sm">${done} of ${OB.length} done</span></div>
+   <div class="h-2 rounded-full mt-3" style="background:var(--muted)"><div class="h-2 rounded-full" style="width:${done/OB.length*100}%;background:var(--orange)"></div></div>
+   <p class="muted text-sm mt-3">Fill it out step by step, or skip the typing: tell your AI about your business and it fills everything in for you. You check it and change anything.</p>
+   <button class="btn btn-orange w-full mt-4" onclick="talkDlg(true)">🎙️ Tell your AI about your business</button></div>
+  <div class="grid gap-3 mt-4">${OB.map(([k,t,sub],i)=>`<div class="card p-5"><button class="w-full text-left flex justify-between items-center gap-3" onclick="obOpen=obOpen==='${k}'?'-':'${k}';tabSetup()"><span><b>${o[k]?"✓ ":(i+1)+". "}${t}</b><span class="muted text-sm block">${sub}</span></span><span class="chip">${o[k]?"Done":"To do"}</span></button>${obOpen===k?`<form class="grid gap-3 mt-4" onsubmit="event.preventDefault();obSave('${k}',this)">${obForm(k)}<div class="flex gap-3 justify-between">${i>0?`<button type="button" class="btn btn-ghost" onclick="obOpen='${OB[i-1][0]}';tabSetup()">← Back</button>`:"<span></span>"}<button class="btn btn-orange">${i<OB.length-1?"Save and next →":"Save and finish"}</button></div></form>`:""}</div>`).join("")}</div>
+  ${done===OB.length?`<div class="card p-6 mt-4 text-center"><div class="display text-2xl">You're all set!</div><p class="muted mt-2">We'll let you know the moment your branded setup is live. Need a change later? Tap "Talk to your AI" anytime.</p></div>`:""}`}
+function obForm(k){const pr=DB.pricing||{},o=DB.operator,mow=BR.key==="mow";
+  if(k==="services")return `<div class="grid grid-cols-3 gap-2 text-sm">${(mow?["Small yard","Medium yard","Large yard"]:["1-car","2-car","3+ car / long"]).map((x,i)=>`<label class="muted">${x}<input class="input mt-1" type="number" required value="${[pr.one_car,pr.two_car,pr.three_car][i]??""}" placeholder="$"></label>`).join("")}</div>
+   <div class="grid grid-cols-3 gap-2 text-sm">${(mow?["Edging","Bagging / cleanup","Rush fee"]:["Walkway","Salt / de-ice","Rush fee"]).map(x=>`<label class="muted">${x}<input class="input mt-1" type="number" placeholder="$"></label>`).join("")}</div><p class="muted text-xs">You can fine-tune everything later on the Pricing tab.</p>`;
+  if(k==="areas")return `<input class="input" required placeholder="Cities or ZIP codes you serve (e.g. Dayton OH, 45402, 45403)"><p class="muted text-xs">Fine-tune on the map in Service Areas anytime.</p>`;
+  if(k==="hours")return `<input class="input" required placeholder="Business hours (e.g. Mon–Sat 7am–7pm)"><input class="input" placeholder="Hours you'll take calls (e.g. weekdays 1–3pm)">`;
+  if(k==="paid")return `<label class="choice flex gap-2"><input type="radio" name="pay" checked> Connect my Stripe account (we'll send a secure link)</label><label class="choice flex gap-2"><input type="radio" name="pay"> I don't have one yet, help me set it up</label><p class="muted text-xs">Under 18? Payment accounts have to belong to an adult, so the parent or guardian connects their own account.</p>`;
+  if(k==="customers")return `<p class="muted text-sm">Upload a CSV of your past customers (name, phone, email, address). They go straight into your CRM so you're up and running.</p><input type="file" accept=".csv" class="input"><label class="flex gap-3 text-sm muted items-start"><input type="checkbox" class="mt-1 w-5 h-5"><span>These customers already agreed to get texts or calls from my business. (If you don't check this, we'll only email them.)</span></label><p class="muted text-xs">No list yet? Save and skip. You can upload anytime in Settings.</p>`;
+  if(k==="insurance")return `<label class="flex gap-3 text-sm items-center"><input type="checkbox" class="w-5 h-5" ${o.insured?"checked":""}> I carry liability insurance</label><label class="text-sm muted">Certificate (PDF or photo)<input type="file" class="input mt-1"></label>`;
+  return ""}
+function obSave(k,f){obState()[k]=true;save();const i=OB.findIndex(x=>x[0]===k);obOpen=(OB.slice(i+1).find(x=>!obState()[x[0]])||["-"])[0];toast("Saved");dashboard("setup")}
+/* ---------- TALK TO YOUR AI (fill setup / change anything by voice) ---------- */
+function talkDlg(setup){partnerDlg(`<div class="flex justify-between items-start"><h3 class="display text-2xl">${setup?"Tell us about your business":"Talk to your AI"}</h3><button onclick="jobdlg.close()" class="text-2xl muted px-2">×</button></div>
+  <p class="muted text-sm mt-2">${setup?"Just talk like you're telling a friend: what you do, what you charge, where you work, your hours. We'll fill in your setup and show you what we wrote.":"Tell it what to change: prices, hours, service area, your messages. It shows you the change before saving."}</p>
+  <button id="micB" class="btn btn-orange w-full mt-4" onclick="talkMic()">🎙️ Tap and talk</button>
+  <textarea id="talkT" class="input mt-3" rows="5" placeholder="Or type it here. Example: I'm Sean, I plow in Dayton and Kettering, 45402 and 45429. 1-car is $45, 2-car $65, 3-car $95, walkway $20, salt $25. I work 6am to 8pm every day, calls weekdays 1 to 3."></textarea>
+  <button class="btn btn-ghost w-full mt-3" onclick="talkFill(${setup?1:0})">Fill it in for me</button><div id="talkOut" class="mt-4"></div>
+  <div class="todo mt-3">IN THE REAL APP: speech is transcribed, the AI maps it to services, prices, ZIPs, hours and messages, shows a review screen, and saves only after the operator confirms.</div>`)}
+let rec=null;
+function talkMic(){const S=window.SpeechRecognition||window.webkitSpeechRecognition;if(!S){toast("Voice isn't supported in this browser. Type it instead.");return}
+  if(rec){rec.stop();rec=null;$("#micB").textContent="🎙️ Tap and talk";return}
+  rec=new S();rec.continuous=true;rec.interimResults=true;rec.onresult=e=>{$("#talkT").value=[...e.results].map(x=>x[0].transcript).join(" ")};rec.onend=()=>{rec=null;const b=$("#micB");if(b)b.textContent="🎙️ Tap and talk"};rec.start();$("#micB").textContent="⏹ Stop"}
+function talkFill(setup){const t=$("#talkT").value.trim();if(!t){toast("Say or type something first");return}
+  const money=[...t.matchAll(/\$\s?(\d+)/g)].map(m=>m[1]),zips=[...t.matchAll(/\b\d{5}\b/g)].map(m=>m[0]);
+  $("#talkOut").innerHTML=`<div class="card p-4 text-sm"><div class="font-bold mb-2">Here's what I got:</div><ul class="grid gap-1 list-disc pl-5">${money.length?`<li>Prices: ${money.map(m=>"$"+m).join(", ")}</li>`:""}${zips.length?`<li>Service ZIPs: ${zips.join(", ")}</li>`:""}<li>Everything else goes into your profile and messages, worded for your customers.</li></ul>
+   <input id="talkFix" class="input mt-3" placeholder="Anything you want changed?"><div class="flex gap-2 mt-3"><button class="btn btn-ghost flex-1" onclick="toast('Updated');$('#talkFix').value=''">Change it</button><button class="btn btn-orange flex-1" onclick="${setup?"OB.slice(0,3).forEach(x=>obState()[x[0]]=true);save();":""}jobdlg.close();toast('Saved');route()">Looks good, save</button></div></div>`}
 function tabInbox(){const list=(DB.inbox||[]).slice().sort((a,b)=>(b.handoff-a.handoff)||(new Date(b.at)-new Date(a.at)));
   $("#tab").innerHTML=`<div class="card p-5"><h2 class="font-bold text-lg">Inbox</h2><p class="muted text-sm mt-1">Every text, email, DM and call recap in one place. Your AI answers first. When it hands one to you, it's flagged here and your phone gets a push alert.</p></div>
   <div class="grid gap-3 mt-4">${list.map(c=>`<button onclick="openThread(${c.id})" class="card p-4 text-left w-full hover:brightness-110"><div class="flex justify-between gap-3 items-start"><div><div class="font-bold">${c.unread?"● ":""}${c.name}</div><div class="muted text-sm">${c.msgs.at(-1)[1].slice(0,90)}${c.msgs.at(-1)[1].length>90?"…":""}</div></div><span class="chip whitespace-nowrap">${c.channel}</span></div>
@@ -577,7 +649,7 @@ function tabJobs(){
   const list=DB.jobs.filter(j=>jobFilter==="All"||j.status===jobFilter).sort((a,b)=>new Date(b.created)-new Date(a.created));
   const month=DB.jobs.filter(j=>{const d=new Date(j.created),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}).length;
   const isStarter=(DB.operator.plan||"starter")==="starter";
-  const upsell=isStarter&&month>=80?`<div class="card p-4 mb-4 flex flex-wrap items-center justify-between gap-3"><div class="text-sm"><b>${month} of 100 jobs this month on Starter.</b> <span class="muted">${month>=100?"New requests still come in and get answered. Booking past 100 needs a bigger plan.":"Starter covers up to 100 jobs a month."}</span></div><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a></div>`:"";
+  const upsell=isStarter&&month>=80?`<div class="card p-4 mb-4 flex flex-wrap items-center justify-between gap-3"><div class="text-sm"><b>${month} of 100 jobs this month on Junior Boss.</b> <span class="muted">${month>=100?"New requests still come in and get answered. Booking past 100 needs a bigger plan.":"Junior Boss covers up to 100 jobs a month."}</span></div><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a></div>`:"";
   $("#tab").innerHTML=`${upsell}
   <div class="card p-5"><div class="flex justify-between items-baseline"><h2 class="font-bold">Last 30 days</h2><span class="muted text-sm">${recent.length} requests</span></div>
     <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">${byStatus.map(([s,n])=>`<div class="rounded-xl p-3 text-center" style="background:var(--muted)"><div class="display text-2xl">${n}</div><div class="text-xs muted">${s}</div></div>`).join("")}</div>
