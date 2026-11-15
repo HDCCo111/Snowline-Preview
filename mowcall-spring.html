@@ -134,7 +134,7 @@ function load(){try{DB=JSON.parse(localStorage.getItem("mowcall_demo_v3"))}catch
 function save(){try{localStorage.setItem("mowcall_demo_v3",JSON.stringify(DB))}catch(e){}}
 function resetDemo(){try{localStorage.removeItem("mowcall_demo_v3")}catch(e){}load();waiverSweep();resetQuote();toast("Sample data reset");route(true)}
 
-const PLANS={starter:{name:"Junior Boss",price:48,cap:35},starterplus:{name:"Junior Boss Plus",price:118,cap:80},payg:{name:"Pay as you go",price:78,cap:null},solo:{name:"Monthly Solo",price:148,cap:null},crew:{name:"Monthly Crew",price:398,cap:null}};
+const PLANS={starter:{name:"Junior Boss",price:48,year:528,cap:25},starterplus:{name:"Junior Boss Plus",price:118,year:1298,cap:60},solo:{name:"Monthly Solo",price:148,year:1628,cap:null},crew:{name:"Monthly Crew",price:398,year:4378,cap:null}};const BRAND_LAUNCH=148;
 const activeCount=()=>DB.customers.filter(c=>c.status==="active").length+DB.extraActive;
 const cust=id=>DB.customers.find(c=>c.id===id);
 const FREQ={weekly:"Weekly",biweekly:"Every other week",once:"One time"};
@@ -312,7 +312,7 @@ function viewSign(){const id=Number(new URLSearchParams(location.hash.split("?")
   <p class="muted text-xs mt-3">${L?"Recibirá una copia por correo electrónico. Puede pedir una copia en papel en cualquier momento.":"You'll get a copy by email. You can ask for a paper copy anytime."}</p></div>`}
 function doSign(id){const c=cust(id),L=(SG.lang||c.lang)==="es",ag=$("#sgag").checked,nm=$("#sgnm").value.trim();
  if(!ag||nm.length<3){toast(L?"Marque la casilla y escriba su nombre para firmar.":"Check the box and type your name to sign.");return}
- c.waiver={signed:nm,at:new Date().toISOString(),version:WAIVER_VER,how:"renewal link",lang:SG.lang||c.lang};delete c.renew;SG.doneFor=id;save();route(true)}
+ c.waiver={signed:nm,at:new Date().toISOString(),version:WAIVER_VER,how:c.payPending?"billing change":"renewal link",lang:SG.lang||c.lang};delete c.renew;if(c.payPending){c.pay=c.payPending;delete c.payPending}SG.doneFor=id;save();route(true)}
 function act(id,kind){
  const c=cust(id),b=DB.op.business,L=T[c.lang];
  DB.route.state[id]=kind;
@@ -356,24 +356,44 @@ function viewCustomers(){
   </div>
   ${p.cap?`<div class="meter mt-3"><div style="width:${Math.min(100,n/p.cap*100)}%"></div></div>`:""}
   <div class="card p-3 mt-3 text-sm" style="background:var(--bg)"><b>Service agreements renew every year, automatically.</b> <span class="muted">At the 1-year mark (or when you update your terms) MowCall texts the customer a link in their language, then reminds them at 7 and 21 days. If they book anything in the meantime, signing is part of that checkout. Visits and payments never stop while it's pending. After the last reminder it shows here so you can ask in person.</span></div>
-  <p class="muted text-xs mt-2">The limit counts <b>active recurring customers</b>, not visits. Paused customers and one-time jobs don't count. Sample data includes ${DB.extraActive} more active customers not listed.</p>
+  <p class="muted text-xs mt-2">The limit counts <b>active recurring customers</b>, not visits. Paused customers and one-time jobs don't count. It's the same limit on PlowCall, because it's the same houses. Sample data includes ${DB.extraActive} more active customers not listed.</p>
   <div class="grid gap-3 mt-4">${DB.customers.map(c=>{const pr=priceFor(c.zones);return `<div class="card p-4" style="background:var(--bg)">
    <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${esc(c.name)} ${c.lang==="es"?'<span class="pill p-muted">Español</span>':""}</div>
    <div class="muted text-sm">${esc(c.addr)} · ${FREQ[c.freq]} on ${DAY_EN[c.day]}s</div>
    <div class="text-sm mt-1">${pr.lines.map(l=>`${ZN[l.zone]} ${fmt(l.sqft)} sq ft`).join(" · ")}</div>
    <div class="text-sm mt-1">${PAY[c.pay]}: <b>${c.pay==="monthly"?money(monthlyFor(c))+"/mo":money(pr.total)+"/visit"}</b> · ACH · about ${Math.round(pr.mins)} min</div>
    <div class="mt-2">${wPill(c)}</div>${c.waiver?`<div class="text-xs muted mt-1">Last signed by ${esc(c.waiver.signed)} · ${new Date(c.waiver.at).toLocaleDateString()}${c.waiver.how?` · ${c.waiver.how}`:""}</div>`:""}</div>
-   <span class="pill ${c.status==="active"?"p-green":"p-yellow"} self-start">${c.status==="active"?"Active":"Paused"}</span></div>
+   <div class="grid gap-1 justify-items-end self-start"><span class="pill ${c.status==="active"?"p-green":"p-yellow"}">${c.status==="active"?"Active":"Paused"+(c.pauseReason?" · "+PAUSE_WHY[c.pauseReason]:"")}</span>${c.pastDue?`<span class="pill p-yellow">Past due ${money(c.pastDue.amount)}</span>`:""}${c.payPending?`<span class="pill p-muted">New billing: waiting on signature</span>`:""}</div></div>
    <div class="flex flex-wrap gap-2 mt-3">
-    <button class="btn btn-sm btn-ghost" onclick="togglePause(${c.id})">${c.status==="active"?"Pause (vacation/drought)":"Resume"}</button>
+    <button class="btn btn-sm btn-ghost" onclick="${c.status==="active"?`pauseDlg(${c.id})`:`togglePause(${c.id})`}">${c.status==="active"?"Pause":"Resume"}</button>${c.pastDue?`<button class="btn btn-sm btn-ghost" onclick="markPaid(${c.id})">Mark paid</button>`:""}
     ${DB.op.payMode==="choose"?`<button class="btn btn-sm btn-ghost" onclick="togglePay(${c.id})">Switch to ${c.pay==="monthly"?"per-visit":"flat monthly"}</button>`:""}
     <button class="btn btn-sm btn-ghost" onclick="extraDlg(${c.id})">See it as the customer: book another service</button>
     ${needsSign(c)||wStat(c).k==="soon"?`<a class="btn btn-sm btn-ghost" href="#/sign?c=${c.id}" onclick="SG={lang:null,doneFor:null}">Open their renewal page</a>`:""}
    </div></div>`}).join("")}</div>
  </div>`);
 }
-function togglePause(id){const c=cust(id);c.status=c.status==="active"?"paused":"active";save();toast(c.status==="paused"?`${c.name} paused. Plan kept, no charges, doesn't count toward your limit.`:`${c.name} resumed`);route()}
-function togglePay(id){const c=cust(id);c.pay=c.pay==="monthly"?"per_visit":"monthly";save();route()}
+const PAUSE_WHY={vacation:"Vacation",weather:"Drought or weather",payment:"Payment issue",other:"Other"};
+function pauseDlg(id){const c=cust(id);openDlg(`<div class="display text-xl">Pause ${esc(c.name)}</div><p class="muted text-sm mt-1">What kind of pause is this?</p>
+ <div class="grid gap-2 mt-4">${Object.entries(PAUSE_WHY).map(([k,l])=>`<button class="choice" onclick="doPause(${id},'${k}')"><b>${l}</b><div class="muted text-sm">${{vacation:"They're away. Visits stop, nothing is billed, and we resume on the date you pick.",weather:"No growth or unsafe ground. Visits stop and nothing is billed until you resume.",payment:"They haven't paid. Visits stop, the account is marked past due, and reminders go out on day 1, 3 and 5.",other:"Visits stop and nothing is billed until you resume."}[k]}</div></button>`).join("")}</div>
+ <label class="text-sm block mt-4">Resume on (optional)<input id="pzDate" type="date" class="input mt-1"></label>
+ <button class="btn btn-ghost w-full mt-4" onclick="closeDlg()">Cancel</button>`)}
+function doPause(id,why){const c=cust(id),b=DB.op.business,L=c.lang==="es",d=$("#pzDate").value;c.status="paused";c.pauseReason=why;c.resumeOn=d||null;
+ if(why==="payment"){const amt=c.pay==="monthly"?monthlyFor(c):priceFor(c.zones).total;c.pastDue={amount:amt,since:new Date().toISOString()};
+  [1,3,5].forEach(n=>logText(c,`Past due, day ${n}`,L?`${b}: Hola ${c.name.split(" ")[0]}, su saldo de ${money(amt)} está vencido. Pague aquí: mowcall.com/pay/demo. ¿Preguntas? Responda este mensaje.`:`${b}: Hi ${c.name.split(" ")[0]}, your balance of ${money(amt)} is past due. Pay here: mowcall.com/pay/demo. Questions? Just reply.`))}
+ save();closeDlg();toast(why==="payment"?`${c.name} paused and marked past due. Reminders scheduled for day 1, 3 and 5.`:`${c.name} paused (${PAUSE_WHY[why]}). Nothing is billed, and they don't count toward your limit.`);route()}
+function markPaid(id){const c=cust(id);delete c.pastDue;if(c.pauseReason==="payment"){c.status="active";delete c.pauseReason}save();toast(`${c.name} marked paid and resumed`);route()}
+function togglePause(id){const c=cust(id);c.status=c.status==="active"?"paused":"active";if(c.status==="active"){delete c.pauseReason;delete c.resumeOn}save();toast(c.status==="paused"?`${c.name} paused. Plan kept, no charges, doesn't count toward your limit.`:`${c.name} resumed`);route()}
+function togglePay(id){const c=cust(id),to=c.pay==="monthly"?"per_visit":"monthly";openDlg(`<div class="display text-xl">Switch ${esc(c.name)} to ${PAY[to].toLowerCase()}?</div>
+ <p class="muted text-sm mt-1">Changing how they pay changes their service agreement, so they sign the updated one. That covers you no matter what. Their current billing stays until they sign.</p>
+ <p class="text-sm font-semibold mt-4">Have you talked to ${esc(c.name.split(" ")[0])} about this change?</p>
+ <div class="flex gap-2 mt-2"><label class="chip"><input type="radio" name="talked" checked> Yes</label><label class="chip"><input type="radio" name="talked"> Not yet, the message explains it</label></div>
+ <p class="text-sm font-semibold mt-4">Send the updated agreement by</p>
+ <div class="grid grid-cols-3 gap-2 mt-2">${[["text","Text"],["email","Email"],["both","Both"]].map(([k,l],i)=>`<button class="choice text-center" onclick="sendTerms(${id},'${to}','${k}')"><b>${l}</b></button>`).join("")}</div>
+ <button class="btn btn-ghost w-full mt-4" onclick="closeDlg()">Cancel</button>`)}
+function sendTerms(id,to,how){const c=cust(id),b=DB.op.business,L=c.lang==="es";c.payPending=to;c.renew={sent:new Date().toISOString(),reason:"billing change"};
+ const msg=L?`${b}: Hola ${c.name.split(" ")[0]}, actualizamos su forma de pago a ${to==="monthly"?"un monto mensual fijo":"pago por visita"}. Revise y firme su acuerdo actualizado aquí: mowcall.com/sign/demo`:`${b}: Hi ${c.name.split(" ")[0]}, we're updating how you pay to ${to==="monthly"?"one flat monthly amount":"pay per visit"}. Review and sign your updated agreement here: mowcall.com/sign/demo`;
+ if(how!=="email")logText(c,"Updated agreement (text)",msg);if(how!=="text")logText(c,"Updated agreement (email)",msg);
+ save();closeDlg();toast(`Updated agreement sent by ${how==="both"?"text and email":how}. Billing switches when they sign.`);route()}
 function addSample(){const p=PLANS[DB.op.plan];if(p.cap&&activeCount()>=p.cap){toast(`You're at your ${p.name} limit. New recurring requests wait in your Inbox.`);return}DB.extraActive++;save();toast("Sample customer added");route()}
 
 /* ===================== 3. SETTINGS ===================== */
@@ -438,15 +458,17 @@ function setNum(k,v){DB.op[k]=Number(v);save();route()}
 /* ===================== 4. PLAN & ADD-ONS (the one place for upgrades) ===================== */
 function viewPlan(){
  const cur=DB.op.plan;
- const opts=[["starter","Up to 35 active recurring customers. No business line."],["starterplus","Up to 80 active recurring customers. Same setup as Junior Boss, no business line or phone AI."],["payg","Your own business line. AI texts 8¢, AI call minutes 38¢."],["solo","Business line, 500 AI texts + 100 AI call minutes a month, no customer limit, QuickBooks Online sync. Crew logins $148/mo each."],["crew","3 trucks with 3 logins, 1,500 AI texts + 300 AI call minutes, business call calendar, QuickBooks Online sync. Extra logins $148/mo."]];
+ const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. Crew logins $148/mo each."],["crew","3 trucks with 3 logins, business call calendar, priority support. Extra logins $148/mo."]];
  return shell("plan",`<div class="grid lg:grid-cols-2 gap-4 items-start">
   <div class="grid gap-4">
    <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month. Every plan includes route order, Google Maps directions, yearly agreement renewals and CSV export.</p>
-    <div class="grid gap-2 mt-4">${opts.map(([k,d])=>`<button class="choice ${k===cur?"on":""}" onclick="DB.op.plan='${k}';save();toast('Plan set to ${PLANS[k].name} (preview only, no charge)');route()"><div class="flex justify-between gap-3"><b>${PLANS[k].name}</b><b>${money(PLANS[k].price)}/mo</b></div><div class="muted text-sm mt-1">${d}</div>${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`).join("")}</div></div>
+    <div class="inline-flex mt-4 rounded-xl overflow-hidden border" style="border-color:var(--input)">${[["monthly","Monthly"],["yearly","Yearly · 1 month free"]].map(([k,l])=>`<button class="px-3 py-2 text-sm font-semibold ${(yr?"yearly":"monthly")===k?"btn-orange":""}" onclick="DB.op.billing='${k}';save();route()">${l}</button>`).join("")}</div>
+    <div class="grid gap-2 mt-4">${opts.map(([k,d])=>`<button class="choice ${k===cur?"on":""}" onclick="DB.op.plan='${k}';save();toast('Plan set to ${PLANS[k].name} (preview only, no charge)');route()"><div class="flex justify-between gap-3"><b>${PLANS[k].name}</b><b>${yr?money(PLANS[k].year)+"/yr":money(PLANS[k].price)+"/mo"}</b></div><div class="muted text-sm mt-1">${d}</div>${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`).join("")}</div></div>
    <div class="card p-5"><div class="display text-lg">Usage packs</div><p class="muted text-sm mt-1">For a busy month. Good for the current month only.</p>
     <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Busy Season Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div></div>
   </div>
   <div class="grid gap-4">
+   ${cur==="starter"||cur==="starterplus"?`<div class="card p-5"><div class="flex justify-between items-baseline gap-3"><div class="display text-lg">Custom Brand Launch</div><b>${money(BRAND_LAUNCH)} one time</b></div><p class="muted text-sm mt-1">Your logo and colors on your quote page and customer app. ${money(BRAND_LAUNCH/2)} today, ${money(BRAND_LAUNCH/2)} when you approve your design. Included free on Monthly Solo and Crew.</p><button class="btn btn-ghost w-full mt-4" onclick="toast('Custom Brand Launch added (preview only, no charge)')">Add Custom Brand Launch</button></div>`:""}
    ${teamCard()}
    <div class="card p-5"><div class="flex justify-between items-baseline gap-3"><div class="display text-lg">Review Booster</div><b>$48/mo</b></div>
     <p class="muted text-sm mt-1">Your AI asks every customer for a Google review after every completed job, then reminds them once. Unhappy replies come to your Inbox so you can make it right. No monthly limit.</p>
@@ -557,9 +579,10 @@ function viewQuote(){
  if(Q.step===1)body=`${trustBar(Q.lang)}
   <div class="flex gap-2">${["home","biz"].map(t=>`<button class="chip ${Q.type===t?"on":""}" onclick="Q.type='${t}';route()">${t==="home"?L.home:L.biz}</button>`).join("")}</div>
   <label class="text-sm font-semibold block mt-4">${L.addr}</label>
-  <div class="flex gap-2 mt-1"><input id="addr" class="input" value="${esc(Q.addr)}" placeholder="123 Main St, Dublin, OH" onkeydown="if(event.key==='Enter')findAddr()"><button class="btn btn-orange shrink-0" onclick="findAddr()" id="findBtn">${L.find}</button></div>
+  <div class="flex gap-2 mt-1"><div class="relative flex-1"><input id="addr" class="input" autocomplete="off" value="${esc(Q.addr)}" placeholder="123 Main St, Dublin, OH" oninput="suggestAddr(this.value)" onkeydown="if(event.key==='Enter'){$('#addrSug').innerHTML='';findAddr()}"><div id="addrSug" class="absolute left-0 right-0 z-[1000] rounded-xl overflow-hidden" style="background:var(--card)"></div></div><button class="btn btn-orange shrink-0" onclick="findAddr()" id="findBtn">${L.find}</button></div>
   <div id="geoMsg" class="text-sm mt-2"></div>
-  <div id="qmap" class="mt-3"></div>
+  <div class="muted text-xs mt-2">${Q.lang==="es"?"O toque su casa en el mapa para elegirla.":"Or tap your house on the map to pick it."}</div>
+  <div id="qmap" class="mt-2"></div>
   ${Q.parcel?parcelCard():""}
   <button id="next1" class="btn btn-orange w-full mt-4" ${Q.found?"":"disabled"} onclick="Q.step=2;route()">${L.next}</button>`;
  if(Q.step===2)body=`<div class="text-sm font-semibold">${L.pick}</div>
@@ -629,7 +652,7 @@ function initMap(){
  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:19,attribution:"Imagery © Esri, Maxar, Earthstar Geographics"}).addTo(MAP);
  MAP.on("moveend",()=>{const c=MAP.getCenter();Q.center=[c.lat,c.lng];Q.zoom=MAP.getZoom()});
  if(Q.found)L.circleMarker(Q.found,{radius:6,color:"#fff",weight:2,fillColor:"#f97316",fillOpacity:1}).addTo(MAP);
- MAP.on("click",e=>{if(Q.step!==2||!Q.active)return;Q.draft.push([e.latlng.lat,e.latlng.lng]);redraw()});
+ MAP.on("click",e=>{if(Q.step===1){pickSpot(e.latlng.lat,e.latlng.lng);return}if(Q.step!==2||!Q.active)return;Q.draft.push([e.latlng.lat,e.latlng.lng]);redraw()});
  if(Q.step===2){MAP.doubleClickZoom.disable();el.classList.toggle("drawing",!!Q.active)}
  MAPLAYERS={};redraw();
 }
@@ -639,13 +662,22 @@ function redraw(){if(!MAP)return;Object.values(MAPLAYERS).forEach(l=>{try{MAP.re
   MAPLAYERS._p=L.layerGroup(Q.draft.map(p=>L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:ZCOLOR[Q.active],fillOpacity:1}))).addTo(MAP)}
  const db=$("#drawBar");if(db)db.innerHTML=drawBar();const pb=$("#pbox");if(pb)pb.innerHTML=priceBoxInner();
 }
+const GEO="https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+async function geocode(v){
+ try{const r=await fetch(`${GEO}/findAddressCandidates?f=json&maxLocations=1&countryCode=USA&outFields=Match_addr&singleLine=${encodeURIComponent(v)}`);const j=await r.json();const c=j.candidates&&j.candidates[0];if(c&&c.score>=80)return {ll:[c.location.y,c.location.x],label:c.address}}catch(e){}
+ try{const r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q="+encodeURIComponent(v),{headers:{"Accept":"application/json"}});const j=await r.json();if(j.length)return {ll:[Number(j[0].lat),Number(j[0].lon)],label:j[0].display_name}}catch(e){}
+ return null}
+async function reverseGeo(lat,lng){try{const r=await fetch(`${GEO}/reverseGeocode?f=json&location=${lng},${lat}`);const j=await r.json();return j.address&&j.address.Match_addr||""}catch(e){return ""}}
+let sugT=null;
+function suggestAddr(v){clearTimeout(sugT);const box=$("#addrSug");if(!box)return;if(v.trim().length<4){box.innerHTML="";return}
+ sugT=setTimeout(async()=>{try{const r=await fetch(`${GEO}/suggest?f=json&countryCode=USA&maxSuggestions=5&text=${encodeURIComponent(v)}`);const j=await r.json();
+  box.innerHTML=(j.suggestions||[]).map(x=>`<button class="block w-full text-left px-3 py-2 text-sm border-b" style="border-color:var(--border)" onclick="$('#addr').value=this.textContent;$('#addrSug').innerHTML='';findAddr()">${esc(x.text)}</button>`).join("")}catch(e){box.innerHTML=""}},250)}
 async function findAddr(){const L_=QT[Q.lang],v=$("#addr").value.trim();Q.addr=v;if(!v)return;
  const btn=$("#findBtn");btn.textContent=L_.finding;btn.disabled=true;$("#geoMsg").textContent="";
- try{const r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q="+encodeURIComponent(v),{headers:{"Accept":"application/json"}});
-  const j=await r.json();if(!j.length)throw 0;
-  Q.found=[Number(j[0].lat),Number(j[0].lon)];Q.center=Q.found;Q.zoom=19;Q.parcel=sampleParcel(v);Q.zones={};Q.polys={};route()}
- catch(e){$("#geoMsg").innerHTML=`<span style="color:var(--yellow)">${L_.notFound}</span>`;btn.textContent=L_.find;btn.disabled=false;
-  Q.found=Q.center.slice();Q.parcel=sampleParcel(v);const nb=$("#next1");if(nb)nb.disabled=false}}
+ const g=await geocode(v);
+ if(g){Q.found=g.ll;Q.center=g.ll;Q.zoom=19;Q.addr=g.label||v;Q.parcel=sampleParcel(Q.addr);Q.zones={};Q.polys={};route();return}
+ $("#geoMsg").innerHTML=`<span style="color:var(--yellow)">${Q.lang==="es"?"No encontramos esa dirección. Acerque el mapa y toque su casa.":"We couldn't find that address. Zoom the map and tap your house."}</span>`;btn.textContent=L_.find;btn.disabled=false}
+async function pickSpot(lat,lng){Q.found=[lat,lng];Q.center=[lat,lng];const a=await reverseGeo(lat,lng);if(a)Q.addr=a;Q.parcel=sampleParcel(Q.addr||String(lat));Q.zones={};Q.polys={};route();toast(Q.lang==="es"?"Propiedad seleccionada":"Property selected")}
 function bookQuote(){const L=QT[Q.lang],o=DB.op,p=PLANS[o.plan];
  if(!Q.agree||Q.sign.trim().length<3){toast(L.needSign);return}
  if(Q.type==="home"&&Q.freq!=="once"){
