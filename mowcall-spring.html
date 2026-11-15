@@ -464,7 +464,7 @@ function setNum(k,v){DB.op[k]=Number(v);save();route()}
 /* ===================== 4. PLAN & ADD-ONS (the one place for upgrades) ===================== */
 function viewPlan(){
  const cur=DB.op.plan;
- const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. Crew logins $148/mo each."],["crew","3 trucks with 3 logins, business call calendar, priority support. Extra logins $148/mo."]];
+ const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. 2 logins included, extra logins $28/mo."],["crew","3 trucks, 5 logins, business call calendar, priority support. Extra logins $28/mo."]];
  return shell("plan",`<div class="grid lg:grid-cols-2 gap-4 items-start">
   <div class="grid gap-4">
    <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month. Every plan includes route order, Google Maps directions, yearly agreement renewals and CSV export.</p>
@@ -485,17 +485,16 @@ function viewPlan(){
   </div></div>`);
 }
 
-const SEATS={solo:1,crew:3};
+const SEATS={solo:2,crew:5},LOGIN_PRICE=28;
 function teamCard(){const k=DB.op.plan,inc=SEATS[k],team=DB.op.team;
- if(!inc)return `<div class="card p-5"><div class="display text-lg">Team logins</div><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Separate logins for crew members come with Monthly Solo and Monthly Crew.</p></div>`;
- const people=1+team.length,extra=Math.max(0,people-inc),total=PLANS[k].price+extra*148;
+ if(!inc)return `<div class="card p-5"><div class="display text-lg">Team logins</div><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Logins for crew members come with Monthly Solo (2 included) and Monthly Crew (5 included).</p></div>`;
+ const people=1+team.length,extra=Math.max(0,people-inc),total=PLANS[k].price+extra*LOGIN_PRICE;
  return `<div class="card p-5"><div class="flex justify-between gap-3 items-baseline"><div class="display text-lg">Team logins</div><b class="text-sm">${people} login${people>1?"s":""} · ${inc} included</b></div>
- <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${k==="solo"?"Monthly Solo includes 1 login (you).":"Monthly Crew includes 3 logins."} Each extra login is <b>$148/mo</b>, the same as adding another truck, because it comes with its own 500 AI texts and 100 AI call minutes.</p>
+ <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${PLANS[k].name} includes ${inc}. Each extra login is <b>$${LOGIN_PRICE}/mo</b>. AI texts and call minutes are shared across your account.</p>
  <div class="grid gap-2 mt-3"><div class="card p-3 text-sm" style="background:var(--bg)"><b>You</b> · Owner · full access · included</div>
- ${team.map((m,i)=>`<div class="card p-3 text-sm flex flex-wrap justify-between gap-2 items-center" style="background:var(--bg)"><span><b>${esc(m.name)}</b> · Crew · ${esc(m.phone)} · ${i+2>inc?"$148/mo":"included"}</span><span class="flex gap-2"><button class="btn btn-sm btn-ghost" onclick="DB.viewAs='crew';DB.crewIdx=${i};save();location.hash='#/route'">See their view</button><button class="btn btn-sm btn-ghost" onclick="DB.op.team.splice(${i},1);save();route()">Remove</button></span></div>`).join("")}</div>
+ ${team.map((m,i)=>`<div class="card p-3 text-sm flex flex-wrap justify-between gap-2 items-center" style="background:var(--bg)"><span><b>${esc(m.name)}</b> · Crew · ${esc(m.phone)} · ${i+2>inc?"$"+LOGIN_PRICE+"/mo":"included"}</span><span class="flex gap-2"><button class="btn btn-sm btn-ghost" onclick="DB.viewAs='crew';DB.crewIdx=${i};save();location.hash='#/route'">See their view</button><button class="btn btn-sm btn-ghost" onclick="DB.op.team.splice(${i},1);save();route()">Remove</button></span></div>`).join("")}</div>
  <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-2 mt-3"><input class="input" id="tmN" placeholder="Crew member's name"><input class="input" id="tmP" placeholder="Their own mobile number"><button class="btn btn-orange" onclick="addMember()">Add login</button></div>
- <div class="text-sm mt-3">Your monthly total: <b>${money(total)}/mo</b>${extra?` (${money(PLANS[k].price)} plan + ${extra} × $148)`:""}</div>
- ${k==="solo"&&people>=3?`<div class="text-sm mt-2 orange font-bold">Monthly Crew ($398) includes 3 logins and costs less than Solo with 2 extra logins ($444).</div>`:""}
+ <div class="text-sm mt-3">Your monthly total: <b>${money(total)}/mo</b>${extra?` (${money(PLANS[k].price)} plan + ${extra} × $${LOGIN_PRICE})`:""}</div>
  <details class="mt-4 text-sm"><summary class="font-bold cursor-pointer">How team logins work</summary><ul class="list-disc pl-5 mt-2 grid gap-1 muted">
   <li>One login = one named person with their own mobile number. Signing in needs a code texted to that number.</li>
   <li>One phone at a time per login. Signing in on a second phone signs the first one out, and you get a text.</li>

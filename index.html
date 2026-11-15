@@ -90,7 +90,7 @@
 const SEED = {
   operator: {
     business_name: "Sean's Plowing (sample)", owner_name: "Sean Dean", phone: "(513) 555-0142",
-    email: "sean@example.com", slug: "seans-plowing", state: "OH", home_base: "Cincinnati, OH",
+    email: "sean@example.com", slug: "seans-plowing", state: "OH", home_base: "Cincinnati, OH", home_ll:[39.1290,-84.5600], team:[{name:"Mike Torres",phone:"(513) 555-0177"}], qbo:false,
     deposit_payment_link: "https://pay.example.com/seans-plowing/deposit",
     bgm_webhook_url: "https://hooks.example.com/seans-plowing/jobs",
     service_zip_codes: ["45202","45211","45238","45248"], active: true,
@@ -100,12 +100,15 @@ const SEED = {
   },
   pricing: { one_car: 45, two_car: 65, three_car: 95, walkway: 20, salt: 25, rush: 30, deposit_type: "percent", deposit_value: 50, trigger_in: 2, trip_fee: 28, mow_notice_hrs: 24 },
   jobs: [
-    {id:101,type:"Plow Now",name:"Maria Lopez",phone:"(513) 555-0110",email:"maria@example.com",address:"412 Elm St",zip:"45202",size:"2-car",addons:["Walkway"],total:115,deposit:57.5,status:"New",created:ago(0.1),outside:false,notes:"Car leaves at 7am"},
-    {id:102,type:"Scheduled",date:"2026-11-14",name:"James Carter",phone:"(513) 555-0187",email:"jc@example.com",address:"88 Ridge Ave",zip:"45238",size:"3+ car / long",addons:["Salt / de-ice"],total:120,deposit:60,status:"Quoted",created:ago(1),outside:false,accepted:true,notes:""},
-    {id:103,type:"Plow Now",name:"Dee Harris",phone:"(513) 555-0199",email:"",address:"9 Vine St",zip:"45211",size:"1-car",addons:[],total:75,deposit:37.5,status:"Deposit Paid",created:ago(2),outside:false,notes:""},
-    {id:104,type:"Scheduled",date:"2026-11-12",name:"Tom Becker",phone:"(513) 555-0156",email:"tb@example.com",address:"230 Oak Hill Dr",zip:"45248",size:"2-car",addons:["Walkway","Salt / de-ice"],total:110,deposit:55,status:"Booked",created:ago(3),outside:false,notes:"Gate code 4412"},
-    {id:105,type:"Plow Now",name:"Ana Ruiz",phone:"(513) 555-0133",email:"",address:"17 Lake Rd",zip:"45040",size:"2-car",addons:[],total:95,deposit:47.5,status:"New",created:ago(4),outside:true,notes:""},
-    {id:106,type:"Scheduled",date:"2026-11-05",name:"Keith Moore",phone:"(513) 555-0170",email:"",address:"5 Pine Ct",zip:"45202",size:"1-car",addons:[],total:45,deposit:22.5,status:"Done",created:ago(6),outside:false,notes:""}
+    {id:101,lat:39.1052,lng:-84.509,type:"Plow Now",name:"Maria Lopez",phone:"(513) 555-0110",email:"maria@example.com",address:"412 Elm St",zip:"45202",size:"2-car",addons:["Walkway"],total:115,deposit:57.5,status:"New",created:ago(0.1),outside:false,notes:"Car leaves at 7am"},
+    {id:102,lat:39.1118,lng:-84.6142,type:"Scheduled",date:"2026-11-14",name:"James Carter",phone:"(513) 555-0187",email:"jc@example.com",address:"88 Ridge Ave",zip:"45238",size:"3+ car / long",addons:["Salt / de-ice"],total:120,deposit:60,status:"Quoted",created:ago(1),outside:false,accepted:true,notes:""},
+    {id:103,lat:39.1556,lng:-84.596,type:"Plow Now",name:"Dee Harris",phone:"(513) 555-0199",email:"",address:"9 Vine St",zip:"45211",size:"1-car",addons:[],total:75,deposit:37.5,status:"Deposit Paid",created:ago(2),outside:false,notes:""},
+    {id:104,lat:39.1631,lng:-84.6493,type:"Scheduled",date:"2026-11-12",name:"Tom Becker",phone:"(513) 555-0156",email:"tb@example.com",address:"230 Oak Hill Dr",zip:"45248",size:"2-car",addons:["Walkway","Salt / de-ice"],total:110,deposit:55,status:"Booked",created:ago(3),outside:false,notes:"Gate code 4412"},
+    {id:105,lat:39.36,lng:-84.31,type:"Plow Now",name:"Ana Ruiz",phone:"(513) 555-0133",email:"",address:"17 Lake Rd",zip:"45040",size:"2-car",addons:[],total:95,deposit:47.5,status:"New",created:ago(4),outside:true,notes:""},
+    {id:107,lat:39.1385,lng:-84.5320,type:"Plow Now",name:"Grace Allen",phone:"(513) 555-0114",email:"",address:"61 Hillcrest Rd",zip:"45202",size:"2-car",addons:["Walkway"],total:85,deposit:42.5,status:"Booked",created:ago(0.3),outside:false,notes:"Steep driveway, go up in low gear"},
+    {id:108,lat:39.1189,lng:-84.5872,type:"Plow Now",name:"Ray Simmons",phone:"(513) 555-0131",email:"",address:"14 Glenway Ave",zip:"45211",size:"1-car",addons:["Salt / de-ice"],total:70,deposit:35,status:"Deposit Paid",created:ago(0.4),outside:false,notes:""},
+    {id:109,lat:39.1497,lng:-84.6311,type:"Scheduled",date:"2026-11-16",name:"Nina Patel",phone:"(513) 555-0162",email:"np@example.com",address:"300 Bridgetown Rd",zip:"45248",size:"3+ car / long",addons:["Walkway","Salt / de-ice"],total:150,deposit:75,status:"Booked",created:ago(0.6),outside:false,notes:"Leave the mailbox side clear"},
+    {id:106,lat:39.1012,lng:-84.515,type:"Scheduled",date:"2026-11-05",name:"Keith Moore",phone:"(513) 555-0170",email:"",address:"5 Pine Ct",zip:"45202",size:"1-car",addons:[],total:45,deposit:22.5,status:"Done",created:ago(6),outside:false,notes:""}
   ],
   partners: [
     {id:201,company:"Westside Medical Plaza",contact:"Linda Park",phone:"(513) 555-0122",can_text:true,email:"linda@westsidemed.example",property:"Medical office lot (60 spaces)",location:"Cincinnati, 45238",notes:"Needs cleared by 6:30am on clinic days",created:ago(1),requested:slotAt(1,"13:30"),status:"requested",log:[[ago(1),"Request received from the quote page. Thank-you message sent automatically."]]},
@@ -230,16 +233,16 @@ function capLine(){return "Up to 25 customers"}
 function capFix(t){return String(t).replace("__CAP__",capLine()).replace("__CAPLOW__","up to 25 customers")}
 const PLANS={
  starter:{name:"Junior Boss",tag:"Side hustle, first business, or a kid running their own business",kids:true,price:48,year:528,
-  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app, in our clean design with your business name","AI answers your website chat and email","Calls and texts go to your own phone, no business line or EIN needed","Best route order + Google Maps directions","Signed service agreement, renewed yearly for you","CSV export anytime","__CAP__"],
+  bullets:["Your QR code, quote page and dashboard","Best route order + Google Maps directions","CSV export anytime","Instant prices and deposits","Your own customer app, in our clean design with your business name","AI answers your website chat and email","Calls and texts go to your own phone, no business line or EIN needed","Best route order + Google Maps directions","Signed service agreement, renewed yearly for you","CSV export anytime","__CAP__"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
  starterplus:{name:"Junior Boss Plus",tag:"Growing, not ready for a business line yet",price:118,year:1298,
   bullets:["Everything in Junior Boss","Up to 60 customers","Same setup, no business line or phone AI","Move up to Monthly Solo anytime"],
   fine:"Want your own logo and colors? Add Custom Brand Launch."},
  solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,year:1628,best:true,
-  bullets:["Everything in Junior Boss Plus","No customer limit","Your own business phone number","AI answers calls, texts and DMs","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-season alerts","Custom branding included, approved by you","Monthly AI report: how you did, what to fix, when to switch seasons","QuickBooks Online sync","Second truck or crew login? $148/mo each"],
+  bullets:["Everything in Junior Boss Plus","No customer limit","Your own business phone number","AI answers calls, texts and DMs","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-season alerts","Custom branding included, approved by you","Monthly AI report: how you did, what to fix, when to switch seasons","QuickBooks Online sync","2 logins: you + 1 crew member (+$28/mo per extra login)"],
   fine:"Includes 500 AI texts and 100 AI call minutes a month."},
  crew:{name:"Monthly Crew",tag:"3 trucks included",price:398,year:4378,
-  bullets:["Everything in Monthly Solo","3 trucks included, each with its own crew login","Business call calendar for commercial work","Priority support","+$148/mo per extra truck or login"],
+  bullets:["Everything in Monthly Solo","5 logins for you and your crew (+$28/mo per extra login)","Business call calendar for commercial work","Priority support","More AI for a big storm month: usage packs"],
   fine:"Includes 1,500 AI texts and 300 AI call minutes a month."}
 };
 const BRAND_LAUNCH=148;
@@ -621,18 +624,73 @@ function loginPage(mode){
 }
 
 /* ============ DASHBOARD ============ */
-const TABS=[["jobs","Jobs"],["inbox","Inbox"],["pricing","Pricing"],["areas","Service Areas"],["partners","Calls"],["link","My Link"],["preview","Customer View"],["feedback","Feedback"],["affiliate","Referrals"],["settings","Settings"],["plan","Plan & add-ons"]];
+const TABS=[["jobs","Jobs"],["route","Today's route"],["inbox","Inbox"],["pricing","Pricing"],["areas","Service Areas"],["partners","Calls"],["link","My Link"],["preview","Customer View"],["feedback","Feedback"],["affiliate","Referrals"],["settings","Settings"],["plan","Plan & add-ons"]];
 const STATUSES=["New","Quoted","Deposit Paid","Booked","Done","Cancelled"];
 let jobFilter="All";
 function dashboard(tab){
   const o=DB.operator;
+  if(DB.viewAs==="crew"){const m=(o.team||[])[DB.crewIdx||0]||{name:"Crew member"};
+   $("#app").innerHTML=`${header(`<span class="text-sm muted">${m.name}</span>`)}<main class="max-w-5xl mx-auto px-4 py-6"><div class="card p-4 mb-4 text-sm flex flex-wrap justify-between items-center gap-2" style="border-color:var(--yellow)"><span><b>Crew view:</b> what ${m.name} sees on their own login. Only today's route. No prices, payments, customer list, exports or settings.</span><button class="btn btn-ghost text-sm min-h-[40px]" onclick="DB.viewAs='owner';save();location.hash='#/dashboard/plan'">Back to owner view</button></div><div id="tab"></div></main>`;
+   tabRoute();return}
   $("#app").innerHTML=`${header(`<div class="flex items-center gap-3">${seasonSwitch()}<span class="text-sm muted hidden lg:inline">${o.business_name}</span><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
   <main class="max-w-5xl mx-auto px-4 py-6">
     <nav class="scroll-x flex gap-2 pb-2">${(obDone()<OB.length?[["setup",`Finish setup (${obDone()}/${OB.length})`],...TABS]:[...TABS,["setup","Setup"]]).map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
     <div id="tab" class="mt-5"></div></main>
   <button onclick="talkDlg()" class="btn btn-orange fixed bottom-5 right-5 z-40 shadow-lg rounded-full">🎙️ Talk to your AI</button>`;
-  ({setup:tabSetup,jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings,plan:tabPlan}[tab]||tabJobs)();
+  (DB.viewAs==="crew"?tabRoute:{setup:tabSetup,route:tabRoute,jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings,plan:tabPlan}[tab]||tabJobs)();
 }
+/* ---------- TODAY'S ROUTE (best order + Google Maps, free: our own math, no map API) ---------- */
+const ZIP_LL={"45202":[39.107,-84.505],"45211":[39.155,-84.597],"45238":[39.111,-84.615],"45248":[39.163,-84.651]};
+function jobLL(j){if(j.lat)return [j.lat,j.lng];const z=ZIP_LL[j.zip]||DB.operator.home_ll||[39.129,-84.56];let h=0;for(const c of String(j.address))h=(h*31+c.charCodeAt(0))>>>0;return [z[0]+((h%200)-100)/12000,z[1]+(((h>>8)%200)-100)/12000]}
+function hav(a,b){const R=3958.8,r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]),h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function homeLL(){return DB.operator.home_ll||[39.129,-84.56]}
+function routeJobs(){const act=DB.jobs.filter(j=>["Deposit Paid","Booked"].includes(j.status)||(j.status==="Done"&&j.done_today)).filter(j=>!j.outside);
+ const ord=DB.operator.route_order||[];return act.sort((a,b)=>{const ia=ord.indexOf(a.id),ib=ord.indexOf(b.id);return (ia<0?999:ia)-(ib<0?999:ib)||new Date(a.created)-new Date(b.created)})}
+function routeMiles(list){let p=homeLL(),m=0;list.forEach(j=>{const q=jobLL(j);m+=hav(p,q);p=q});return m*1.3}
+function bestOrderP(){const all=routeJobs(),before=routeMiles(all);let left=[...all],p=homeLL(),out=[];
+ while(left.length){left.sort((a,b)=>hav(p,jobLL(a))-hav(p,jobLL(b)));const n=left.shift();out.push(n);p=jobLL(n)}
+ DB.operator.route_order=out.map(j=>j.id);save();const after=routeMiles(out);toast(after<before-0.05?`Reordered. About ${(before-after).toFixed(1)} fewer miles.`:"Already in the best order.");tabRoute()}
+function mapsLinksP(list){const pts=list.filter(j=>j.status!=="Done").map(jobLL);if(!pts.length)return "";const out=[];let o=homeLL();
+ for(let i=0;i<pts.length;i+=9){const c=pts.slice(i,i+9),d=c[c.length-1],w=c.slice(0,-1);
+  const u=`https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${o.join(",")}&destination=${d.join(",")}${w.length?"&waypoints="+w.map(q=>q.join(",")).join("%7C"):""}`;
+  out.push(`<a class="btn btn-ghost text-sm min-h-[40px]" target="_blank" rel="noopener" href="${u}">🧭 Open ${pts.length>9?`stops ${i+1}–${i+c.length}`:"route"} in Google Maps</a>`);o=d}
+ return out.join("")}
+function routeOTW(id){const j=DB.jobs.find(x=>x.id===id);j.otw=new Date().toISOString();save();toast(texting()?"On-the-way text sent to "+j.name.split(" ")[0]:"Texting isn't approved yet, so your AI is calling "+j.name.split(" ")[0]+" with the on-the-way notice");tabRoute()}
+function routeDone(id){const j=DB.jobs.find(x=>x.id===id);j.status="Done";j.done_today=true;j.done_notice=new Date().toISOString();save();toast("Done! Text + thank-you email sent to "+j.name.split(" ")[0]);tabRoute()}
+function tabRoute(){const crew=DB.viewAs==="crew",list=routeJobs(),left=list.filter(j=>j.status!=="Done").length;
+ $("#tab").innerHTML=`<div class="card p-5"><div class="flex flex-wrap justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Today's route</h2><span class="muted text-sm">${list.length} stops · ${left} left · about ${routeMiles(list.filter(j=>j.status!=="Done")).toFixed(1)} miles of driving</span></div>
+  <div class="flex flex-wrap gap-2 mt-4">${crew?"":`<button class="btn btn-orange text-sm min-h-[40px]" onclick="bestOrderP()">↕ Best order</button>`}${mapsLinksP(list)}</div>
+  <p class="muted text-xs mt-3">${crew?"Stops are in the order your boss set. Tap Open in Google Maps for turn-by-turn directions.":`Booked and deposit-paid jobs inside your service area. <b>Best order</b> puts them in the shortest driving order from your home base. <b>Open in Google Maps</b> gives turn-by-turn directions in that order (free, up to 10 stops per route, longer routes split automatically).`}</p></div>
+ <div class="grid gap-3 mt-4">${list.length?list.map((j,i)=>`<div class="card p-4"><div class="flex justify-between gap-3 items-start"><div><div class="font-bold">${i+1}. ${j.name}</div><div class="muted text-sm">${j.address}, ${j.zip} · ${j.size}${j.addons.length?" · "+j.addons.join(", "):""}</div>${crew?"":`<div class="text-sm mt-1">${money(j.total)}${j.type==="Scheduled"&&j.date?" · scheduled "+j.date:""}</div>`}${j.notes?`<div class="text-sm mt-1"><span class="muted">Notes:</span> ${j.notes}</div>`:""}</div><span class="pill st-${j.status.replace(" ","")}">${j.status}</span></div>
+  <div class="flex flex-wrap gap-2 mt-3"><button class="btn btn-ghost text-sm min-h-[40px]" ${j.otw||j.status==="Done"?"disabled":""} onclick="routeOTW(${j.id})">${j.otw?"✓ On the way sent":"On the way"}</button><button class="btn btn-orange text-sm min-h-[40px]" ${j.status==="Done"?"disabled":""} onclick="routeDone(${j.id})">${j.status==="Done"?"✓ Done":"Done + photo"}</button><a class="btn btn-ghost text-sm min-h-[40px]" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=${jobLL(j).join(",")}">Directions</a></div></div>`).join(""):`<p class="muted">No booked jobs right now.</p>`}</div>`}
+/* ---------- TEAM LOGINS (Monthly plans) ---------- */
+const LOGIN_PRICE=28,SEATS_P={solo:2,crew:5};
+function teamCardP(){const o=DB.operator,k=o.plan||"starter",inc=SEATS_P[k],team=o.team||(o.team=[]);
+ if(!inc)return `<div class="card p-6"><h2 class="font-bold text-lg">Team logins</h2><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Logins for crew members come with Monthly Solo (2 included) and Monthly Crew (5 included).</p></div>`;
+ const people=1+team.length,extra=Math.max(0,people-inc),base=o.billing==="yearly"?Math.round(PLANS[k].year/12):PLANS[k].price;
+ return `<div class="card p-6"><div class="flex justify-between gap-3 items-baseline"><h2 class="font-bold text-lg">Team logins</h2><b class="text-sm">${people} of ${inc} included${extra?` + ${extra} extra`:""}</b></div>
+ <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${PLANS[k].name} includes ${inc}. Each extra login is <b>$${LOGIN_PRICE}/mo</b>. AI texts and call minutes are shared across your account.</p>
+ <div class="grid gap-2 mt-3"><div class="rounded-xl p-3 text-sm" style="background:var(--muted)"><b>You</b> · Owner · full access</div>
+ ${team.map((m,i)=>`<div class="rounded-xl p-3 text-sm flex flex-wrap justify-between gap-2 items-center" style="background:var(--muted)"><span><b>${m.name}</b> · Crew · ${m.phone} · ${i+2>inc?"$"+LOGIN_PRICE+"/mo":"included"}</span><span class="flex gap-2"><button class="btn btn-ghost text-sm min-h-[36px]" onclick="DB.viewAs='crew';DB.crewIdx=${i};save();location.hash='#/dashboard/route'">See their view</button><button class="btn btn-ghost text-sm min-h-[36px]" onclick="DB.operator.team.splice(${i},1);save();tabPlan()">Remove</button></span></div>`).join("")}</div>
+ <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-2 mt-3"><input class="input" id="tmN" placeholder="Crew member's name"><input class="input" id="tmP" placeholder="Their own mobile number"><button class="btn btn-orange" onclick="addMemberP()">Add login</button></div>
+ ${extra?`<div class="text-sm mt-3">Extra logins: <b>${extra} × $${LOGIN_PRICE} = $${extra*LOGIN_PRICE}/mo</b> on top of your plan.</div>`:""}
+ <details class="mt-4 text-sm"><summary class="font-bold cursor-pointer">How team logins work</summary><ul class="list-disc pl-5 mt-2 grid gap-1 muted">
+  <li>One login = one named person with their own mobile number. Signing in needs a code texted to that number.</li>
+  <li>One phone at a time per login. Signing in on a second phone signs the first one out, and you get a text.</li>
+  <li>Crew logins see only today's route: addresses, notes, On the way, Done + photo, directions. No prices, payments, customer list, exports, settings or billing.</li>
+  <li>Same business name and branding on every login. One payout bank account and one customer list per account. A second business needs its own account.</li>
+  <li>Two Junior Boss accounts for one business (same bank account, tax ID or phone) to get around the customer limit are combined, and the plan that fits applies.</li>
+  <li>Swapping a login to a new person is fine for seasonal help. The old person is signed out right away. More than 3 swaps in 30 days gets a quick review.</li>
+  <li>AI texts and call minutes from every login count toward your account's monthly total.</li></ul></details></div>`}
+function addMemberP(){const n=$("#tmN").value.trim(),p=$("#tmP").value.trim(),d=p.replace(/\D/g,"");
+ if(n.length<2||d.length<10){toast("Add a name and their own 10-digit mobile number");return}
+ if((DB.operator.team||[]).some(m=>m.phone.replace(/\D/g,"")===d)||DB.operator.phone.replace(/\D/g,"")===d){toast("That number already has a login. One login per person.");return}
+ DB.operator.team.push({name:n,phone:p});save();toast(`${n} added. They get a text to set up their login (preview: nothing sent).`);tabPlan()}
+function exportJobsCSV(){const rows=[["Name","Phone","Email","Address","ZIP","Service","Date","Driveway","Add-ons","Total","Deposit","Status","Requested"]];
+ DB.jobs.forEach(j=>rows.push([j.name,j.phone,j.email,j.address,j.zip,j.type,j.date||"",j.size,j.addons.join(" + "),j.total,j.deposit,j.status,new Date(j.created).toISOString().slice(0,10)]));
+ const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="plowcall-jobs.csv";document.body.appendChild(a);a.click();a.remove();toast("Jobs and customers downloaded")}
+
 function planLabel(){const k=DB.operator.plan||"starter",p=PLANS[k]||PLANS.starter,yr=DB.operator.billing==="yearly";return `${p.name} · $${yr?p.year.toLocaleString()+"/yr":p.price+"/mo"}`}
 /* ---------- SEASON SWITCH (one account, PlowCall <-> MowCall) ---------- */
 function seasonOf(){return DB.operator.season||"plow"}
@@ -656,7 +714,7 @@ function reportCard(){const k=DB.operator.plan||"starter";if(k!=="solo"&&k!=="cr
    <ul class="grid gap-1 text-sm mt-3 list-disc pl-5"><li>3 quotes didn't book. Following up within an hour books more of them.</li><li>Most requests come in 6–8am on storm days. Your AI handled them while you plowed.</li><li>${new Date().getMonth()>=8||new Date().getMonth()<=1?"Spring is coming: turn on MowCall in March to keep these same customers all year.":"Snow season is coming: turn on PlowCall in November to keep these same customers all year."}</li></ul></div>`}
 function tabPlan(){
   const o=DB.operator,cur=o.plan||"starter",yr=o.billing==="yearly";
-  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync."],["crew","3 trucks with their own logins, business call calendar, priority support."]];
+  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync. 2 logins included."],["crew","3 trucks, 5 logins, business call calendar, priority support."]];
   const renew=new Date(o.renews||Date.now()+200*864e5);
   $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
   <div class="grid gap-5">
@@ -668,6 +726,7 @@ function tabPlan(){
     <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Storm or Busy Season Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
     <details class="mt-3 text-xs muted"><summary class="cursor-pointer">How AI use is counted</summary><p class="mt-2">Monthly Solo includes 500 AI texts and 100 AI call minutes a month (Crew: 1,500 and 300). One AI text is one AI reply up to 320 characters. Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute. Texts and calls you send yourself are always included.</p></details></div></div>
   <div class="grid gap-5">
+   ${teamCardP()}
    <div class="card p-6"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>$48/mo</b></div>
     <p class="muted text-sm mt-1">Your AI asks every customer for a Google review after every completed job, by text and email, then reminds them once. Unhappy replies come to your Inbox so you can make it right. No monthly limit.</p>
     <button class="btn btn-ghost w-full mt-4" onclick="toast('Review Booster added (preview only, no charge)')">Add Review Booster</button></div>
@@ -1053,6 +1112,9 @@ function tabSettings(){
     <div class="grid grid-cols-3 gap-2 mt-3"><label class="text-xs muted">From<input type="time" class="input !min-h-[42px] mt-1" value="${o.partner_start}" onchange="DB.operator.partner_start=this.value;save()"></label>
      <label class="text-xs muted">To<input type="time" class="input !min-h-[42px] mt-1" value="${o.partner_end}" onchange="DB.operator.partner_end=this.value;save()"></label>
      <label class="text-xs muted">Call length<select class="input !min-h-[42px] mt-1" onchange="DB.operator.partner_slot=+this.value;save()">${[15,30,45,60].map(n=>`<option ${o.partner_slot===n?"selected":""} value="${n}">${n} min</option>`).join("")}</select></label></div></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Export and bookkeeping</h2><p class="muted text-sm mt-1">Download your jobs and customers anytime. The file opens in Excel or Google Sheets and imports into QuickBooks.</p>
+    <button class="btn btn-ghost w-full mt-3" onclick="exportJobsCSV()">⬇ Download jobs and customers (CSV)</button>
+    ${["solo","crew"].includes(o.plan)?`<button class="choice mt-3 w-full text-left ${o.qbo?"on":""}" onclick="DB.operator.qbo=!DB.operator.qbo;save();tabSettings()"><div class="font-bold">${o.qbo?"✓ QuickBooks Online connected":"Connect QuickBooks Online"}</div><div class="muted text-sm">${o.qbo?"New customers, invoices, deposits and payments go to QuickBooks automatically.":"Included with your plan. Sends customers, invoices, deposits and payments to QuickBooks automatically."}</div></button>`:""}</div>
   </div></div>`;
 }
 
