@@ -220,10 +220,12 @@ const PHONE_FAQ=[
  ["What if a storm misses or I can't make it?","Tap \"Can't make it\" on the job. Your customer picks: roll their deposit to the next service, or get an automatic refund to their card. You never handle refunds by hand. Customers can cancel free until you tap \"On the way.\" After that, your trip fee comes out of their deposit."],
  ["Will my customers sign a waiver?","Yes. Every booking includes your service terms and liability waiver, branded with your business name: marking driveway edges, hidden objects, refreezing, and reporting damage within 24 hours. You can add an \"Insured\" badge once you upload your insurance certificate."],
  ["Is there an App Store app?","Every plan includes your own branded customer app that installs from your quote page in one tap, with no app store needed. Want your own listing in the App Store and Google Play? That's a paid add-on, and Apple and Google charge their own yearly developer fees in your business name."],
- ["Do I need a business phone number at all?","Not on Starter: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Starter covers up to 100 jobs a month; past that, you'll move up to Starter Plus or a plan with a business line). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
+ ["Do I need a business phone number at all?","Not on Starter: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Starter covers __CAPLOW__; past that, you'll move up to Starter Plus or a plan with a business line). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
+function capLine(){return BR.key==="mow"?"Up to 35 active recurring customers":"Up to 100 jobs a month"}
+function capFix(t){return String(t).replace("__CAP__",capLine()).replace("__CAPLOW__",BR.key==="mow"?"up to 35 active recurring customers":"up to 100 jobs a month")}
 const PLANS={
  starter:{name:"Starter",tag:"Side hustle, first business or Junior Boss",price:48,setup:0,
-  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","Up to 100 jobs a month"],
+  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","__CAP__"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
  payg:{name:"Pay as you go",tag:"1 truck, a smaller customer list",price:78,setup:148,
   bullets:["Everything in Starter","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
@@ -254,7 +256,7 @@ function pricingSection(){
     <div class="font-bold text-xl">${p.name}</div><div class="muted text-sm">${p.tag}</div>
     <div class="mt-4"><span class="display text-4xl">$${p.price}</span><span class="muted">/mo</span>${k==="payg"?`<span class="muted text-sm"> + AI use</span>`:""}</div>
     <div class="muted text-xs mt-1">${p.setup?`$${p.setup} one-time setup`:"No setup fee"}${p.season?` · ${p.fine}`:""}</div>
-    <ul class="mt-5 grid gap-2 text-sm flex-1">${p.bullets.map(b=>`<li class="flex gap-2"><span class="orange">✓</span>${b}</li>`).join("")}</ul>
+    <ul class="mt-5 grid gap-2 text-sm flex-1">${p.bullets.map(b=>`<li class="flex gap-2"><span class="orange">✓</span>${capFix(b)}</li>`).join("")}</ul>
     ${!p.season?`<p class="muted text-xs mt-4">${p.fine}</p>`:""}
     <a href="#/start?plan=${k}" class="btn btn-orange mt-5">Get started</a></div>`}).join("")}</div>
 
@@ -272,10 +274,9 @@ function calcPlan(n){n=+n;const t=+(($("#trucksR")||{}).value||1);const o=$("#ca
 
 /* ---------- LANDING ---------- */
 let slideIdx=0,slideTimer=null;
-function heroSlides(){const B=BR;return [
+function heroSlides(){const B=BR;const imgs=B.key==="mow"?[["img/mow-1.jpg","Landscaper on his zero-turn mower smiling at a new booking on his phone"],["img/mow-2.jpg","Landscaper in a backyard tapping Done on his phone to send the customer a finished-job photo"]]:[["img/plow-1.jpg","Plow operator smiling at a new booking on his phone beside his truck"],["img/plow-2.jpg","Plow operator clearing a driveway at night with his job list on the dashboard"]];return [
   `<div class="flex justify-center items-center h-full">${heroArt()}</div>`,
-  `<img src="https://dnznrvs05pmza.cloudfront.net/gemini/gemini-nano-banana-2.1/images/65528371-3c55-4fce-8b8d-3af1c65261f4/011e8c93-7aef-4e2c-8879-c971281d7617/Photorealistic_early_morning_winter_scene_in_a_snowy_Ohio_su.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiMzBlMWNmYTY4MDMzZWZmMyIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5NDc4MzUyNn0.ivOxVhj_8eNpf-MIe5tXTXb5GfQlyPDyiPzRxltXW7o" alt="Plow operator smiling at a new booking on his phone beside his truck" class="w-full h-full object-cover rounded-2xl" style="min-height:300px;aspect-ratio:4/3">`,
-  `<img src="https://dnznrvs05pmza.cloudfront.net/gemini/gemini-nano-banana-2.1/images/d746732f-54c4-4485-a2a5-82e8af076967/c4871220-e689-4b02-8596-25601ed33f8c/Photorealistic_winter_scene_shot_from_inside_a_pickup_truck_.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiMzIxNjc5ZDU1MTE1YzM3NiIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5NDc5NDU4MX0.0j6D0E_W9Vj9M-LhRVFzYj6XRDL5s3r8WTShdSesPoc" alt="Plow operator clearing a driveway at night with his job list on the dashboard" class="w-full h-full object-cover rounded-2xl" style="min-height:300px;aspect-ratio:4/3">`]}
+  ...imgs.map(([src,alt])=>`<img src="${src}" alt="${alt}" class="w-full h-full object-cover rounded-2xl" style="min-height:300px;aspect-ratio:4/3" loading="lazy">`)]}
 function showSlide(i){const s=heroSlides();slideIdx=(i+s.length)%s.length;const el=$("#slide");if(!el)return clearInterval(slideTimer);el.innerHTML=s[slideIdx];document.querySelectorAll(".dot").forEach((d,k)=>d.style.background=k===slideIdx?"var(--orange)":"var(--muted)")}
 function landing(){
   const ref=getRef(),B=BR,hl='style="background:color-mix(in oklab,var(--orange) 10%,transparent)"';
@@ -308,7 +309,7 @@ function landing(){
     <p class="muted text-xs mt-3">✗ means we couldn't find it in their published plans. Competitor details come from public pricing pages and software reviews, checked November 2026.</p>
   </section>
   <section id="faq" class="max-w-3xl mx-auto px-5 py-16"><h2 class="display text-3xl">Questions</h2><div class="mt-6 space-y-3">
-    ${[...PHONE_FAQ,...B.faq].map(q=>`<details class="card p-5"><summary class="font-bold cursor-pointer">${q[0]}</summary><p class="muted mt-3">${q[1]}</p></details>`).join("")}</div></section>
+    ${[...PHONE_FAQ,...B.faq].map(q=>`<details class="card p-5"><summary class="font-bold cursor-pointer">${q[0]}</summary><p class="muted mt-3">${capFix(q[1])}</p></details>`).join("")}</div></section>
   ${footer()}`;
   showSlide(0);clearInterval(slideTimer);slideTimer=setInterval(()=>showSlide(slideIdx+1),5000);calcPlan(40);
   if(location.hash.includes("demo"))document.getElementById("demo").scrollIntoView();
@@ -522,16 +523,41 @@ function loginPage(mode){
 }
 
 /* ============ DASHBOARD ============ */
-const TABS=[["jobs","Jobs"],["inbox","Inbox"],["pricing","Pricing"],["areas","Service Areas"],["partners","Calls"],["link","My Link"],["preview","Customer View"],["feedback","Feedback"],["affiliate","Referrals"],["settings","Settings"]];
+const TABS=[["jobs","Jobs"],["inbox","Inbox"],["pricing","Pricing"],["areas","Service Areas"],["partners","Calls"],["link","My Link"],["preview","Customer View"],["feedback","Feedback"],["affiliate","Referrals"],["settings","Settings"],["plan","Plan & add-ons"]];
 const STATUSES=["New","Quoted","Deposit Paid","Booked","Done","Cancelled"];
 let jobFilter="All";
 function dashboard(tab){
   const o=DB.operator;
-  $("#app").innerHTML=`${header(`<div class="flex items-center gap-3"><span class="text-sm muted hidden sm:inline">${o.business_name}</span><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
+  $("#app").innerHTML=`${header(`<div class="flex items-center gap-3"><span class="text-sm muted hidden sm:inline">${o.business_name}</span><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
   <main class="max-w-5xl mx-auto px-4 py-6">
     <nav class="scroll-x flex gap-2 pb-2">${TABS.map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
     <div id="tab" class="mt-5"></div></main>`;
-  ({jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings}[tab]||tabJobs)();
+  ({jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings,plan:tabPlan}[tab]||tabJobs)();
+}
+function planLabel(){const k=DB.operator.plan||"starter";return ({starter:"Starter · $48",starterplus:"Starter Plus · $118",payg:"Pay as you go · $78",solo:"Monthly Solo · $148",crew:"Monthly Crew · $398"})[k]||"Starter · $48"}
+function tabPlan(){
+  const o=DB.operator,cur=o.plan||"starter",mow=BR.key==="mow";
+  const opts=[["starter","Starter",48,mow?"Up to 35 active recurring customers. No business line.":"Up to 100 jobs a month. No business line."],
+   ["starterplus","Starter Plus",118,mow?"Up to 80 active recurring customers. Same setup as Starter, no business line or phone AI.":"Up to 250 jobs a month. Same setup as Starter, no business line or phone AI."],
+   ["payg","Pay as you go",78,"Your own business line. AI texts 8¢, AI call minutes 38¢."],
+   ["solo","Monthly Solo",148,"Business line, 500 AI texts + 100 AI call minutes a month, no customer limit."],
+   ["crew","Monthly Crew",398,"3 trucks, 1,500 AI texts + 300 AI call minutes, business call calendar."]];
+  const curName=(opts.find(x=>x[0]===cur)||opts[0])[1];
+  $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
+  <div class="grid gap-5">
+   <div class="card p-6"><h2 class="font-bold text-lg">Your plan</h2><p class="muted text-sm mt-1">You're on <b>${curName}</b>. Switch anytime as your season changes. Moving down takes effect next month.</p>
+    <div class="grid gap-2 mt-4">${opts.map(([k,n,pr,d])=>`<button class="choice ${k===cur?"on":""}" onclick="DB.operator.plan='${k}';save();toast('Plan set to ${n} (preview only, no charge)');tabPlan()"><div class="flex justify-between gap-3"><b>${n}</b><b>$${pr}/mo</b></div><div class="muted text-sm mt-1">${d}</div>${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`).join("")}</div></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Usage packs</h2><p class="muted text-sm mt-1">For a busy month. Good for the current month only.</p>
+    <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],[mow?"Busy Season Pack: +1,000 texts and +200 minutes":"Storm Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
+    <p class="muted text-xs mt-2">Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute.</p></div></div>
+  <div class="grid gap-5">
+   <div class="card p-6"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>$48/mo</b></div>
+    <p class="muted text-sm mt-1">Your AI asks every customer for a Google review after every completed job, by text and email, then reminds them once. Unhappy replies come to your Inbox so you can make it right. No monthly limit.</p>
+    <button class="btn btn-ghost w-full mt-4" onclick="toast('Review Booster added (preview only, no charge)')">Add Review Booster</button></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Your own App Store and Google Play listing</h2>
+    <p class="muted text-sm mt-1">Every plan already includes your branded customer app through an install link. A store listing is optional. Apple and Google charge their own yearly developer fees, paid in your business name.</p>
+    <button class="btn btn-ghost w-full mt-4" onclick="toast('We will send you add-on pricing.')">Get add-on pricing</button></div>
+  </div></div>`;
 }
 function tabInbox(){const list=(DB.inbox||[]).slice().sort((a,b)=>(b.handoff-a.handoff)||(new Date(b.at)-new Date(a.at)));
   $("#tab").innerHTML=`<div class="card p-5"><h2 class="font-bold text-lg">Inbox</h2><p class="muted text-sm mt-1">Every text, email, DM and call recap in one place. Your AI answers first. When it hands one to you, it's flagged here and your phone gets a push alert.</p></div>
@@ -551,10 +577,7 @@ function tabJobs(){
   const list=DB.jobs.filter(j=>jobFilter==="All"||j.status===jobFilter).sort((a,b)=>new Date(b.created)-new Date(a.created));
   const month=DB.jobs.filter(j=>{const d=new Date(j.created),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}).length;
   const isStarter=(DB.operator.plan||"starter")==="starter";
-  const upsell=isStarter&&month>=80?`<div class="card p-5 mb-4" style="border-color:var(--orange)"><b>${month>=100?"You've hit 100 jobs this month. Nice work!":"You're at "+month+" of 100 jobs this month."}</b>
-   <p class="muted text-sm mt-1">${month>=100?"New requests still come in and nobody gets turned away, but you'll need to move up to keep booking past 100.":"Starter covers up to 100 jobs a month. Move up before you hit the limit."}</p>
-   <div class="grid gap-2 mt-3"><button class="btn btn-orange w-full" onclick="toast('Starter Plus: $118/mo. Up to 250 jobs a month, same phone and setup you have now.')">Starter Plus: $118/mo · up to 250 jobs, keep your current setup</button>
-   <button class="btn btn-ghost w-full" onclick="toast('Monthly Solo: $148/mo + business line and AI calls/texts.')">Monthly Solo: $148/mo · adds your business line and phone AI</button></div></div>`:"";
+  const upsell=isStarter&&month>=80?`<div class="card p-4 mb-4 flex flex-wrap items-center justify-between gap-3"><div class="text-sm"><b>${month} of 100 jobs this month on Starter.</b> <span class="muted">${month>=100?"New requests still come in and get answered. Booking past 100 needs a bigger plan.":"Starter covers up to 100 jobs a month."}</span></div><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a></div>`:"";
   $("#tab").innerHTML=`${upsell}
   <div class="card p-5"><div class="flex justify-between items-baseline"><h2 class="font-bold">Last 30 days</h2><span class="muted text-sm">${recent.length} requests</span></div>
     <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">${byStatus.map(([s,n])=>`<div class="rounded-xl p-3 text-center" style="background:var(--muted)"><div class="display text-2xl">${n}</div><div class="text-xs muted">${s}</div></div>`).join("")}</div>
@@ -642,7 +665,7 @@ function tabLink(){
   <div class="todo mt-5">In the real app this link uses your published PlowCall web address, not this preview address.</div></div>
   <div class="card p-6 max-w-xl mt-5"><h2 class="font-bold text-lg">Your customer app</h2><p class="muted text-sm mt-1">Every customer who books gets a link to install your branded app on their phone, free. They can rebook, track jobs and get your storm alerts.</p>
   <div class="flex items-center gap-3 mt-4 p-3 rounded-xl" style="background:var(--muted)"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background:var(--orange)">❄️</div><div><div class="font-bold">${DB.operator.business_name}</div><div class="muted text-xs">Installed by customers from your quote page</div></div></div>
-  <div class="mt-5 p-4 rounded-xl text-sm" style="background:var(--muted)"><b>Want your own listing in the App Store and Google Play?</b><p class="muted mt-1">That's a paid add-on. Apple and Google also charge their own yearly developer fees (Apple is about $99 a year), paid by you in your business name.</p><button class="btn btn-ghost w-full mt-3" onclick="toast('Thanks! We will send you add-on pricing.')">Get add-on pricing</button></div></div>`;
+  <p class="muted text-xs mt-4">Your own App Store and Google Play listing is an option on your <a class="underline" href="#/dashboard/plan">Plan &amp; add-ons</a> page.</p></div></div>`;
   try{new QRCode(document.getElementById("qr"),{text:url,width:220,height:220})}catch(e){$("#qr").textContent="QR code loads here"}
 }
 function dlQR(){const c=document.querySelector("#qr canvas"),i=document.querySelector("#qr img");const a=document.createElement("a");a.download="plowcall-qr.png";a.href=c?c.toDataURL("image/png"):(i?i.src:"");a.click()}
@@ -837,16 +860,10 @@ function tabSettings(){
   const conn=(label,val)=>`<div class="flex justify-between items-center gap-3 py-3 border-b" style="border-color:var(--border)"><div><div class="text-sm">${label}</div><div class="muted text-xs truncate max-w-[220px] sm:max-w-sm">${val}</div></div><span class="pill st-Booked whitespace-nowrap">✓ Connected</span></div>`;
   $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
   <div class="grid gap-5">
-   <div class="card p-6"><div class="flex justify-between items-baseline"><h2 class="font-bold text-lg">Plan and AI usage</h2><span class="muted text-sm">Monthly Solo · $148</span></div>
+   <div class="card p-6"><div class="flex justify-between items-baseline"><h2 class="font-bold text-lg">Plan and AI usage</h2><span class="muted text-sm">${planLabel()}</span></div>
     ${[["AI texts",312,500],["AI call minutes",64,100]].map(([l,u,m])=>`<div class="mt-4"><div class="flex justify-between text-sm"><span>${l}</span><span class="muted">${u} of ${m} this month</span></div><div class="h-2 rounded-full mt-1" style="background:var(--muted)"><div class="h-2 rounded-full" style="width:${u/m*100}%;background:var(--orange)"></div></div></div>`).join("")}
-    <div class="text-sm font-bold mt-5">Busy month? Add more anytime</div>
-    <div class="grid gap-2 mt-2">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Storm Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
-    <p class="muted text-xs mt-2">Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute. Change plans anytime.</p></div>
-   <div class="card p-6" style="border-color:var(--orange)"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>$48/mo</b></div>
-    <p class="muted text-sm mt-1">Most happy customers never leave a review because nobody asks. Your AI asks every customer after every job, by text and email, with a one-tap link to your Google reviews. Then it reminds them once if they haven't.</p>
-    <ul class="muted text-xs mt-3 grid gap-1 list-disc pl-5"><li>Every customer gets the same ask. Google and the FTC don't allow only asking happy customers.</li><li>Unhappy replies come straight to your Inbox so you can make it right.</li><li>See requests sent and reviews gained each month.</li></ul>
-    <p class="muted text-xs mt-3">Every completed job, every customer, no monthly limit.</p>
-    <button class="btn btn-orange w-full mt-4" onclick="toast('Review Booster added. Your AI starts asking after your next completed job.')">Add Review Booster</button></div>
+    <a href="#/dashboard/plan" class="btn btn-orange w-full mt-5">Upgrade</a>
+    <p class="muted text-xs mt-2">Plans, usage packs and add-ons all live on your Plan &amp; add-ons page.</p></div>
    <div class="card p-6"><h2 class="font-bold text-lg">Phone and texting status</h2><p class="muted text-sm mt-1">Carriers approve business texting, usually within 2 business days and up to 7. Your AI works the whole time.</p>
     ${trackerRow("Business line and AI calls","Live",true)}${trackerRow("Texting: business registration","Approved",true)}${trackerRow("Texting: campaign review","In review, usually 2 business days",false)}${trackerRow("Texting live","We'll text you the moment it's on",false)}
     <div class="mt-4 p-3 rounded-xl text-sm" style="background:var(--muted)"><b>Until texting is live:</b> your AI calls customers for appointment reminders and on-the-way notices, and sends everything else (confirmations, prices, thank-yous) by email. Once texting is on, texts take over and calls stay for reminders and on-the-way only.</div></div>

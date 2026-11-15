@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Black&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>try{var t=localStorage.getItem("snowline_theme")||"dark";if(t==="light"||(t==="system"&&matchMedia("(prefers-color-scheme: light)").matches))document.documentElement.classList.add("light")}catch(e){}</script>
 <style>
   *,*::before,*::after{box-sizing:border-box}
@@ -60,21 +62,26 @@
   .bubble.in{background:#e5e5ea;color:#111;border-bottom-left-radius:.3rem}
   .meter{height:10px;border-radius:999px;background:var(--muted);overflow:hidden}
   .meter>div{height:100%;background:var(--orange)}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--green);color:var(--green);border-radius:999px;padding:.3rem .7rem;font-size:.8rem;font-weight:700}
+  #qmap{height:340px;border-radius:1rem;overflow:hidden;border:1px solid var(--border)}
+  #qmap.drawing{cursor:crosshair}
+  .leaflet-container{font-family:Archivo,sans-serif}
   dialog::backdrop{background:rgb(0 0 0 / .6)}
-  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2000}
 </style>
 </head>
 <body class="min-h-screen">
 
-<div class="sticky top-0 z-50 text-xs" style="background:oklch(0.85 0.15 90);color:oklch(0.15 0.03 255)">
+<div class="sticky top-0 z-[1500] text-xs" style="background:oklch(0.85 0.15 90);color:oklch(0.15 0.03 255)">
   <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 items-center">
-    <strong>MOWCALL SPRING CHANGES PREVIEW · sample data, nothing is sent</strong>
+    <strong>MOWCALL PREVIEW · sample data, nothing is sent</strong>
     <a href="#/route" class="underline">1. Today's route</a>
-    <a href="#/customers" class="underline">2. Customers + cap</a>
-    <a href="#/settings" class="underline">3. Operator settings</a>
-    <a href="#/quote" class="underline">4. Homeowner quote (EN/ES)</a>
-    <a href="#/texts" class="underline">5. Customer texts</a>
-    <a href="index.html#/mow" class="underline">Back to full preview</a>
+    <a href="#/customers" class="underline">2. Customers</a>
+    <a href="#/settings" class="underline">3. Settings</a>
+    <a href="#/plan" class="underline">4. Plan &amp; add-ons</a>
+    <a href="#/quote" class="underline">5. Homeowner quote</a>
+    <a href="#/texts" class="underline">6. Customer texts</a>
+    <a href="index.html#/mow" class="underline">MowCall landing page</a>
     <button onclick="resetDemo()" class="underline">Reset sample data</button>
   </div>
 </div>
@@ -85,40 +92,79 @@
 <div id="toast"></div>
 
 <script>
-/* ===================== SAMPLE DATA ===================== */
+/* ===================== HELPERS ===================== */
 const $=s=>document.querySelector(s);
-const money=n=>"$"+Number(n).toFixed(0);
+const money=n=>"$"+Math.round(Number(n)).toLocaleString();
+const fmt=n=>Math.round(n).toLocaleString();
+const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAY_ES={Mon:"lunes",Tue:"martes",Wed:"miércoles",Thu:"jueves",Fri:"viernes",Sat:"sábado"};
+const DAY_EN={Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
+function toast(m){const t=$("#toast");t.innerHTML=`<div class="card px-4 py-3 text-sm font-semibold shadow-xl">${m}</div>`;clearTimeout(t._h);t._h=setTimeout(()=>t.innerHTML="",3500)}
+function openDlg(html){$("#dlgBody").innerHTML=html;$("#dlg").showModal()}
+function closeDlg(){$("#dlg").close()}
+
+/* ===================== SAMPLE DATA ===================== */
+const MOWERS={push:{label:"21-inch push mower",min:7},walk:{label:"36–48-inch walk-behind",min:4.5},zero:{label:"52–60-inch zero-turn",min:3}};
 const SEED={
- op:{business:"Sean's Lawn & Snow",plan:"starter",payMode:"choose",defaultPay:"per_visit",ach:true,
-     prices:{small:35,medium:45,large:60},tallFee:25,tallInches:6,firstCut:20,spanish:true,notice:24},
+ op:{business:"Sean's Lawn & Snow",plan:"starter",payMode:"choose",
+     rate:6.8,minimum:48,firstCut:28,tallFee:28,tallInches:6,mower:"zero",setupMin:10,floorOn:false,floorRate:68,
+     spanish:true,notice:24,
+     creds:{
+      insured:{on:true,detail:"$1,000,000 general liability",exp:"2027-04-30",proof:true},
+      licensed:{on:true,detail:"Ohio business license",exp:"2027-12-31",proof:true},
+      bonded:{on:false,detail:"",exp:"",proof:false}}},
  customers:[
-  {id:1,name:"Dana Price",addr:"412 Oak Ridge Dr",size:"medium",freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Gate code 4417. Friendly dog (Bo), keep gate shut.",status:"active"},
-  {id:2,name:"Luis Ramírez",addr:"88 Willow Ct",size:"large",freq:"weekly",day:"Tue",pay:"monthly",lang:"es",notes:"Perro en el patio de atrás. Bolsas de basura en la acera los martes.",status:"active"},
-  {id:3,name:"Marcy Hill",addr:"1503 Birch Ln",size:"small",freq:"biweekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Side gate sticks. Lift and push.",status:"active"},
-  {id:4,name:"Greg & Tasha Moore",addr:"27 Cedar Pt",size:"medium",freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"",status:"active"},
-  {id:5,name:"Rosa Delgado",addr:"640 Maple Ave",size:"medium",freq:"biweekly",day:"Tue",pay:"monthly",lang:"es",notes:"Mover la manguera antes de cortar.",status:"active"},
-  {id:6,name:"Ken Whitfield",addr:"9 Pine Hollow",size:"large",freq:"weekly",day:"Wed",pay:"per_visit",lang:"en",notes:"Paused for vacation until the 20th.",status:"paused"}
+  {id:1,name:"Dana Price",addr:"412 Oak Ridge Dr",zones:{front:2400,back:4100},freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Gate code 4417. Friendly dog (Bo), keep gate shut.",status:"active"},
+  {id:2,name:"Luis Ramírez",addr:"88 Willow Ct",zones:{front:3800,back:7900,side:900},freq:"weekly",day:"Tue",pay:"monthly",lang:"es",notes:"Perro en el patio de atrás. Bolsas de basura en la acera los martes.",status:"active"},
+  {id:3,name:"Marcy Hill",addr:"1503 Birch Ln",zones:{front:1900},freq:"biweekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Front yard only. Side gate sticks.",status:"active"},
+  {id:4,name:"Greg & Tasha Moore",addr:"27 Cedar Pt",zones:{front:3100,back:5200},freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"",status:"active"},
+  {id:5,name:"Rosa Delgado",addr:"640 Maple Ave",zones:{back:4600},freq:"biweekly",day:"Tue",pay:"monthly",lang:"es",notes:"Solo el patio de atrás. Mover la manguera antes de cortar.",status:"active"},
+  {id:6,name:"Ken Whitfield",addr:"9 Pine Hollow",zones:{front:5200,back:8800},freq:"weekly",day:"Wed",pay:"per_visit",lang:"en",notes:"Paused for vacation until the 20th.",status:"paused"}
  ],
  extraActive:25,
  route:{day:"Tue",stops:[1,2,3,4,5],state:{}},
  texts:[]
 };
 let DB;
-function load(){try{DB=JSON.parse(localStorage.getItem("mowspring_demo"))}catch(e){}if(!DB)DB=JSON.parse(JSON.stringify(SEED))}
-function save(){localStorage.setItem("mowspring_demo",JSON.stringify(DB))}
-function resetDemo(){localStorage.removeItem("mowspring_demo");load();toast("Sample data reset");route()}
-function toast(m){const t=$("#toast");t.innerHTML=`<div class="card px-4 py-3 text-sm font-semibold shadow-xl">${m}</div>`;clearTimeout(t._h);t._h=setTimeout(()=>t.innerHTML="",3200)}
-function openDlg(html){$("#dlgBody").innerHTML=html;$("#dlg").showModal()}
-function closeDlg(){$("#dlg").close()}
+function load(){try{DB=JSON.parse(localStorage.getItem("mowcall_demo_v2"))}catch(e){}if(!DB)DB=JSON.parse(JSON.stringify(SEED))}
+function save(){try{localStorage.setItem("mowcall_demo_v2",JSON.stringify(DB))}catch(e){}}
+function resetDemo(){try{localStorage.removeItem("mowcall_demo_v2")}catch(e){}load();resetQuote();toast("Sample data reset");route(true)}
 
-const PLANS={starter:{name:"Starter",price:48,cap:35},plus:{name:"Starter Plus",price:118,cap:80},solo:{name:"Monthly Solo",price:148,cap:null}};
+const PLANS={starter:{name:"Starter",price:48,cap:35},starterplus:{name:"Starter Plus",price:118,cap:80},payg:{name:"Pay as you go",price:78,cap:null},solo:{name:"Monthly Solo",price:148,cap:null},crew:{name:"Monthly Crew",price:398,cap:null}};
 const activeCount=()=>DB.customers.filter(c=>c.status==="active").length+DB.extraActive;
 const cust=id=>DB.customers.find(c=>c.id===id);
-const visitPrice=c=>DB.op.prices[c.size];
 const FREQ={weekly:"Weekly",biweekly:"Every other week",once:"One time"};
 const PAY={per_visit:"Autopay after each visit",monthly:"Flat monthly"};
+const ZN={front:"Front yard",back:"Backyard",side:"Side yards"};
+const ZN_ES={front:"Jardín delantero",back:"Patio trasero",side:"Jardines laterales"};
+const ZCOLOR={front:"#4ade80",back:"#38bdf8",side:"#facc15"};
+
+/* ===================== PRICING ENGINE ===================== */
+// Price per visit = lawn sq ft x operator's rate per 1,000 sq ft, never below the per-visit minimum.
+// Optional: an hourly floor makes sure the price covers the operator's target hourly rate.
+function sqftOf(z){return Object.values(z||{}).reduce((a,b)=>a+(Number(b)||0),0)}
+function minutesFor(sq){const o=DB.op;return o.setupMin+sq/1000*MOWERS[o.mower].min}
+function priceFor(z){
+ const o=DB.op,sq=sqftOf(z),lines=Object.entries(z||{}).filter(([k,v])=>v>0).map(([k,v])=>({zone:k,sqft:v,price:v/1000*o.rate}));
+ let base=lines.reduce((a,l)=>a+l.price,0),total=Math.max(o.minimum,base),why="";
+ if(total>base)why="minimum";
+ const mins=minutesFor(sq);
+ if(o.floorOn){const floor=mins/60*o.floorRate;if(floor>total){total=floor;why="hourly"}}
+ total=Math.round(total);
+ return {sqft:sq,lines,base,total,why,mins,hourly:total/(mins/60)};
+}
+const visitPrice=c=>priceFor(c.zones).total;
 const monthlyFor=c=>Math.round(visitPrice(c)*(c.freq==="weekly"?52:26)/12);
+
+/* ===================== CREDENTIALS ===================== */
+// Shown to customers ONLY when the operator turned it on, uploaded proof and it hasn't expired. Otherwise nothing is said.
+function liveCreds(){const c=DB.op.creds,today=new Date().toISOString().slice(0,10);
+ return Object.entries(c).filter(([k,v])=>v.on&&v.proof&&(!v.exp||v.exp>=today)).map(([k,v])=>({k,...v}))}
+function trustBar(lang){const L=lang==="es",cs=liveCreds();if(!cs.length)return "";
+ const name={insured:L?"Asegurado":"Insured",licensed:L?"Con licencia":"Licensed",bonded:L?"Afianzado":"Bonded"};
+ return `<div class="card p-4 mb-4" style="background:var(--bg)"><div class="flex flex-wrap gap-2">${cs.map(c=>`<span class="badge">✓ ${name[c.k]}</span>`).join("")}</div>
+ <div class="muted text-xs mt-2">${cs.map(c=>`${name[c.k]}: ${esc(c.detail)}${c.exp?` (${L?"vigente hasta":"valid through"} ${c.exp})`:""}`).join(" · ")}. ${L?"Comprobante en archivo.":"Proof on file."}</div></div>`}
 
 /* ===================== CUSTOMER TEXT TEMPLATES ===================== */
 const T={
@@ -139,52 +185,42 @@ const T={
   paid:(a)=>`Pago recibido: ${a} por banco (ACH). ¡Gracias!`
  }
 };
-const DAY_ES={Mon:"lunes",Tue:"martes",Wed:"miércoles",Thu:"jueves",Fri:"viernes",Sat:"sábado"};
-const DAY_EN={Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
 function logText(c,kind,body){DB.texts.unshift({to:c.name,lang:c.lang,kind,body,at:new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})});DB.texts=DB.texts.slice(0,30);save()}
 const photoLink=id=>`mowcall.com/p/${(id*7919).toString(36)}`;
+const first=n=>String(n).split(" ")[0];
 
-/* ===================== SHELL ===================== */
-const TABS=[["route","Today's route"],["customers","Customers"],["settings","Settings"],["quote","Homeowner quote"],["texts","Customer texts"]];
+/* ===================== OPERATOR SHELL ===================== */
+const TABS=[["route","Today's route"],["customers","Customers"],["settings","Settings"],["plan","Plan & add-ons"],["quote","Homeowner quote"],["texts","Customer texts"]];
 function shell(tab,inner){
  return `<div class="flex items-center justify-between gap-3 mb-4">
-  <div><div class="text-xs muted">MowCall · operator view</div><div class="display text-2xl">${DB.op.business}</div></div>
-  <span class="pill p-ice">${PLANS[DB.op.plan].name} · ${money(PLANS[DB.op.plan].price)}/mo</span></div>
+  <div><div class="text-xs muted">MowCall · operator view</div><div class="display text-2xl">${esc(DB.op.business)}</div></div>
+  <a href="#/plan" class="btn btn-sm btn-orange">Upgrade</a></div>
   <nav class="scroll-x flex gap-2 pb-3">${TABS.map(t=>`<a href="#/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
-  ${capBanner()}${inner}`;
+  ${inner}`;
 }
-function capBanner(){
- const p=PLANS[DB.op.plan];if(!p.cap)return "";
- const n=activeCount();if(n<p.cap-5)return "";
- const full=n>=p.cap;
- return `<div class="card p-4 mb-4" style="border-color:${full?"var(--red)":"var(--yellow)"}">
-  <div class="font-bold">${full?`You're at ${p.cap} active customers, the ${p.name} limit.`:`Heads-up: ${n} of ${p.cap} active customers on ${p.name}.`}</div>
-  <p class="muted text-sm mt-1">${full?"New requests still come in and get answered. To book more recurring customers, upgrade.":"Paused and one-time customers don't count toward your limit."}</p>
-  <div class="flex flex-wrap gap-2 mt-3">${DB.op.plan==="starter"?`<button class="btn btn-sm btn-orange" onclick="upgrade('plus')">Starter Plus $118/mo · up to 80 customers</button>`:""}
-  <button class="btn btn-sm btn-ghost" onclick="upgrade('solo')">Monthly Solo $148/mo · no limit, business line + phone AI</button></div></div>`;
-}
-function upgrade(p){DB.op.plan=p;save();toast(`Switched to ${PLANS[p].name} (preview only, no charge)`);route()}
+function capLine(){const p=PLANS[DB.op.plan],n=activeCount();
+ return p.cap?`<div class="text-sm muted mb-4">${p.name}: <b style="color:var(--fg)">${n} of ${p.cap}</b> active customers${n>=p.cap?" · new recurring requests wait in your Inbox":""}</div>`:`<div class="text-sm muted mb-4">${p.name}: <b style="color:var(--fg)">${n}</b> active customers, no limit</div>`}
 
 /* ===================== 1. TODAY'S ROUTE ===================== */
 function viewRoute(){
- const r=DB.route;
- const stops=r.stops.map(cust).filter(c=>c&&c.status==="active");
- const st=id=>r.state[id]||"scheduled";
+ const r=DB.route,stops=r.stops.map(cust).filter(c=>c&&c.status==="active"),st=id=>r.state[id]||"scheduled";
  const badge={scheduled:["Scheduled","p-muted"],omw:["On the way","p-yellow"],done:["Done · billed","p-green"],skipped:["Skipped · not billed","p-ice"],missed:["Missed · reschedule","p-red"],moved:["Moved (rain)","p-ice"]};
  const doneCount=stops.filter(c=>st(c.id)==="done").length;
- const earned=stops.filter(c=>st(c.id)==="done").reduce((s,c)=>s+(c.pay==="per_visit"?visitPrice(c):0),0);
- return shell("route",`
+ const earned=stops.filter(c=>st(c.id)==="done"&&c.pay==="per_visit").reduce((s,c)=>s+visitPrice(c),0);
+ const totalMin=stops.reduce((s,c)=>s+priceFor(c.zones).mins,0);
+ return shell("route",`${capLine()}
  <div class="card p-5">
   <div class="flex flex-wrap items-center justify-between gap-3">
-   <div><div class="display text-xl">${DAY_EN[r.day]}'s route</div><div class="muted text-sm">${stops.length} stops · ${doneCount} done · ${money(earned)} charged by autopay so far</div></div>
+   <div><div class="display text-xl">${DAY_EN[r.day]}'s route</div><div class="muted text-sm">${stops.length} stops · about ${Math.round(totalMin/60*10)/10} hours on site · ${doneCount} done · ${money(earned)} charged by autopay so far</div></div>
    <button class="btn btn-red" onclick="rainDlg()">🌧 Rain delay: move today</button>
   </div>
   <div class="grid gap-3 mt-4">
-  ${stops.map((c,i)=>{const s=st(c.id),[bt,bc]=badge[s];return `<div class="card p-4" style="background:var(--bg)">
-   <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${i+1}. ${c.name} ${c.lang==="es"?'<span class="pill p-muted">ES</span>':""}</div>
-    <div class="muted text-sm">${c.addr} · ${c.size} yard · ${FREQ[c.freq]} · ${PAY[c.pay]}${c.pay==="monthly"?` (${money(monthlyFor(c))}/mo)`:` (${money(visitPrice(c))}/visit)`}</div></div>
+  ${stops.map((c,i)=>{const s=st(c.id),[bt,bc]=badge[s],pr=priceFor(c.zones);return `<div class="card p-4" style="background:var(--bg)">
+   <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${i+1}. ${esc(c.name)} ${c.lang==="es"?'<span class="pill p-muted">ES</span>':""}</div>
+    <div class="muted text-sm">${esc(c.addr)} · ${Object.keys(c.zones).map(z=>ZN[z]).join(" + ")} · ${fmt(pr.sqft)} sq ft · ${FREQ[c.freq]}</div>
+    <div class="text-sm mt-1">${c.pay==="monthly"?`Flat monthly ${money(monthlyFor(c))}/mo`:`${money(pr.total)}/visit, autopay`} · about ${Math.round(pr.mins)} min (${money(pr.hourly)}/hr)</div></div>
     <span class="pill ${bc} self-start">${bt}</span></div>
-   ${c.notes?`<div class="text-sm mt-2"><span class="muted">Property notes:</span> ${c.notes}</div>`:""}
+   ${c.notes?`<div class="text-sm mt-2"><span class="muted">Property notes:</span> ${esc(c.notes)}</div>`:""}
    <div class="flex flex-wrap gap-2 mt-3">
     <button class="btn btn-sm btn-ghost" ${s!=="scheduled"?"disabled":""} onclick="act(${c.id},'omw')">On the way</button>
     <button class="btn btn-sm btn-orange" ${["done","skipped","moved"].includes(s)?"disabled":""} onclick="doneDlg(${c.id})">Done + photo</button>
@@ -192,44 +228,43 @@ function viewRoute(){
     <button class="btn btn-sm btn-ghost" ${["done","skipped","moved","missed"].includes(s)?"disabled":""} onclick="act(${c.id},'missed')">Missed</button>
    </div></div>`}).join("")}
   </div>
-  <p class="muted text-xs mt-4"><b>Skipped</b> = weather or ground made it unsafe; customer isn't charged and the plan keeps going. <b>Missed</b> = we didn't make it; the job goes back on the schedule. Only <b>Done</b> triggers autopay for per-visit customers.</p>
+  <p class="muted text-xs mt-4"><b>Skipped</b> = weather or ground made it unsafe; no charge and the plan keeps going. <b>Missed</b> = we didn't make it; it goes back on the schedule. Only <b>Done</b> triggers autopay for per-visit customers.</p>
   <div class="todo mt-3">Real build: these buttons send an event to Boss Growth Machine, which sends the text in the customer's language (consent, opt-outs and 9am–8pm quiet hours apply) and runs the ACH charge. Lovable only adds the buttons and the webhook.</div>
  </div>`);
 }
 function act(id,kind){
  const c=cust(id),b=DB.op.business,L=T[c.lang];
  DB.route.state[id]=kind;
- if(kind==="omw")logText(c,"On the way",L.omw(c.name.split(" ")[0],b));
- if(kind==="skipped")logText(c,"Skipped",L.skip(c.name.split(" ")[0],b));
+ if(kind==="omw")logText(c,"On the way",L.omw(first(c.name),b));
+ if(kind==="skipped")logText(c,"Skipped",L.skip(first(c.name),b));
  save();toast(kind==="omw"?`"On the way" text sent to ${c.name}`:kind==="skipped"?`Skipped. ${c.name} gets a no-charge text`:`Marked missed. Back on the schedule.`);route();
 }
 function doneDlg(id){const c=cust(id);
- openDlg(`<div class="display text-xl">Mark done: ${c.name}</div>
+ openDlg(`<div class="display text-xl">Mark done: ${esc(c.name)}</div>
  <p class="muted text-sm mt-1">Snap a photo. The customer gets a text with a link to it (a link, not a picture message, so texts stay cheap).</p>
  <label class="choice mt-4 flex items-center gap-3 cursor-pointer"><input type="checkbox" id="ph" checked> <span>📷 Photo taken (sample)</span></label>
  <div class="text-sm mt-3">${c.pay==="per_visit"?`Autopay will charge <b>${money(visitPrice(c))}</b> by bank (ACH).`:`Flat monthly customer: no charge today (billed ${money(monthlyFor(c))} on the 1st).`}</div>
  <div class="flex gap-2 mt-5"><button class="btn btn-orange flex-1" onclick="markDone(${id})">Mark done</button><button class="btn btn-ghost" onclick="closeDlg()">Cancel</button></div>`)}
 function markDone(id){const c=cust(id),b=DB.op.business,L=T[c.lang];
  DB.route.state[id]="done";
- logText(c,"Done",L.done(c.name.split(" ")[0],b,c.addr,photoLink(id)));
+ logText(c,"Done",L.done(first(c.name),b,c.addr,photoLink(id)));
  if(c.pay==="per_visit")logText(c,"Payment",L.paid(money(visitPrice(c))));
  save();closeDlg();toast(`Done. ${c.name} got the photo link${c.pay==="per_visit"?" and the autopay receipt":""}`);route()}
+function rainLeft(){return DB.route.stops.map(cust).filter(c=>c&&c.status==="active"&&["scheduled","omw"].includes(DB.route.state[c.id]||"scheduled"))}
 function rainDlg(){
- const left=DB.route.stops.map(cust).filter(c=>c&&c.status==="active"&&["scheduled","omw"].includes(DB.route.state[c.id]||"scheduled"));
- if(!left.length)return toast("No stops left to move today");
+ const left=rainLeft();if(!left.length)return toast("No stops left to move today");
  openDlg(`<div class="display text-xl">Rain delay</div>
  <p class="muted text-sm mt-1">Move the ${left.length} stops you haven't finished. Each customer gets one text in their language.</p>
  <div class="text-sm font-semibold mt-4">Move them to</div>
  <div class="flex flex-wrap gap-2 mt-2" id="rdays">${DAYS.filter(d=>d!==DB.route.day).map((d,i)=>`<button class="chip ${i===1?"on":""}" onclick="document.querySelectorAll('#rdays .chip').forEach(x=>x.classList.remove('on'));this.classList.add('on')" data-d="${d}">${DAY_EN[d]}</button>`).join("")}</div>
- <div class="card p-3 mt-4 text-sm" style="background:var(--bg)"><div class="muted text-xs mb-1">Sample text (English)</div>${T.en.rain("Dana",DB.op.business,"Wednesday")}</div>
+ <div class="card p-3 mt-4 text-sm" style="background:var(--bg)"><div class="muted text-xs mb-1">Sample text (English)</div>${T.en.rain("Dana",esc(DB.op.business),"Wednesday")}</div>
  <div class="flex gap-2 mt-5"><button class="btn btn-orange flex-1" onclick="doRain()">Move ${left.length} stops + text customers</button><button class="btn btn-ghost" onclick="closeDlg()">Cancel</button></div>`)}
 function doRain(){
- const d=document.querySelector("#rdays .chip.on").dataset.d;
- const left=DB.route.stops.map(cust).filter(c=>c&&c.status==="active"&&["scheduled","omw"].includes(DB.route.state[c.id]||"scheduled"));
- left.forEach(c=>{DB.route.state[c.id]="moved";logText(c,"Rain delay",T[c.lang].rain(c.name.split(" ")[0],DB.op.business,c.lang==="es"?DAY_ES[d]:DAY_EN[d]))});
+ const d=document.querySelector("#rdays .chip.on").dataset.d,left=rainLeft();
+ left.forEach(c=>{DB.route.state[c.id]="moved";logText(c,"Rain delay",T[c.lang].rain(first(c.name),DB.op.business,c.lang==="es"?DAY_ES[d]:DAY_EN[d]))});
  save();closeDlg();toast(`${left.length} stops moved to ${DAY_EN[d]}. Customers texted.`);route()}
 
-/* ===================== 2. CUSTOMERS + CAP ===================== */
+/* ===================== 2. CUSTOMERS ===================== */
 function viewCustomers(){
  const p=PLANS[DB.op.plan],n=activeCount();
  return shell("customers",`
@@ -239,125 +274,277 @@ function viewCustomers(){
    <button class="btn btn-sm btn-ghost" onclick="addSample()">+ Add a sample customer</button>
   </div>
   ${p.cap?`<div class="meter mt-3"><div style="width:${Math.min(100,n/p.cap*100)}%"></div></div>`:""}
-  <p class="muted text-xs mt-2">The limit counts <b>active recurring customers</b>, not visits. Paused customers and one-time jobs don't count. Showing 6 of ${n+DB.customers.filter(c=>c.status!=="active").length} (sample data includes ${DB.extraActive} more active customers not listed).</p>
-  <div class="grid gap-3 mt-4">${DB.customers.map(c=>`<div class="card p-4" style="background:var(--bg)">
-   <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${c.name} ${c.lang==="es"?'<span class="pill p-muted">Español</span>':""}</div>
-   <div class="muted text-sm">${c.addr} · ${c.size} yard · ${FREQ[c.freq]} on ${DAY_EN[c.day]}s</div>
-   <div class="text-sm mt-1">${PAY[c.pay]}: <b>${c.pay==="monthly"?money(monthlyFor(c))+"/mo":money(visitPrice(c))+"/visit"}</b> · ACH</div></div>
+  <p class="muted text-xs mt-2">The limit counts <b>active recurring customers</b>, not visits. Paused customers and one-time jobs don't count. Sample data includes ${DB.extraActive} more active customers not listed.</p>
+  <div class="grid gap-3 mt-4">${DB.customers.map(c=>{const pr=priceFor(c.zones);return `<div class="card p-4" style="background:var(--bg)">
+   <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${esc(c.name)} ${c.lang==="es"?'<span class="pill p-muted">Español</span>':""}</div>
+   <div class="muted text-sm">${esc(c.addr)} · ${FREQ[c.freq]} on ${DAY_EN[c.day]}s</div>
+   <div class="text-sm mt-1">${pr.lines.map(l=>`${ZN[l.zone]} ${fmt(l.sqft)} sq ft`).join(" · ")}</div>
+   <div class="text-sm mt-1">${PAY[c.pay]}: <b>${c.pay==="monthly"?money(monthlyFor(c))+"/mo":money(pr.total)+"/visit"}</b> · ACH · about ${Math.round(pr.mins)} min</div>
+   ${c.waiver?`<div class="text-xs muted mt-1">Waiver signed by ${esc(c.waiver.signed)} · ${new Date(c.waiver.at).toLocaleString()}</div>`:""}</div>
    <span class="pill ${c.status==="active"?"p-green":"p-yellow"} self-start">${c.status==="active"?"Active":"Paused"}</span></div>
    <div class="flex flex-wrap gap-2 mt-3">
     <button class="btn btn-sm btn-ghost" onclick="togglePause(${c.id})">${c.status==="active"?"Pause (vacation/drought)":"Resume"}</button>
     ${DB.op.payMode==="choose"?`<button class="btn btn-sm btn-ghost" onclick="togglePay(${c.id})">Switch to ${c.pay==="monthly"?"per-visit":"flat monthly"}</button>`:""}
-   </div></div>`).join("")}</div>
+   </div></div>`}).join("")}</div>
  </div>`);
 }
 function togglePause(id){const c=cust(id);c.status=c.status==="active"?"paused":"active";save();toast(c.status==="paused"?`${c.name} paused. Plan kept, no charges, doesn't count toward your limit.`:`${c.name} resumed`);route()}
 function togglePay(id){const c=cust(id);c.pay=c.pay==="monthly"?"per_visit":"monthly";save();route()}
-function addSample(){const p=PLANS[DB.op.plan];if(p.cap&&activeCount()>=p.cap){toast("At your limit. Upgrade to add more recurring customers.");return}DB.extraActive++;save();toast("Sample customer added");route()}
+function addSample(){const p=PLANS[DB.op.plan];if(p.cap&&activeCount()>=p.cap){toast(`You're at your ${p.name} limit. New recurring requests wait in your Inbox.`);return}DB.extraActive++;save();toast("Sample customer added");route()}
 
 /* ===================== 3. SETTINGS ===================== */
-function viewSettings(){const o=DB.op,num=(k,v,w="24")=>`<input class="input !min-h-[42px] !w-${w} inline-block" type="number" min="0" value="${v}" onchange="setNum('${k}',this.value)">`;
+function viewSettings(){const o=DB.op;
+ const num=(k,v,step="1",w="6rem")=>`<input class="input !min-h-[42px] inline-block" style="width:${w}" type="number" min="0" step="${step}" value="${v}" onchange="setNum('${k}',this.value)">`;
+ const ex=priceFor({front:2500,back:4500});
+ const credRow=(k,label,ph)=>{const c=o.creds[k],today=new Date().toISOString().slice(0,10),expired=c.exp&&c.exp<today,shown=c.on&&c.proof&&!expired;
+  return `<div class="card p-4 mt-3" style="background:var(--bg)">
+   <div class="flex justify-between items-center gap-3"><label class="flex items-center gap-2 font-bold"><input type="checkbox" ${c.on?"checked":""} onchange="DB.op.creds.${k}.on=this.checked;save();route()"> ${label}</label>
+   <span class="pill ${shown?"p-green":"p-muted"}">${shown?"Shown to customers":expired?"Expired · hidden":"Hidden"}</span></div>
+   ${c.on?`<div class="grid gap-2 mt-3"><input class="input" placeholder="${ph}" value="${esc(c.detail)}" onchange="DB.op.creds.${k}.detail=this.value;save();route()">
+   <label class="text-sm muted">Expires <input class="input !min-h-[42px] mt-1" type="date" value="${c.exp}" onchange="DB.op.creds.${k}.exp=this.value;save();route()"></label>
+   <button class="btn btn-sm ${c.proof?"btn-ghost":"btn-orange"}" onclick="DB.op.creds.${k}.proof=!DB.op.creds.${k}.proof;save();route()">${c.proof?"✓ Proof uploaded (sample) · remove":"Upload proof (certificate or license)"}</button></div>`:""}
+  </div>`};
  return shell("settings",`
- <div class="grid md:grid-cols-2 gap-4">
-  <div class="card p-5"><div class="display text-lg">How recurring customers pay</div>
-   <p class="muted text-sm mt-1">Bank payment (ACH) is the default because it costs the least. Cards only if you turn them on.</p>
-   ${[["per_visit","Autopay after each visit","Charged when you tap Done. Skipped visits are never charged."],["monthly","Flat monthly","Same amount on the 1st of each month in season. Easier for customers to budget."],["choose","Let each customer pick","The quote page offers both. You can switch any customer later."]].map(x=>`<button class="choice mt-3 ${o.payMode===x[0]?"on":""}" onclick="DB.op.payMode='${x[0]}';save();route()"><div class="font-bold">${x[1]}</div><div class="muted text-sm">${x[2]}</div></button>`).join("")}
+ <div class="grid md:grid-cols-2 gap-4 items-start">
+  <div class="card p-5"><div class="display text-lg">Your mowing prices</div>
+   <p class="muted text-sm mt-1">Customers outline their own front yard, backyard and side yards on a satellite map. We measure each area and price it with your numbers.</p>
+   <div class="grid gap-3 mt-4 text-sm">
+    <div class="flex items-center justify-between gap-3"><span>Price per 1,000 sq ft of lawn</span><span>$ ${num("rate",o.rate,"0.1")}</span></div>
+    <div class="flex items-center justify-between gap-3"><span>Minimum per visit</span><span>$ ${num("minimum",o.minimum)}</span></div>
+    <div class="flex items-center justify-between gap-3"><span>First-cut fee (new customers)</span><span>$ ${num("firstCut",o.firstCut)}</span></div>
+    <div class="flex items-center justify-between gap-3"><span>Tall-grass fee if over ${num("tallInches",o.tallInches,"1","4.5rem")} in.</span><span>$ ${num("tallFee",o.tallFee)}</span></div>
+   </div>
+   <div class="display text-lg mt-6">How long jobs take</div>
+   <p class="muted text-sm mt-1">Used to show your time on each property and your real hourly earnings. No hourly rate needed.</p>
+   <div class="grid gap-2 mt-3">${Object.entries(MOWERS).map(([k,m])=>`<button class="choice ${o.mower===k?"on":""}" onclick="DB.op.mower='${k}';save();route()"><b>${m.label}</b><div class="muted text-sm">About ${m.min} min per 1,000 sq ft, including trim and blow</div></button>`).join("")}</div>
+   <div class="flex items-center justify-between gap-3 mt-3 text-sm"><span>Setup, unload and drive per stop (minutes)</span>${num("setupMin",o.setupMin)}</div>
+   <label class="choice mt-4 flex gap-3 items-start cursor-pointer ${o.floorOn?"on":""}"><input type="checkbox" class="mt-1" ${o.floorOn?"checked":""} onchange="DB.op.floorOn=this.checked;save();route()"><span><b>Optional: never earn less than $${o.floorRate}/hour</b><span class="muted text-sm block">If a yard is slow for its size, the price goes up to cover your time. Off by default.</span></span></label>
+   ${o.floorOn?`<div class="flex items-center justify-between gap-3 mt-2 text-sm"><span>Target hourly earnings</span><span>$ ${num("floorRate",o.floorRate)}</span></div>`:""}
+   <div class="card p-3 mt-4 text-sm" style="background:var(--bg)"><b>Example:</b> 2,500 sq ft front + 4,500 sq ft back = 7,000 sq ft → <b>${money(ex.total)}</b> per visit${ex.why==="minimum"?" (your minimum)":ex.why==="hourly"?" (your hourly floor)":""} · about ${Math.round(ex.mins)} min · ${money(ex.hourly)}/hr</div>
   </div>
-  <div class="card p-5"><div class="display text-lg">Prices per mow</div>
-   <div class="grid gap-3 mt-3 text-sm">${["small","medium","large"].map(s=>`<div class="flex items-center justify-between gap-3"><span class="capitalize">${s} yard</span><span>$ ${num("prices."+s,o.prices[s])}</span></div>`).join("")}</div>
-   <div class="display text-lg mt-6">Tall grass and first cut</div>
-   <div class="grid gap-3 mt-3 text-sm">
-    <div class="flex items-center justify-between gap-3"><span>Tall-grass fee if over ${o.tallInches} inches</span><span>$ ${num("tallFee",o.tallFee)}</span></div>
-    <div class="flex items-center justify-between gap-3"><span>First-cut fee (new customers)</span><span>$ ${num("firstCut",o.firstCut)}</span></div></div>
-   <p class="muted text-xs mt-2">Both fees are shown on the quote page <b>before</b> the customer books. No surprise charges.</p>
-  </div>
-  <div class="card p-5"><div class="display text-lg">Spanish</div>
-   <button class="choice mt-3 ${o.spanish?"on":""}" onclick="DB.op.spanish=!DB.op.spanish;save();route()"><div class="font-bold">${o.spanish?"On":"Off"}: quote page, customer pages and AI replies in Spanish</div><div class="muted text-sm">Customers pick English or Español. Texts go out in the language they picked.</div></button>
-  </div>
-  <div class="card p-5"><div class="display text-lg">Your plan</div>
-   ${Object.entries(PLANS).map(([k,p])=>`<button class="choice mt-3 ${o.plan===k?"on":""}" onclick="upgrade('${k}')"><div class="flex justify-between"><b>${p.name}</b><b>${money(p.price)}/mo</b></div><div class="muted text-sm">${p.cap?`Up to ${p.cap} active recurring customers`:"No customer limit · business line + phone AI"}</div></button>`).join("")}
-   <p class="muted text-xs mt-2">Change plans anytime as your season changes.</p>
+  <div class="grid gap-4">
+   <div class="card p-5"><div class="display text-lg">Licenses, insurance and bonding</div>
+    <p class="muted text-sm mt-1">Turned on, with proof uploaded and not expired? Customers see it as a badge before they get a quote. Anything else stays hidden. Customers never see "not insured."</p>
+    ${credRow("insured","Insured","e.g. $1,000,000 general liability")}
+    ${credRow("licensed","Licensed","e.g. Ohio business license, or state applicator license")}
+    ${credRow("bonded","Bonded","e.g. $10,000 surety bond")}
+    <div class="mt-4">${trustBar("en")||'<p class="muted text-sm">No badges showing right now.</p>'}</div>
+   </div>
+   <div class="card p-5"><div class="display text-lg">How recurring customers pay</div>
+    <p class="muted text-sm mt-1">Bank payment (ACH) is the default because it costs the least.</p>
+    ${[["per_visit","Autopay after each visit","Charged when you tap Done. Skipped visits are never charged."],["monthly","Flat monthly","Same amount on the 1st of each month in season."],["choose","Let each customer pick","The quote page offers both. You can switch any customer later."]].map(x=>`<button class="choice mt-3 ${o.payMode===x[0]?"on":""}" onclick="DB.op.payMode='${x[0]}';save();route()"><div class="font-bold">${x[1]}</div><div class="muted text-sm">${x[2]}</div></button>`).join("")}
+   </div>
+   <div class="card p-5"><div class="display text-lg">Spanish</div>
+    <button class="choice mt-3 ${o.spanish?"on":""}" onclick="DB.op.spanish=!DB.op.spanish;save();route()"><div class="font-bold">${o.spanish?"On":"Off"}: quote page, customer pages and AI replies in Spanish</div><div class="muted text-sm">Customers pick English or Español. Texts go out in the language they picked.</div></button>
+   </div>
   </div>
  </div>`);
 }
-function setNum(k,v){const parts=k.split(".");if(parts.length===2)DB.op[parts[0]][parts[1]]=Number(v);else DB.op[k]=Number(v);save()}
+function setNum(k,v){DB.op[k]=Number(v);save();route()}
 
-/* ===================== 4. HOMEOWNER QUOTE ===================== */
-const Q={lang:"en",step:1,size:"medium",freq:"weekly",tall:false,pay:"per_visit",notes:"",gate:"",pets:"",name:"",addr:""};
-const QT={
- en:{title:"Get your lawn price",sub:b=>`Instant price from ${b}. No phone call needed.`,addr:"Property address",size:"Yard size",sizes:{small:"Small (up to ¼ acre)",medium:"Medium (¼–½ acre)",large:"Large (½–1 acre)"},
-  freq:"How often?",freqs:{weekly:"Weekly",biweekly:"Every other week",once:"One time"},tall:t=>`Is the grass over ${t} inches right now?`,yes:"Yes",no:"No",
-  fees:"Fees, shown before you book",tallFee:"Tall-grass fee (first visit only)",firstCut:"First-cut fee (first visit only)",perVisit:"Per mow",
-  pay:"How do you want to pay?",pays:{per_visit:"Pay after each mow",monthly:"Same amount every month"},bank:"Paid by bank (ACH). Skipped visits are never charged.",
-  notes:"Anything we should know?",gate:"Gate code",pets:"Pets in the yard?",other:"Other notes (trash cans, hoses, sprinklers)",
-  next:"See my price",book:"Book my plan",back:"Back",total:"Your price",first:"First visit total",monthly:"Monthly",
-  ai:"Heads-up: we use an AI assistant to text and answer calls so our crew can stay on the job. A person on our team checks every conversation.",
-  doneT:"You're booked!",doneS:d=>`Your first mow is scheduled. You'll get a text when we're on the way and a photo when we're done. Cancel or pause free with ${d} hours' notice.`,name:"Your name"},
- es:{title:"Precio para su césped",sub:b=>`Precio al instante de ${b}. No necesita llamar.`,addr:"Dirección de la propiedad",size:"Tamaño del jardín",sizes:{small:"Pequeño (hasta ¼ de acre)",medium:"Mediano (¼ a ½ acre)",large:"Grande (½ a 1 acre)"},
-  freq:"¿Con qué frecuencia?",freqs:{weekly:"Cada semana",biweekly:"Cada dos semanas",once:"Una sola vez"},tall:t=>`¿El césped mide más de ${t} pulgadas ahora?`,yes:"Sí",no:"No",
-  fees:"Cargos, antes de reservar",tallFee:"Cargo por césped alto (solo la primera visita)",firstCut:"Cargo del primer corte (solo la primera visita)",perVisit:"Por corte",
-  pay:"¿Cómo quiere pagar?",pays:{per_visit:"Pagar después de cada corte",monthly:"La misma cantidad cada mes"},bank:"Pago por banco (ACH). Nunca se cobran las visitas canceladas por el clima.",
-  notes:"¿Algo que debamos saber?",gate:"Código de la reja",pets:"¿Mascotas en el jardín?",other:"Otras notas (botes de basura, mangueras, rociadores)",
-  next:"Ver mi precio",book:"Reservar mi plan",back:"Atrás",total:"Su precio",first:"Total de la primera visita",monthly:"Mensual",
-  ai:"Aviso: usamos un asistente de IA para enviar mensajes y contestar llamadas, así nuestro equipo puede seguir trabajando. Una persona de nuestro equipo revisa cada conversación.",
-  doneT:"¡Reservado!",doneS:d=>`Su primer corte está programado. Le enviaremos un mensaje cuando vayamos en camino y una foto al terminar. Cancele o pause gratis con ${d} horas de aviso.`,name:"Su nombre"}
-};
-function viewQuote(){
- const o=DB.op,L=QT[Q.lang];
- const per=o.prices[Q.size],first=per+(Q.tall?o.tallFee:0)+(Q.freq!=="once"?o.firstCut:0);
- const mo=Math.round(per*(Q.freq==="weekly"?52:26)/12);
- const payOpts=o.payMode==="choose"?["per_visit","monthly"]:[o.payMode];
- if(!payOpts.includes(Q.pay))Q.pay=payOpts[0];
- const langToggle=o.spanish?`<div class="inline-flex border rounded-xl overflow-hidden" style="border-color:var(--input)">${["en","es"].map(l=>`<button class="px-4 py-2 font-semibold ${Q.lang===l?"btn-orange":""}" onclick="Q.lang='${l}';route()">${l==="en"?"English":"Español"}</button>`).join("")}</div>`:"";
- let body="";
- if(Q.step===1)body=`
-  <label class="text-sm font-semibold">${L.addr}</label><input class="input mt-1" value="${Q.addr}" placeholder="123 Main St" oninput="Q.addr=this.value">
-  <div class="text-sm font-semibold mt-5">${L.size}</div><div class="grid gap-2 mt-2">${Object.entries(L.sizes).map(([k,v])=>`<button class="choice ${Q.size===k?"on":""}" onclick="Q.size='${k}';route()"><div class="flex justify-between"><span class="font-semibold">${v}</span><b>${money(o.prices[k])}</b></div></button>`).join("")}</div>
-  <div class="text-sm font-semibold mt-5">${L.freq}</div><div class="flex flex-wrap gap-2 mt-2">${Object.entries(L.freqs).map(([k,v])=>`<button class="chip ${Q.freq===k?"on":""}" onclick="Q.freq='${k}';route()">${v}</button>`).join("")}</div>
-  <div class="text-sm font-semibold mt-5">${L.tall(o.tallInches)}</div><div class="flex gap-2 mt-2"><button class="chip ${Q.tall?"on":""}" onclick="Q.tall=true;route()">${L.yes}</button><button class="chip ${!Q.tall?"on":""}" onclick="Q.tall=false;route()">${L.no}</button></div>
-  <div class="card p-4 mt-5" style="background:var(--bg)"><div class="font-bold">${L.fees}</div>
-   <div class="flex justify-between text-sm mt-2"><span>${L.perVisit}</span><b>${money(per)}</b></div>
-   ${Q.freq!=="once"?`<div class="flex justify-between text-sm mt-1"><span>${L.firstCut}</span><b>${money(o.firstCut)}</b></div>`:""}
-   ${Q.tall?`<div class="flex justify-between text-sm mt-1"><span>${L.tallFee}</span><b>${money(o.tallFee)}</b></div>`:""}
+/* ===================== 4. PLAN & ADD-ONS (the one place for upgrades) ===================== */
+function viewPlan(){
+ const cur=DB.op.plan;
+ const opts=[["starter","Up to 35 active recurring customers. No business line."],["starterplus","Up to 80 active recurring customers. Same setup as Starter, no business line or phone AI."],["payg","Your own business line. AI texts 8¢, AI call minutes 38¢."],["solo","Business line, 500 AI texts + 100 AI call minutes a month, no customer limit."],["crew","3 crews, 1,500 AI texts + 300 AI call minutes, business call calendar."]];
+ return shell("plan",`<div class="grid lg:grid-cols-2 gap-4 items-start">
+  <div class="grid gap-4">
+   <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month.</p>
+    <div class="grid gap-2 mt-4">${opts.map(([k,d])=>`<button class="choice ${k===cur?"on":""}" onclick="DB.op.plan='${k}';save();toast('Plan set to ${PLANS[k].name} (preview only, no charge)');route()"><div class="flex justify-between gap-3"><b>${PLANS[k].name}</b><b>${money(PLANS[k].price)}/mo</b></div><div class="muted text-sm mt-1">${d}</div>${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`).join("")}</div></div>
+   <div class="card p-5"><div class="display text-lg">Usage packs</div><p class="muted text-sm mt-1">For a busy month. Good for the current month only.</p>
+    <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Busy Season Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div></div>
   </div>
-  <button class="btn btn-orange w-full mt-5" onclick="Q.step=2;route()">${L.next}</button>`;
- if(Q.step===2)body=`
-  <div class="card p-4" style="background:var(--bg)"><div class="muted text-sm">${L.total}</div>
-   <div class="display text-3xl mt-1">${money(per)} <span class="text-base muted">/ ${L.perVisit.toLowerCase()}</span></div>
-   <div class="text-sm mt-1">${L.first}: <b>${money(first)}</b>${Q.freq!=="once"?` · ${L.monthly}: <b>${money(mo)}</b>`:""}</div></div>
-  ${Q.freq!=="once"?`<div class="text-sm font-semibold mt-5">${L.pay}</div><div class="grid gap-2 mt-2">${payOpts.map(k=>`<button class="choice ${Q.pay===k?"on":""}" onclick="Q.pay='${k}';route()"><div class="flex justify-between"><span class="font-semibold">${L.pays[k]}</span><b>${k==="monthly"?money(mo):money(per)}</b></div></button>`).join("")}</div><p class="muted text-xs mt-2">${L.bank}</p>`:""}
-  <div class="text-sm font-semibold mt-5">${L.notes}</div>
-  <div class="grid gap-2 mt-2"><input class="input" placeholder="${L.name}" value="${Q.name}" oninput="Q.name=this.value"><input class="input" placeholder="${L.gate}" value="${Q.gate}" oninput="Q.gate=this.value"><input class="input" placeholder="${L.pets}" value="${Q.pets}" oninput="Q.pets=this.value"><textarea class="input" rows="2" placeholder="${L.other}" oninput="Q.notes=this.value">${Q.notes}</textarea></div>
-  <p class="muted text-xs mt-4">${L.ai}</p>
-  <div class="flex gap-2 mt-5"><button class="btn btn-ghost" onclick="Q.step=1;route()">${L.back}</button><button class="btn btn-orange flex-1" onclick="bookQuote()">${L.book}</button></div>`;
- if(Q.step===3)body=`<div class="text-center py-6"><div class="text-5xl">✅</div><div class="display text-2xl mt-3">${L.doneT}</div><p class="muted mt-2">${L.doneS(o.notice)}</p>
-  <button class="btn btn-ghost mt-5" onclick="Object.assign(Q,{step:1,tall:false,name:'',addr:'',gate:'',pets:'',notes:''});route()">${Q.lang==="es"?"Empezar de nuevo":"Start over"}</button></div>`;
- return `<div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div class="text-xs muted">Homeowner view · what customers see after scanning the QR code</div><a href="#/route" class="underline text-sm">Back to operator view</a></div>
- <div class="max-w-lg mx-auto card p-6">
-  <div class="flex justify-between items-start gap-3"><div><div class="display text-2xl">${L.title}</div><div class="muted text-sm mt-1">${L.sub(o.business)}</div></div>${langToggle}</div>
-  <div class="mt-5">${body}</div>
- </div>
- <div class="todo max-w-lg mx-auto mt-4">Preview only: no booking is saved and no payment is taken. In the real build, Book adds the customer to your Customers list, counts toward your plan limit, and the deposit/ACH setup runs through your own payment link.</div>`;
+  <div class="grid gap-4">
+   <div class="card p-5"><div class="flex justify-between items-baseline gap-3"><div class="display text-lg">Review Booster</div><b>$48/mo</b></div>
+    <p class="muted text-sm mt-1">Your AI asks every customer for a Google review after every completed job, then reminds them once. Unhappy replies come to your Inbox so you can make it right. No monthly limit.</p>
+    <button class="btn btn-ghost w-full mt-4" onclick="toast('Review Booster added (preview only, no charge)')">Add Review Booster</button></div>
+   <div class="card p-5"><div class="display text-lg">Your own App Store and Google Play listing</div>
+    <p class="muted text-sm mt-1">Every plan already includes your branded customer app through an install link. A store listing is optional. Apple and Google charge their own yearly developer fees, paid in your business name.</p>
+    <button class="btn btn-ghost w-full mt-4" onclick="toast('We will send you add-on pricing.')">Get add-on pricing</button></div>
+  </div></div>`);
 }
-function bookQuote(){
- const o=DB.op,p=PLANS[o.plan];
- if(Q.freq!=="once"&&p.cap&&activeCount()>=p.cap){Q.step=3;route();toast("Operator note: you're at your plan limit, so this request goes to your inbox until you upgrade.");return}
- if(Q.freq!=="once"){const id=Date.now()%100000;DB.customers.push({id,name:Q.name||(Q.lang==="es"?"Cliente nuevo":"New customer"),addr:Q.addr||"(sample address)",size:Q.size,freq:Q.freq,day:"Wed",pay:Q.pay,lang:Q.lang,notes:[Q.gate&&`Gate ${Q.gate}`,Q.pets,Q.notes].filter(Boolean).join(". "),status:"active"});save()}
- Q.step=3;route()}
 
-/* ===================== 5. CUSTOMER TEXTS ===================== */
+/* ===================== 5. HOMEOWNER QUOTE ===================== */
+let Q;
+function resetQuote(){Q={lang:"en",step:1,type:"home",addr:"",found:null,center:[40.0996,-83.1141],zoom:18,parcel:null,zones:{},polys:{},active:null,draft:[],freq:"weekly",tall:false,pay:"per_visit",gate:"",pets:"",notes:"",sign:"",agree:false}}
+resetQuote();
+const QT={
+ en:{title:"Get your lawn price",sub:b=>`Instant price from ${b}. No phone call, no site visit.`,home:"Home",biz:"Business",addr:"Property address",find:"Find my property",finding:"Finding…",notFound:"We couldn't find that address. Check it, or move the map to your property.",
+  step1:"Find your property",step2:"Show us what to mow",step3:"Your service",step4:"Review and sign",
+  pick:"Which areas do you want mowed?",outlineHelp:z=>`Tap each corner of your ${z.toLowerCase()} on the map. Tap "Finish" when you're done.`,finish:"Finish",undo:"Undo last point",clear:"Clear",estimate:"I'm not sure, estimate it for me",
+  record:"Property record",lot:"Lot size",house:"House footprint",sample:"Sample in this preview. The real app pulls this from county property records.",tooBig:"That's bigger than the lot on record. Please check your outline.",
+  per:"per visit",min:"Includes the per-visit minimum",freq:"How often?",freqs:{weekly:"Weekly",biweekly:"Every other week",once:"One time"},tall:t=>`Is the grass over ${t} inches right now?`,yes:"Yes",no:"No",
+  fees:"One-time fees, shown before you book",tallFee:"Tall-grass fee (first visit only)",firstCut:"First-cut fee (first visit only)",
+  pay:"How do you want to pay?",pays:{per_visit:"Pay after each mow",monthly:"Same amount every month"},bank:"Paid by bank (ACH). Weather-skipped visits are never charged.",
+  notes:"Anything we should know?",gate:"Gate code",pets:"Pets in the yard?",other:"Other notes (trash cans, hoses, sprinklers)",name:"Your full name",
+  next:"Next",back:"Back",book:"Sign and book",bizBook:"Sign and request my call",
+  total:"Your price",firstVisit:"First visit",
+  waiverT:b=>`${b} service terms and liability waiver`,agree:b=>`I've read and agree to ${b}'s service terms and liability waiver.`,sign:"Type your full name to sign",signed:"Signed",
+  ai:"Heads-up: we use an AI assistant to text and answer calls so our crew can stay on the job. A person on our team checks every conversation.",
+  bizNote:"Business properties get a confirmed price after a short call. This is your estimate.",
+  doneT:"You're booked!",doneS:d=>`Your first mow is scheduled. You'll get a text when we're on the way and a photo when we're done. Cancel or pause free with ${d} hours' notice.`,
+  bizDoneT:"Request sent!",bizDoneS:"We'll text you to set up a short call, then confirm your price.",needZone:"Choose at least one area and outline it, or tap estimate.",needSign:"Please check the box and type your name to sign.",restart:"Start over",tap3:"Tap at least 3 corners.",estd:"Estimated from the property record. The operator confirms it."},
+ es:{title:"Precio para su césped",sub:b=>`Precio al instante de ${b}. Sin llamadas ni visitas.`,home:"Casa",biz:"Negocio",addr:"Dirección de la propiedad",find:"Buscar mi propiedad",finding:"Buscando…",notFound:"No encontramos esa dirección. Revísela o mueva el mapa hasta su propiedad.",
+  step1:"Busque su propiedad",step2:"Muéstrenos qué cortar",step3:"Su servicio",step4:"Revisar y firmar",
+  pick:"¿Qué áreas quiere que cortemos?",outlineHelp:z=>`Toque cada esquina de su ${z.toLowerCase()} en el mapa. Toque "Terminar" cuando acabe.`,finish:"Terminar",undo:"Deshacer último punto",clear:"Borrar",estimate:"No estoy seguro, calcúlelo por mí",
+  record:"Registro de la propiedad",lot:"Tamaño del lote",house:"Área de la casa",sample:"Ejemplo en esta vista previa. La aplicación real usa los registros de propiedad del condado.",tooBig:"Es más grande que el lote registrado. Revise su marcado.",
+  per:"por visita",min:"Incluye el mínimo por visita",freq:"¿Con qué frecuencia?",freqs:{weekly:"Cada semana",biweekly:"Cada dos semanas",once:"Una sola vez"},tall:t=>`¿El césped mide más de ${t} pulgadas ahora?`,yes:"Sí",no:"No",
+  fees:"Cargos únicos, antes de reservar",tallFee:"Cargo por césped alto (solo la primera visita)",firstCut:"Cargo del primer corte (solo la primera visita)",
+  pay:"¿Cómo quiere pagar?",pays:{per_visit:"Pagar después de cada corte",monthly:"La misma cantidad cada mes"},bank:"Pago por banco (ACH). Nunca se cobran las visitas canceladas por el clima.",
+  notes:"¿Algo que debamos saber?",gate:"Código de la reja",pets:"¿Mascotas en el jardín?",other:"Otras notas (botes de basura, mangueras, rociadores)",name:"Su nombre completo",
+  next:"Siguiente",back:"Atrás",book:"Firmar y reservar",bizBook:"Firmar y pedir mi llamada",
+  total:"Su precio",firstVisit:"Primera visita",
+  waiverT:b=>`Términos de servicio y exención de responsabilidad de ${b}`,agree:b=>`Leí y acepto los términos de servicio y la exención de responsabilidad de ${b}.`,sign:"Escriba su nombre completo para firmar",signed:"Firmado",
+  ai:"Aviso: usamos un asistente de IA para enviar mensajes y contestar llamadas, así nuestro equipo puede seguir trabajando. Una persona de nuestro equipo revisa cada conversación.",
+  bizNote:"Las propiedades de negocios reciben un precio confirmado después de una llamada corta. Este es su estimado.",
+  doneT:"¡Reservado!",doneS:d=>`Su primer corte está programado. Le enviaremos un mensaje cuando vayamos en camino y una foto al terminar. Cancele o pause gratis con ${d} horas de aviso.`,
+  bizDoneT:"¡Solicitud enviada!",bizDoneS:"Le enviaremos un mensaje para programar una llamada corta y confirmar su precio.",needZone:"Elija al menos un área y márquela, o toque calcular.",needSign:"Marque la casilla y escriba su nombre para firmar.",restart:"Empezar de nuevo",tap3:"Toque al menos 3 esquinas.",estd:"Calculado desde el registro de la propiedad. El operador lo confirma."}
+};
+function waiverLines(lang){const b=DB.op.business,n=DB.op.notice;return lang==="es"?[
+ `${b} corta y da servicio a las áreas que usted marcó, si el clima y el suelo lo permiten.`,
+ "Recoja juguetes, mangueras, desechos de mascotas y cualquier objeto del jardín antes de que lleguemos. No somos responsables por objetos dejados en el césped.",
+ "Marque rociadores, cercas invisibles para perros y cualquier cosa enterrada. No somos responsables por daños a objetos ocultos o sin marcar.",
+ "El precio se basa en las áreas que usted marcó. Si el área real es muy diferente, le avisaremos antes de cobrar cualquier cambio.",
+ "La lluvia y el suelo mojado pueden mover su servicio uno o dos días por seguridad y por la salud del césped.",
+ "Si algo se daña, envíe fotos dentro de las 24 horas después del servicio para que podamos arreglarlo.",
+ `Cancele o pause gratis con ${n} horas de aviso.`]:[
+ `${b} mows and services the areas you outlined, weather and ground conditions allowing.`,
+ "Please pick up toys, hoses, pet waste and anything in the yard before we arrive. We are not responsible for items left in the lawn.",
+ "Mark sprinkler heads, invisible dog fences and anything buried. We are not responsible for damage to unmarked or hidden items.",
+ "Your price is based on the areas you outlined. If the real area is very different, we'll tell you before charging any change.",
+ "Rain and wet ground can move your service a day or two for safety and lawn health.",
+ "If something is damaged, send photos within 24 hours of service so we can make it right.",
+ `Cancel or pause free with ${n} hours' notice.`]}
+
+/* --- geometry: geodesic area of a lat/lng ring, in square feet --- */
+function ringSqft(pts){if(pts.length<3)return 0;const R=6378137,rad=d=>d*Math.PI/180;let a=0;
+ for(let i=0;i<pts.length;i++){const p1=pts[i],p2=pts[(i+1)%pts.length];a+=(rad(p2[1])-rad(p1[1]))*(2+Math.sin(rad(p1[0]))+Math.sin(rad(p2[0])))}
+ return Math.abs(a*R*R/2)*10.7639}
+/* --- sample property record (real build: county parcel data) --- */
+function sampleParcel(addr){let h=0;for(const ch of addr.toLowerCase())h=(h*31+ch.charCodeAt(0))>>>0;
+ const lot=7000+h%7500,house=1500+(h>>8)%1200;return {lot,house}}
+function estimateZones(){const p=Q.parcel||{lot:9500,house:1900},lawn=Math.max(1500,(p.lot-p.house)*0.72);
+ return {front:Math.round(lawn*0.38),back:Math.round(lawn*0.54),side:Math.round(lawn*0.08)}}
+
+let MAP=null,MAPLAYERS={};
+function viewQuote(){
+ const o=DB.op,L=QT[Q.lang],b=esc(o.business);
+ const langToggle=o.spanish?`<div class="inline-flex border rounded-xl overflow-hidden shrink-0" style="border-color:var(--input)">${["en","es"].map(l=>`<button class="px-3 py-2 font-semibold ${Q.lang===l?"btn-orange":""}" onclick="Q.lang='${l}';route()">${l==="en"?"English":"Español"}</button>`).join("")}</div>`:"";
+ const steps=[L.step1,L.step2,L.step3,L.step4];
+ const prog=Q.step<=4?`<div class="flex gap-1 mt-4">${steps.map((s,i)=>`<div class="flex-1 h-1.5 rounded-full" style="background:${i<Q.step?"var(--orange)":"var(--muted)"}"></div>`).join("")}</div><div class="text-sm font-bold mt-3">${Q.step}. ${steps[Q.step-1]}</div>`:"";
+ let body="";
+ const pr=priceFor(Q.zones);
+ const priceBox=()=>`<div class="card p-4 mt-4" style="background:var(--bg)" id="pbox">${priceBoxInner()}</div>`;
+ if(Q.step===1)body=`${trustBar(Q.lang)}
+  <div class="flex gap-2">${["home","biz"].map(t=>`<button class="chip ${Q.type===t?"on":""}" onclick="Q.type='${t}';route()">${t==="home"?L.home:L.biz}</button>`).join("")}</div>
+  <label class="text-sm font-semibold block mt-4">${L.addr}</label>
+  <div class="flex gap-2 mt-1"><input id="addr" class="input" value="${esc(Q.addr)}" placeholder="123 Main St, Dublin, OH" onkeydown="if(event.key==='Enter')findAddr()"><button class="btn btn-orange shrink-0" onclick="findAddr()" id="findBtn">${L.find}</button></div>
+  <div id="geoMsg" class="text-sm mt-2"></div>
+  <div id="qmap" class="mt-3"></div>
+  ${Q.parcel?parcelCard():""}
+  <button id="next1" class="btn btn-orange w-full mt-4" ${Q.found?"":"disabled"} onclick="Q.step=2;route()">${L.next}</button>`;
+ if(Q.step===2)body=`<div class="text-sm font-semibold">${L.pick}</div>
+  <div class="flex flex-wrap gap-2 mt-2">${["front","back","side"].map(z=>`<button class="chip ${Q.zones[z]!==undefined||Q.active===z?"on":""}" onclick="toggleZone('${z}')">${(Q.lang==="es"?ZN_ES:ZN)[z]}</button>`).join("")}</div>
+  <div id="drawBar" class="mt-3">${drawBar()}</div>
+  <div id="qmap" class="mt-3"></div>
+  <button class="btn btn-ghost btn-sm w-full mt-3" onclick="useEstimate()">${L.estimate}</button>
+  ${Q.parcel?parcelCard():""}
+  ${priceBox()}
+  <div class="flex gap-2 mt-4"><button class="btn btn-ghost" onclick="Q.step=1;route()">${L.back}</button><button class="btn btn-orange flex-1" onclick="if(!Object.values(Q.zones).some(v=>v>0)){toast(QT[Q.lang].needZone);return}Q.step=3;route()">${L.next}</button></div>`;
+ if(Q.step===3){const payOpts=o.payMode==="choose"?["per_visit","monthly"]:[o.payMode];if(!payOpts.includes(Q.pay))Q.pay=payOpts[0];
+  const mo=Math.round(pr.total*(Q.freq==="weekly"?52:26)/12);
+  body=`<div class="text-sm font-semibold">${L.freq}</div><div class="flex flex-wrap gap-2 mt-2">${Object.entries(L.freqs).map(([k,v])=>`<button class="chip ${Q.freq===k?"on":""}" onclick="Q.freq='${k}';route()">${v}</button>`).join("")}</div>
+  <div class="text-sm font-semibold mt-5">${L.tall(o.tallInches)}</div><div class="flex gap-2 mt-2"><button class="chip ${Q.tall?"on":""}" onclick="Q.tall=true;route()">${L.yes}</button><button class="chip ${!Q.tall?"on":""}" onclick="Q.tall=false;route()">${L.no}</button></div>
+  ${Q.freq!=="once"?`<div class="text-sm font-semibold mt-5">${L.pay}</div><div class="grid gap-2 mt-2">${payOpts.map(k=>`<button class="choice ${Q.pay===k?"on":""}" onclick="Q.pay='${k}';route()"><div class="flex justify-between"><span class="font-semibold">${L.pays[k]}</span><b>${k==="monthly"?money(mo):money(pr.total)}</b></div></button>`).join("")}</div><p class="muted text-xs mt-2">${L.bank}</p>`:""}
+  <div class="text-sm font-semibold mt-5">${L.notes}</div>
+  <div class="grid gap-2 mt-2"><input class="input" placeholder="${L.gate}" value="${esc(Q.gate)}" oninput="Q.gate=this.value"><input class="input" placeholder="${L.pets}" value="${esc(Q.pets)}" oninput="Q.pets=this.value"><textarea class="input" rows="2" placeholder="${L.other}" oninput="Q.notes=this.value">${esc(Q.notes)}</textarea></div>
+  ${priceBox()}
+  <div class="flex gap-2 mt-4"><button class="btn btn-ghost" onclick="Q.step=2;route()">${L.back}</button><button class="btn btn-orange flex-1" onclick="Q.step=4;route()">${L.next}</button></div>`}
+ if(Q.step===4){
+  body=`${priceBox()}
+  ${Q.type==="biz"?`<p class="text-sm mt-3 orange font-semibold">${L.bizNote}</p>`:""}
+  <details class="card p-4 mt-4 text-sm" open><summary class="cursor-pointer font-bold">${L.waiverT(b)}</summary><ol class="list-decimal pl-5 grid gap-2 mt-3 muted">${waiverLines(Q.lang).map(t=>`<li>${esc(t)}</li>`).join("")}</ol></details>
+  <label class="flex gap-3 text-sm items-start mt-3"><input id="agree" type="checkbox" class="mt-1 w-5 h-5" ${Q.agree?"checked":""} onchange="Q.agree=this.checked"><span>${L.agree(b)}</span></label>
+  <label class="text-sm font-semibold block mt-3">${L.sign}</label><input id="sign" class="input mt-1" style="font-family:cursive;font-size:1.2rem" value="${esc(Q.sign)}" oninput="Q.sign=this.value" placeholder="${L.name}">
+  <p class="muted text-xs mt-3">${L.ai}</p>
+  <div class="flex gap-2 mt-4"><button class="btn btn-ghost" onclick="Q.step=3;route()">${L.back}</button><button id="bookBtn" class="btn btn-orange flex-1" onclick="bookQuote()">${Q.type==="biz"?L.bizBook:L.book}</button></div>`}
+ if(Q.step===5)body=`<div class="text-center py-6"><div class="text-5xl">✅</div><div class="display text-2xl mt-3">${Q.type==="biz"?L.bizDoneT:L.doneT}</div><p class="muted mt-2">${Q.type==="biz"?L.bizDoneS:L.doneS(o.notice)}</p>
+  <p class="muted text-xs mt-3">${L.signed}: ${esc(Q.sign)} · ${new Date().toLocaleString()}</p>
+  <button class="btn btn-ghost mt-5" onclick="const l=Q.lang;resetQuote();Q.lang=l;route()">${L.restart}</button></div>`;
+ return `<div class="flex flex-wrap justify-between items-center gap-3 mb-4"><div class="text-xs muted">Homeowner view · what customers see after scanning the QR code</div><a href="#/route" class="underline text-sm">Back to operator view</a></div>
+ <div class="max-w-xl mx-auto card p-5">
+  <div class="flex justify-between items-start gap-3"><div><div class="display text-2xl">${L.title}</div><div class="muted text-sm mt-1">${L.sub(b)}</div></div>${langToggle}</div>
+  ${prog}<div class="mt-4">${body}</div>
+ </div>
+ <div class="todo max-w-xl mx-auto mt-4">Preview: the satellite map and address search are live, but the property record is sample data and nothing is saved or charged. The real build looks up the lot size from county records, saves the signed waiver with a timestamp, and sends the booking to the operator's Customers list.</div>`;
+}
+function priceBoxInner(){const o=DB.op,L=QT[Q.lang],pr=priceFor(Q.zones),zn=Q.lang==="es"?ZN_ES:ZN;
+ if(!pr.lines.length)return `<div class="muted text-sm">${L.needZone}</div>`;
+ const extra=(Q.tall?o.tallFee:0)+(Q.freq!=="once"?o.firstCut:0);
+ return `<div class="muted text-sm">${L.total}</div>
+  <div class="display text-3xl mt-1">${money(pr.total)} <span class="text-base muted">${L.per}</span></div>
+  <div class="grid gap-1 mt-2 text-sm">${pr.lines.map(l=>`<div class="flex justify-between"><span><span style="color:${ZCOLOR[l.zone]}">■</span> ${zn[l.zone]} · ${fmt(l.sqft)} sq ft</span><span>${money(l.price)}</span></div>`).join("")}
+  ${pr.why==="minimum"?`<div class="muted text-xs">${L.min} (${money(o.minimum)})</div>`:""}</div>
+  ${Q.step>=3&&extra?`<div class="text-sm mt-2 pt-2" style="border-top:1px solid var(--border)">${L.fees}: ${Q.freq!=="once"?`${L.firstCut} ${money(o.firstCut)}`:""}${Q.tall?` · ${L.tallFee} ${money(o.tallFee)}`:""}<div class="font-bold mt-1">${L.firstVisit}: ${money(pr.total+extra)}</div></div>`:""}
+  ${Q.step<3?`<div class="text-xs muted mt-2">${L.fees}: ${L.firstCut.split(" (")[0]} ${money(o.firstCut)} · ${L.tallFee.split(" (")[0]} ${money(o.tallFee)}</div>`:""}`}
+function parcelCard(){const L=QT[Q.lang],p=Q.parcel,tot=sqftOf(Q.zones),over=tot>p.lot-p.house;
+ return `<div class="card p-3 mt-3 text-sm" style="background:var(--bg)"><div class="font-bold">${L.record}</div>
+ <div class="flex flex-wrap gap-x-4 mt-1"><span>${L.lot}: <b>${fmt(p.lot)} sq ft</b> (${(p.lot/43560).toFixed(2)} acres)</span><span>${L.house}: <b>${fmt(p.house)} sq ft</b></span></div>
+ ${over?`<div class="text-xs mt-1" style="color:var(--yellow)">${L.tooBig}</div>`:""}
+ <div class="muted text-xs mt-1">${L.sample}</div></div>`}
+function drawBar(){const L=QT[Q.lang];if(!Q.active)return "";const zn=(Q.lang==="es"?ZN_ES:ZN)[Q.active];
+ return `<div class="card p-3 text-sm" style="background:var(--bg);border-color:${ZCOLOR[Q.active]}"><b>${zn}:</b> ${L.outlineHelp(zn)}
+ <div class="flex flex-wrap gap-2 mt-2"><button id="finishBtn" class="btn btn-sm btn-orange" onclick="finishZone()">${L.finish} (${Q.draft.length})</button><button class="btn btn-sm btn-ghost" onclick="Q.draft.pop();redraw()">${L.undo}</button><button class="btn btn-sm btn-ghost" onclick="Q.draft=[];redraw()">${L.clear}</button></div></div>`}
+function toggleZone(z){
+ if(Q.active===z){Q.active=null;Q.draft=[];return route()}
+ if(Q.zones[z]!==undefined){delete Q.zones[z];delete Q.polys[z];return route()}
+ Q.active=z;Q.draft=[];route()}
+function finishZone(){if(Q.draft.length<3){toast(QT[Q.lang].tap3);return}
+ Q.polys[Q.active]=Q.draft.slice();Q.zones[Q.active]=Math.round(ringSqft(Q.draft));Q.active=null;Q.draft=[];route()}
+function useEstimate(){const e=estimateZones(),keys=Object.keys(Q.zones);if(Q.active&&!keys.includes(Q.active))keys.push(Q.active);
+ const use=keys.length?keys:["front","back"];use.forEach(k=>{if(!Q.polys[k])Q.zones[k]=e[k]});Q.active=null;Q.draft=[];route();toast(QT[Q.lang].estd)}
+function initMap(){
+ const el=$("#qmap");if(!el)return;if(!window.L){el.innerHTML='<div class="p-4 muted text-sm">Map could not load.</div>';return}
+ if(MAP){try{MAP.remove()}catch(e){}MAP=null}
+ MAP=L.map(el,{zoomControl:true,attributionControl:true}).setView(Q.center,Q.zoom);
+ L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:20,maxNativeZoom:19,attribution:"Imagery © Esri, Maxar, Earthstar Geographics"}).addTo(MAP);
+ MAP.on("moveend",()=>{const c=MAP.getCenter();Q.center=[c.lat,c.lng];Q.zoom=MAP.getZoom()});
+ if(Q.found)L.circleMarker(Q.found,{radius:6,color:"#fff",weight:2,fillColor:"#f97316",fillOpacity:1}).addTo(MAP);
+ MAP.on("click",e=>{if(Q.step!==2||!Q.active)return;Q.draft.push([e.latlng.lat,e.latlng.lng]);redraw()});
+ if(Q.step===2){MAP.doubleClickZoom.disable();el.classList.toggle("drawing",!!Q.active)}
+ MAPLAYERS={};redraw();
+}
+function redraw(){if(!MAP)return;Object.values(MAPLAYERS).forEach(l=>{try{MAP.removeLayer(l)}catch(e){}});MAPLAYERS={};
+ Object.entries(Q.polys).forEach(([z,pts])=>{MAPLAYERS[z]=L.polygon(pts,{color:ZCOLOR[z],weight:2,fillOpacity:.3}).addTo(MAP)});
+ if(Q.active&&Q.draft.length){MAPLAYERS._d=L.polygon(Q.draft,{color:ZCOLOR[Q.active],weight:2,dashArray:"6 4",fillOpacity:.2}).addTo(MAP);
+  MAPLAYERS._p=L.layerGroup(Q.draft.map(p=>L.circleMarker(p,{radius:5,color:"#fff",weight:2,fillColor:ZCOLOR[Q.active],fillOpacity:1}))).addTo(MAP)}
+ const db=$("#drawBar");if(db)db.innerHTML=drawBar();const pb=$("#pbox");if(pb)pb.innerHTML=priceBoxInner();
+}
+async function findAddr(){const L_=QT[Q.lang],v=$("#addr").value.trim();Q.addr=v;if(!v)return;
+ const btn=$("#findBtn");btn.textContent=L_.finding;btn.disabled=true;$("#geoMsg").textContent="";
+ try{const r=await fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us&q="+encodeURIComponent(v),{headers:{"Accept":"application/json"}});
+  const j=await r.json();if(!j.length)throw 0;
+  Q.found=[Number(j[0].lat),Number(j[0].lon)];Q.center=Q.found;Q.zoom=19;Q.parcel=sampleParcel(v);Q.zones={};Q.polys={};route()}
+ catch(e){$("#geoMsg").innerHTML=`<span style="color:var(--yellow)">${L_.notFound}</span>`;btn.textContent=L_.find;btn.disabled=false;
+  Q.found=Q.center.slice();Q.parcel=sampleParcel(v);const nb=$("#next1");if(nb)nb.disabled=false}}
+function bookQuote(){const L=QT[Q.lang],o=DB.op,p=PLANS[o.plan];
+ if(!Q.agree||Q.sign.trim().length<3){toast(L.needSign);return}
+ if(Q.type==="home"&&Q.freq!=="once"){
+  if(p.cap&&activeCount()>=p.cap){Q.step=5;route();toast("Operator note: you're at your plan limit, so this request waits in your Inbox.");return}
+  DB.customers.push({id:Date.now()%100000,name:Q.sign.trim(),addr:Q.addr||"(sample address)",zones:{...Q.zones},freq:Q.freq,day:"Wed",pay:Q.pay,lang:Q.lang,notes:[Q.gate&&`Gate ${Q.gate}`,Q.pets,Q.notes].filter(Boolean).join(". "),status:"active",waiver:{signed:Q.sign.trim(),at:new Date().toISOString(),version:"mow-waiver-preview-1"}});save()}
+ Q.step=5;route()}
+
+/* ===================== 6. CUSTOMER TEXTS ===================== */
 function viewTexts(){
  const b=DB.op.business;
- const samples=DB.texts.length?DB.texts:[];
  const lib=[["English",[["AI notice (once, up front)",T.en.aiNote(b)],["Rain delay",T.en.rain("Dana",b,"Wednesday")],["On the way",T.en.omw("Dana",b)],["Done + photo link",T.en.done("Dana",b,"412 Oak Ridge Dr",photoLink(1))],["Skipped (no charge)",T.en.skip("Dana",b)]]],
   ["Español",[["Aviso de IA (una vez)",T.es.aiNote(b)],["Retraso por lluvia",T.es.rain("Luis",b,"miércoles")],["En camino",T.es.omw("Luis",b)],["Listo + foto",T.es.done("Luis",b,"88 Willow Ct",photoLink(2))],["Visita cancelada (sin cargo)",T.es.skip("Luis",b)]]]];
  return shell("texts",`
  <div class="grid md:grid-cols-2 gap-4">
   ${lib.map(([lang,items])=>`<div class="card p-5"><div class="display text-lg">${lang}</div>
-   <div class="rounded-2xl p-4 mt-3 grid gap-3" style="background:#fff">${items.map(([k,v])=>`<div><div class="text-[11px] text-gray-500 mb-1">${k}</div><div class="bubble in">${v}</div></div>`).join("")}</div></div>`).join("")}
+   <div class="rounded-2xl p-4 mt-3 grid gap-3" style="background:#fff">${items.map(([k,v])=>`<div><div class="text-[11px] text-gray-500 mb-1">${k}</div><div class="bubble in">${esc(v)}</div></div>`).join("")}</div></div>`).join("")}
  </div>
  <div class="card p-5 mt-4"><div class="display text-lg">Sent in this preview</div>
-  ${samples.length?`<div class="grid gap-2 mt-3">${samples.map(t=>`<div class="text-sm card p-3" style="background:var(--bg)"><div class="muted text-xs">${t.at} · to ${t.to} · ${t.kind} · ${t.lang==="es"?"Español":"English"}</div><div class="mt-1">${t.body}</div></div>`).join("")}</div>`:`<p class="muted text-sm mt-2">Nothing yet. Tap buttons on <a class="underline" href="#/route">Today's route</a> to see the texts each customer would get.</p>`}
+  ${DB.texts.length?`<div class="grid gap-2 mt-3">${DB.texts.map(t=>`<div class="text-sm card p-3" style="background:var(--bg)"><div class="muted text-xs">${t.at} · to ${esc(t.to)} · ${t.kind} · ${t.lang==="es"?"Español":"English"}</div><div class="mt-1">${esc(t.body)}</div></div>`).join("")}</div>`:`<p class="muted text-sm mt-2">Nothing yet. Tap buttons on <a class="underline" href="#/route">Today's route</a> to see the texts each customer would get.</p>`}
  </div>
  <div class="todo mt-4">Spanish wording is a draft and should be checked by a native speaker before launch.</div>`);
 }
@@ -365,8 +552,10 @@ function viewTexts(){
 /* ===================== ROUTER ===================== */
 function route(top){
  const h=(location.hash||"#/route").slice(2).split("?")[0]||"route";
- const v={route:viewRoute,customers:viewCustomers,settings:viewSettings,quote:viewQuote,texts:viewTexts}[h]||viewRoute;
+ const v={route:viewRoute,customers:viewCustomers,settings:viewSettings,plan:viewPlan,quote:viewQuote,texts:viewTexts}[h]||viewRoute;
+ if(MAP){try{MAP.remove()}catch(e){}MAP=null}
  $("#app").innerHTML=v();if(top===true)window.scrollTo(0,0);
+ if(h==="quote"&&(Q.step===1||Q.step===2))initMap();
 }
 load();addEventListener("hashchange",()=>route(true));route(true);
 </script>
