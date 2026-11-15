@@ -134,7 +134,7 @@ function load(){try{DB=JSON.parse(localStorage.getItem("mowcall_demo_v3"))}catch
 function save(){try{localStorage.setItem("mowcall_demo_v3",JSON.stringify(DB))}catch(e){}}
 function resetDemo(){try{localStorage.removeItem("mowcall_demo_v3")}catch(e){}load();waiverSweep();resetQuote();toast("Sample data reset");route(true)}
 
-const PLANS={starter:{name:"Junior Boss",price:48,year:528,cap:25},starterplus:{name:"Junior Boss Plus",price:118,year:1298,cap:60},solo:{name:"Monthly Solo",price:148,year:1628,cap:null},crew:{name:"Monthly Crew",price:398,year:4378,cap:null}};const BRAND_LAUNCH=148;
+const PLANS={starter:{name:"Junior Boss",price:48,year:528,cap:25},starterplus:{name:"Rising Boss",price:118,year:1298,cap:60},solo:{name:"Monthly Solo",price:148,year:1628,cap:null},crew:{name:"Monthly Crew",price:398,year:4378,cap:null}};const BRAND_LAUNCH=148;
 const activeCount=()=>DB.customers.filter(c=>c.status==="active").length+DB.extraActive;
 const cust=id=>DB.customers.find(c=>c.id===id);
 const FREQ={weekly:"Weekly",biweekly:"Every other week",once:"One time"};
