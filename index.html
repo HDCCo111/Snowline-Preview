@@ -114,7 +114,7 @@ const SEED = {
   ],
   feedback: [],
   demos: [],
-  affiliate: {code:"SEAN", referrals:[{name:"Northline Snow Co.",plan:"Monthly Solo",payments:3,status:"Paid out",payout:148},{name:"Ridgeway Plow & Lawn",plan:"Pay as you go",payments:1,status:"Payment 1 of 3 cleared",payout:78},{name:"Mike's Driveway Pros",plan:"Season prepay",payments:1,status:"Paid out (season prepay)",payout:148}]},
+  affiliate: {code:"SEAN", referrals:[{name:"Northline Snow Co.",plan:"Monthly Solo",payments:3,status:"Paid out",payout:148},{name:"Ridgeway Plow & Lawn",plan:"Junior Boss Plus",payments:1,status:"Payment 1 of 3 cleared",payout:118},{name:"Mike's Driveway Pros",plan:"Monthly Solo, yearly",payments:1,status:"Paid out (yearly prepay)",payout:148}]},
   inbox: [
     {id:301,name:"Maria Lopez",channel:"Text",handoff:true,reason:"Asked about a cracked mailbox post from last storm",unread:true,at:ago(0.05),msgs:[["in","Hi, your truck clipped our mailbox post last time. Can someone look at it?",ago(0.06)],["ai","Thank you for letting us know, Maria. I'm sorry about that. I've passed this to the owner right now, and he'll reach out to you today.",ago(0.055)]]},
     {id:302,name:"James Carter",channel:"Email",handoff:false,reason:"",unread:false,at:ago(0.8),msgs:[["in","Can you also do the walkway on Saturday?",ago(0.82)],["ai","Yes! Walkway added for Saturday, +$20. Your new total is $140. Reply here if anything changes.",ago(0.8)]]},
@@ -158,7 +158,7 @@ const BRANDS={
    ["Your own branded customer app","✓|free install link, no app store needed","✗|web client portal","✗","✗|web customer portal (paid)","✗"],
    ["Business calls on a confirm/reschedule calendar","✓","✗","✗","✗","✗"],
    ["Same account runs your lawn season","✓|MowCall","✓","✓","✗|snow only","✓"]]},
-  faq:[["What is the QR code for?","It goes on your truck or signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can drive safe, and that a person on your team monitors and approves every conversation."],["Can I use it with one truck?","Yes. It works for a solo operator or a fleet."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about spring?","The same account switches to MowCall for mowing and yard work, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Junior Boss plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account. See our Junior Boss page for parents."],["Can I change plans when the season changes?","Yes, anytime, month to month. Busy winter? Go Monthly. Slow stretch? Drop to Pay as you go or Junior Boss. We'd rather you never pay for more than you use."]]},
+  faq:[["What is the QR code for?","It goes on your truck or signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can drive safe, and that a person on your team monitors and approves every conversation."],["Can I use it with one truck?","Yes. It works for a solo operator or a fleet."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about spring?","The same account switches to MowCall for mowing and yard work, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Junior Boss plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account. See our Junior Boss page for parents."],["Can I change plans when the season changes?","Yes, anytime, month to month. Busy winter? Go Monthly. Slow stretch? Drop to Junior Boss. We'd rather you never pay for more than you use."]]},
  mow:{key:"mow",name:"MowCall",domain:"mowcall.com",who:"lawn care and landscaping crews",
   headline:"Keep the mower running. Your AI handles every customer.",
   sub:"One QR code, one phone number, one inbox. Quotes, deposits and recurring mows get booked while you work.",
@@ -220,62 +220,65 @@ const PHONE_FAQ=[
  ["Do I need an EIN?","Not to use the app. Calls work on any plan with a business line. Texting is the part that needs carrier approval: with an EIN we register you as a standard business. No EIN? We can register you as a sole proprietor (one number, lower daily text limit). An EIN is free from the IRS and takes about 10 minutes online. <a class='underline ice' href='#/blog/ein'>Read: EINs and business texting, explained</a>"],
  ["Can I keep my current business phone number?","Yes. We can move (port) your existing business number into your account so your customers keep calling the number they know, or forward it to your new line. Porting usually takes a couple of weeks, and your old number keeps working until it's done."],
  ["Can the AI use my personal cell number?","It can. We can forward calls and messages to your personal cell. But using a personal number for business means that business activity is tied to you personally, not to a business entity like an LLC that helps separate business risk from your personal assets. We recommend a dedicated business line. This isn't legal advice, so talk to an attorney or accountant about what's right for you. <a class='underline ice' href='#/blog/phone-liability'>Read: personal vs. business phone lines</a>"],
- ["Can I cancel?","Yes. Monthly plans cancel anytime, and you keep everything until the end of the month you paid for. Season prepay gets a full refund within 7 days of signing up. After that, unused months roll over to your next season (MowCall in spring, PlowCall in winter), with the same customers and the same account. Your customer list is always yours, and you can take your business number with you."],
+ ["Can I cancel?","Yes. Monthly plans cancel anytime, and you keep everything until the end of the month you paid for. Yearly plans get a full refund within 7 days of signing up. After that you keep full access for the whole year, and we remind you before it renews so you can cancel in one tap. Your customer list is always yours, and you can take your business number with you."],
  ["What if a storm misses or I can't make it?","Tap \"Can't make it\" on the job. Your customer picks: roll their deposit to the next service, or get an automatic refund to their card. You never handle refunds by hand. Customers can cancel free until you tap \"On the way.\" After that, your trip fee comes out of their deposit."],
  ["Will my customers sign a waiver?","Yes. Every booking includes your service terms and liability waiver, branded with your business name: marking driveway edges, hidden objects, refreezing, and reporting damage within 24 hours. You can add an \"Insured\" badge once you upload your insurance certificate."],
  ["Is there an App Store app?","Every plan includes your own branded customer app that installs from your quote page in one tap, with no app store needed. Want your own listing in the App Store and Google Play? That's a paid add-on, and Apple and Google charge their own yearly developer fees in your business name."],
- ["Do I need a business phone number at all?","Not on Junior Boss: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Junior Boss covers __CAPLOW__; past that, you'll move up to Junior Boss Plus or a plan with a business line). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
-function capLine(){return BR.key==="mow"?"Up to 35 active recurring customers":"Up to 100 jobs a month"}
-function capFix(t){return String(t).replace("__CAP__",capLine()).replace("__CAPLOW__",BR.key==="mow"?"up to 35 active recurring customers":"up to 100 jobs a month")}
+ ["Do I need a business phone number at all?","Not on Junior Boss: customers book through your quote page and app, the AI handles your website chat and email, and calls or texts go to your own phone until you add a business line (Junior Boss covers __CAPLOW__; past that, you move up to Junior Boss Plus (60 customers) or Monthly Solo (no limit, plus your own business line)). On every other plan, a business line is how the AI answers calls and texts for you, and it's included."]];
+function capLine(){return "Up to 25 customers"}
+function capFix(t){return String(t).replace("__CAP__",capLine()).replace("__CAPLOW__","up to 25 customers")}
 const PLANS={
- starter:{name:"Junior Boss",tag:"Side hustle, first business, or a kid running their own business",kids:true,price:48,setup:0,
-  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","Best route order + Google Maps directions","Signed service agreement, renewed yearly for you","CSV export anytime","__CAP__"],
+ starter:{name:"Junior Boss",tag:"Side hustle, first business, or a kid running their own business",kids:true,price:48,year:528,
+  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app, in our clean design with your business name","AI answers your website chat and email","Calls and texts go to your own phone, no business line or EIN needed","Best route order + Google Maps directions","Signed service agreement, renewed yearly for you","CSV export anytime","__CAP__"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
- payg:{name:"Pay as you go",tag:"1 truck, a smaller customer list",price:78,setup:148,
-  bullets:["Everything in Junior Boss","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
-  fine:"Calls work the day your line is set up. Texting turns on after carrier approval."},
- solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,setup:298,season:698,best:true,
-  bullets:["Everything in Pay as you go","500 AI texts + 100 AI call minutes included","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-storm alerts","Custom branding, approved by you","QuickBooks Online sync","Second truck or crew login? $148/mo each (own login + 500 AI texts + 100 AI minutes)"],
-  fine:"Season prepay Nov–Mar: $698 and setup is free."},
- crew:{name:"Monthly Crew",tag:"3 trucks included",price:398,setup:298,season:1898,
-  bullets:["Everything in Monthly Solo","3 trucks included, each with its own crew login","1,500 AI texts + 300 AI call minutes included","+$148/mo per extra truck or login (adds 500 AI texts + 100 AI minutes)","Business call calendar for commercial work","Priority support","Extra AI use billed at Pay-as-you-go rates"],
-  fine:"Season prepay Nov–Mar: $1,898 and setup is free."}
+ starterplus:{name:"Junior Boss Plus",tag:"Growing, not ready for a business line yet",price:118,year:1298,
+  bullets:["Everything in Junior Boss","Up to 60 customers","Same setup, no business line or phone AI","Move up to Monthly Solo anytime"],
+  fine:"Want your own logo and colors? Add Custom Brand Launch."},
+ solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,year:1628,best:true,
+  bullets:["Everything in Junior Boss Plus","No customer limit","Your own business phone number","AI answers calls, texts and DMs","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-season alerts","Custom branding included, approved by you","Monthly AI report: how you did, what to fix, when to switch seasons","QuickBooks Online sync","Second truck or crew login? $148/mo each"],
+  fine:"Includes 500 AI texts and 100 AI call minutes a month."},
+ crew:{name:"Monthly Crew",tag:"3 trucks included",price:398,year:4378,
+  bullets:["Everything in Monthly Solo","3 trucks included, each with its own crew login","Business call calendar for commercial work","Priority support","+$148/mo per extra truck or login"],
+  fine:"Includes 1,500 AI texts and 300 AI call minutes a month."}
 };
+const BRAND_LAUNCH=148;
 let planTab="monthly";
-function paygCost(jobs){return 78+jobs*6*0.08+jobs*1.5*0.38}
 function fleetPrice(t){return t<=1?148:t===2?296:398+(t-3)*148}
+function planPrice(k,yr){const p=PLANS[k];return yr?p.year:p.price}
 function pricingSection(){
-  const shown=planTab==="payg"?["starter","payg"]:["solo","crew"];
+  const yr=planTab==="yearly";
   return `<section id="pricing" class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">Pricing that moves with your season</h2>
-  <p class="muted mt-2 max-w-2xl">Snow and grass don't run on a schedule, so your plan shouldn't either. Switch plans anytime, month to month. We'll tell you when another plan would save you money.</p>
-  <div class="card p-6 mt-6"><div class="font-bold">Start here: which plan fits your month?</div>
+  <p class="muted mt-2 max-w-2xl">One account runs PlowCall in winter and MowCall in summer. No setup fees. Switch plans anytime.</p>
+  <div class="grid sm:grid-cols-2 gap-3 mt-6">
+   <div class="card p-4 text-sm" style="border-color:var(--orange)"><b>Live in 24 hours, or your first month is free.</b> <span class="muted">Your dashboard, quote page, QR code and customer app, ready in a day.</span></div>
+   <div class="card p-4 text-sm"><b>Founding Operator price lock.</b> <span class="muted">The first 100 operators keep their price for life.</span></div></div>
+  <div class="card p-6 mt-4"><div class="font-bold">Start here: which plan fits you?</div>
     <label class="text-sm muted block mt-3">Trucks: <b id="trucksN" class="text-[var(--fg)]">1</b></label>
     <input id="trucksR" type="range" min="1" max="10" value="1" class="w-full mt-2" oninput="calcPlan($('#jobsR').value)">
-    <label class="text-sm muted block mt-3">Jobs you expect this month: <b id="jobsN" class="text-[var(--fg)]">40</b></label>
-    <input id="jobsR" type="range" min="5" max="400" value="40" class="w-full mt-2" oninput="calcPlan(this.value)">
+    <label class="text-sm muted block mt-3">Customers (houses and lots you serve): <b id="jobsN" class="text-[var(--fg)]">20</b></label>
+    <input id="jobsR" type="range" min="5" max="300" value="20" class="w-full mt-2" oninput="calcPlan(this.value)">
     <p id="calcOut" class="mt-3 text-sm"></p></div>
-  <div class="seg mt-6"><button class="${planTab==="payg"?"on":""}" onclick="planTab='payg';refreshPricing()">Pay as you go</button><button class="${planTab==="monthly"?"on":""}" onclick="planTab='monthly';refreshPricing()">Monthly (we've got you covered)</button></div>
-  <div class="grid md:grid-cols-2 gap-5 mt-6">${shown.map(k=>{const p=PLANS[k];return `<div class="card p-6 flex flex-col" ${p.best?'style="border-color:var(--orange)"':""}>
+  <div class="seg mt-6"><button class="${!yr?"on":""}" onclick="planTab='monthly';refreshPricing()">Monthly</button><button class="${yr?"on":""}" onclick="planTab='yearly';refreshPricing()">Yearly · 1 month free</button></div>
+  ${yr?`<p class="muted text-sm mt-3">Yearly covers PlowCall <b>and</b> MowCall all year. Monthly Solo and Crew yearly also get <b>Review Booster free for 3 months</b>.</p>`:""}
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mt-6">${Object.keys(PLANS).map(k=>{const p=PLANS[k];return `<div class="card p-6 flex flex-col" ${p.best?'style="border-color:var(--orange)"':""}>
     ${p.best?`<span class="pill self-start mb-3" style="background:var(--orange);color:oklch(0.15 0.03 255)">Most operators pick this</span>`:""}
     <div class="font-bold text-xl">${p.name}</div><div class="muted text-sm">${p.tag}</div>
-    <div class="mt-4"><span class="display text-4xl">$${p.price}</span><span class="muted">/mo</span>${k==="payg"?`<span class="muted text-sm"> + AI use</span>`:""}</div>
-    <div class="muted text-xs mt-1">${p.setup?`$${p.setup} one-time setup`:"No setup fee"}${p.season?` · ${p.fine}`:""}</div>
+    <div class="mt-4"><span class="display text-4xl">$${yr?p.year.toLocaleString():p.price}</span><span class="muted">/${yr?"yr":"mo"}</span></div>
+    <div class="muted text-xs mt-1">${yr?`Save $${p.price} vs monthly`:"No setup fee"}</div>
     <ul class="mt-5 grid gap-2 text-sm flex-1">${p.bullets.map(b=>`<li class="flex gap-2"><span class="orange">✓</span>${capFix(b)}</li>`).join("")}</ul>
-    ${!p.season?`<p class="muted text-xs mt-4">${p.fine}</p>`:""}
-    <a href="#/start?plan=${k}" class="btn btn-orange mt-5">Get started</a>${p.kids?`<a href="#/kids" class="btn btn-ghost mt-2">For parents: see the Junior Boss page →</a>`:""}</div>`}).join("")}</div>
-  <div class="card p-5 mt-5 flex flex-wrap gap-4 items-center justify-between"><div><div class="font-bold">Junior Boss · $48/mo, no setup fee</div><div class="muted text-sm">For side hustles, first businesses and kids running their own business. Parents hold the account.</div></div><div class="flex flex-wrap gap-2"><a href="#/kids" class="btn btn-ghost">For parents →</a><a href="#/start?plan=starter" class="btn btn-orange">Start Junior Boss</a></div></div>
-
-  <div class="card p-5 mt-4 text-sm" style="border-color:var(--yellow)"><b>Business phone lines, read this first.</b> <span class="muted">On Pay as you go, Solo and Crew, your business number takes calls (and the AI answers them) the same day it's set up. Texting is different: U.S. carriers must approve every business that texts. With an <b>EIN</b>, we register you as a standard business. No EIN? We can register you as a <b>sole proprietor</b> (one number, lower daily text limit). Approval usually takes about 2 business days (up to 7). Until then, your AI covers reminders by call and everything else by email. Junior Boss has no business line, so customers reach you on your own phone. <a class="underline ice" href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Phone number and EIN questions →</a></span></div>
-  <p class="muted text-xs mt-3">One AI text = one AI reply up to 320 characters (2 standard text segments). One AI call minute = one minute your AI is on a call. Regular texts and calls you send yourself are included.</p>
-  <div class="card p-5 mt-4 text-sm"><b>What's the setup fee for?</b> <span class="muted">We want your custom branding perfect before you launch, and you approve it. It also covers registering your business phone line with the carriers. Your dashboard is live within 24 hours of finishing your setup form.</span></div>
+    <p class="muted text-xs mt-4">${p.fine}</p>
+    <a href="#/start?plan=${k}&billing=${yr?"yearly":"monthly"}" class="btn btn-orange mt-5">Get started</a>${p.kids?`<a href="#/kids" class="btn btn-ghost mt-2">For parents: see the Junior Boss page →</a>`:""}</div>`}).join("")}</div>
+  <div class="card p-5 mt-5 text-sm" style="border-color:var(--yellow)"><b>Business phone lines, read this first.</b> <span class="muted">On Monthly Solo and Crew, your business number takes calls (and the AI answers them) the same day it's set up. Texting is different: U.S. carriers must approve every business that texts. With an <b>EIN</b>, we register you as a standard business. No EIN? We can register you as a <b>sole proprietor</b> (one number, lower daily text limit). Approval usually takes about 2 business days (up to 7). Until then, your AI covers reminders by call and everything else by email. Junior Boss and Junior Boss Plus have no business line, so customers reach you on your own phone. <a class="underline ice" href="javascript:void(0)" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Phone number and EIN questions →</a></span></div>
+  <div class="card p-5 mt-4 text-sm"><b>Custom branding.</b> <span class="muted">Included on Monthly Solo and Crew. On Junior Boss and Junior Boss Plus you start right away on our clean design with your business name, or add <b>Custom Brand Launch</b> for $${BRAND_LAUNCH} one time: $${BRAND_LAUNCH/2} today and $${BRAND_LAUNCH/2} when you approve your design. We want your custom branding perfect before you launch, so you approve it first.</span></div>
   </section>`;
 }
-function refreshPricing(){const el=$("#pricing");if(el){el.outerHTML=pricingSection();calcPlan(40)}}
-function calcPlan(n){n=+n;const t=+(($("#trucksR")||{}).value||1);const o=$("#calcOut");if(!o)return;$("#jobsN").textContent=n;$("#trucksN").textContent=t;
-  const texts=Math.round(n*6),mins=Math.round(n*1.5);let msg;
-  if(t===1){const pg=paygCost(n);msg=pg<148?`<b>Pay as you go</b> at about $${Math.round(pg)} this month. Monthly Solo would be $148.`:`<b>Monthly Solo</b> at $148. Pay as you go would run about $${Math.round(pg)}.`}
-  else msg=t===2?`<b>Monthly Solo + 1 extra truck</b> at $296/mo.`:`<b>Monthly Crew</b> at $${fleetPrice(t)}/mo for ${t} trucks${t>3?` (3 included + ${t-3} extra at $148)`:""}.`;
-  o.innerHTML=`${n} jobs this month is about <b>${texts.toLocaleString()} AI texts</b> and <b>${mins.toLocaleString()} AI call minutes</b> for the month. Your best deal: ${msg}`}
+function refreshPricing(){const el=$("#pricing");if(el){el.outerHTML=pricingSection();calcPlan(20)}}
+function calcPlan(n){n=+n;const t=+(($("#trucksR")||{}).value||1);const o=$("#calcOut");if(!o)return;$("#jobsN").textContent=n;$("#trucksN").textContent=t;let msg;
+  if(t>1)msg=t===2?`<b>Monthly Solo + 1 extra truck</b> at $296/mo.`:`<b>Monthly Crew</b> at $${fleetPrice(t)}/mo for ${t} trucks${t>3?` (3 included + ${t-3} extra at $148)`:""}.`;
+  else if(n<=25)msg=`<b>Junior Boss</b> at $48/mo. Want the AI answering your calls and texts on a business line? That's Monthly Solo at $148.`;
+  else if(n<=60)msg=`<b>Junior Boss Plus</b> at $118/mo, or for $30 more, <b>Monthly Solo</b> adds your business line, phone AI and custom branding.`;
+  else msg=`<b>Monthly Solo</b> at $148/mo. No customer limit.`;
+  o.innerHTML=`${n} customers and ${t} truck${t>1?"s":""}. Your best fit: ${msg}`}
 
 /* ---------- LANDING ---------- */
 let slideIdx=0,slideTimer=null;
@@ -299,6 +302,7 @@ function landing(){
   <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">How it works</h2>
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">${B.how.map((s,i)=>`<div class="card p-6"><div class="display text-3xl orange">0${i+1}</div><h3 class="font-bold mt-4">${s[0]}</h3><p class="muted mt-2 text-sm">${s[1]}</p></div>`).join("")}</div></section>
   <section id="demo" class="max-w-4xl mx-auto px-5 py-16"><div class="card p-6 md:p-10" id="demobox">${demoGate()}</div></section>
+  <section class="max-w-4xl mx-auto px-5 pb-8"><div class="card p-6 md:p-10" id="seasonDemo">${seasonDemo()}</div></section>
   <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">What you get</h2>
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">${B.features.map(f=>`<div class="card p-6"><h3 class="font-bold">${f[0]}</h3><p class="muted mt-2 text-sm">${f[1]}</p>${f[2]?`<span class="pill mt-3 inline-block" style="background:var(--muted);color:var(--ice)">Set up with your Boss Growth Machine account</span>`:""}</div>`).join("")}</div></section>
   <section class="max-w-6xl mx-auto px-5 py-16 grid md:grid-cols-2 gap-6">
@@ -316,10 +320,28 @@ function landing(){
   <section id="faq" class="max-w-3xl mx-auto px-5 py-16"><h2 class="display text-3xl">Questions</h2><div class="mt-6 space-y-3">
     ${[...PHONE_FAQ,...B.faq].map(q=>`<details class="card p-5"><summary class="font-bold cursor-pointer">${q[0]}</summary><p class="muted mt-3">${capFix(q[1])}</p></details>`).join("")}</div></section>
   ${footer()}`;
-  showSlide(0);clearInterval(slideTimer);slideTimer=setInterval(()=>showSlide(slideIdx+1),5000);calcPlan(40);
+  showSlide(0);clearInterval(slideTimer);slideTimer=setInterval(()=>showSlide(slideIdx+1),5000);calcPlan(20);
   if(location.hash.includes("demo"))document.getElementById("demo").scrollIntoView();
   if(location.hash.includes("pricing"))document.getElementById("pricing").scrollIntoView();
 }
+let SD={on:"plow",step:"switch"};
+function seasonDemo(){const mow=SD.on==="mow",o=DB.operator;
+  const quote=mow?[["Small yard","$38"],["Medium yard","$48"],["Edging","$12"]]:[["1-car driveway","$45"],["2-car driveway","$65"],["Walkway","$20"]];
+  return `<h2 class="display text-3xl">One account. Both seasons.</h2><p class="muted mt-2">Same customers, same phone number, same QR code. Flip one switch and your business goes from plowing to mowing.</p>
+  <div class="seg mt-5"><button class="${SD.step==="switch"?"on":""}" onclick="SD.step='switch';$('#seasonDemo').innerHTML=seasonDemo()">Switch seasons</button><button class="${SD.step==="yearly"?"on":""}" onclick="SD.step='yearly';$('#seasonDemo').innerHTML=seasonDemo()">Pay yearly</button></div>
+  ${SD.step==="switch"?`<div class="grid md:grid-cols-2 gap-6 mt-6 items-start"><div>
+   <div class="inline-flex rounded-full p-1" style="background:var(--muted)">${[["plow","❄️ PlowCall"],["mow","🌱 MowCall"]].map(([k,l])=>`<button class="px-4 py-2 rounded-full text-sm font-bold" style="${SD.on===k?"background:var(--orange);color:#111":""}" onclick="SD.on='${k}';$('#seasonDemo').innerHTML=seasonDemo()">${l}</button>`).join("")}</div>
+   <ul class="grid gap-2 text-sm mt-5"><li>✓ Your quote page and app swap to ${mow?"lawn":"snow"} services and prices</li><li>✓ Your customer list stays the same: houses, history, consent, payment info</li><li>✓ Your AI switches to its ${mow?"lawn":"snow"} script on the same number</li><li>✓ In March and November, your AI checks the forecast for your ZIP codes and offers to run both at once</li>${mow?"<li>✓ First time on MowCall: set lawn prices (or tell your AI), recurring plans and your service agreement</li>":""}</ul></div>
+   <div class="rounded-[2rem] p-3 mx-auto w-full max-w-[280px]" style="background:#111;border:2px solid #333"><div class="rounded-[1.5rem] p-4" style="background:${mow?"#eaf7ee":"#eef4fb"};color:#111;min-height:360px">
+    <div class="text-xs text-gray-500 text-center">${mow?"MowCall":"PlowCall"} · ${o.business_name}</div><div class="font-bold text-lg mt-3">${mow?"Get your lawn price":"Get your plow price"}</div>
+    <div class="grid gap-2 mt-3">${quote.map(([a,b])=>`<div class="flex justify-between bg-white rounded-xl px-3 py-2 text-sm"><span>${a}</span><b>${b}</b></div>`).join("")}</div>
+    <div class="mt-4 rounded-xl px-3 py-3 text-center text-sm font-bold" style="background:${mow?"#2f8f46":"#ff7a1a"};color:#fff">${mow?"Book weekly mowing":"Book my plow"}</div>
+    <div class="text-[11px] text-gray-500 mt-3 text-center">Same QR code and link all year</div></div></div></div>`
+  :`<div class="grid md:grid-cols-2 gap-6 mt-6 items-start"><div class="card p-5"><div class="font-bold">Monthly Solo, yearly</div>
+    <div class="flex justify-between mt-3 text-sm"><span>12 months of PlowCall + MowCall</span><span>$1,776</span></div><div class="flex justify-between text-sm orange"><span>1 month free</span><span>−$148</span></div>
+    <div class="mt-3 p-3 rounded-xl flex justify-between" style="background:color-mix(in oklab,var(--orange) 16%,var(--card))"><b>Due today</b><b class="display text-2xl">$1,628</b></div>
+    <p class="muted text-xs mt-3">Renews ${fmtDate(new Date(Date.now()+365*864e5))}. We remind you 30 days before, with a one-tap cancel. Full refund within 7 days.</p></div>
+    <ul class="grid gap-2 text-sm"><li>✓ Covers both seasons, so you never re-sign up in spring</li><li>✓ Review Booster free for 3 months, then $48/mo if you keep it</li><li>✓ Custom branding included</li><li>✓ Founding Operator price lock</li></ul></div>`}`}
 function demoGate(){
   const B=BR;
   if(DB.demoUnlocked)return `<h2 class="display text-3xl">The 2-minute demo</h2>
@@ -378,6 +400,7 @@ function kidsPage(){
     ${card("You, the parent (account holder)",`<ul class="grid gap-2 list-disc pl-5"><li>Own the account and sign the terms</li><li>Payments and deposits go to <b>your</b> bank or Stripe account</li><li>Approve prices before they go live</li><li>Pick the neighborhoods (ZIP codes) they can work in</li><li>Set work hours, like after school and weekends only</li><li>Approve every new customer before the first job</li><li>See every message, job and dollar from your own login</li></ul>`)}
     ${card("Your kid (the Junior Boss)",`<ul class="grid gap-2 list-disc pl-5"><li>Shows up and does the work</li><li>Marks jobs "on the way" and "done" from their own login</li><li>Snaps before-and-after photos</li><li>Sets goals and watches their earnings grow</li><li>Learns pricing, customer service and showing up on time</li><li>Can't change prices, payouts or service areas without you</li></ul>`)}
    </div>
+   <div class="card p-5 mt-5 flex flex-wrap gap-4 items-center justify-between"><div><div class="font-bold">Junior Boss · $48/mo, no setup fee</div><div class="muted text-sm">Up to 25 customers. Parents hold the account. Growing fast? Junior Boss Plus covers up to 60.</div></div><a href="#/start?plan=starter" class="btn btn-orange">Start Junior Boss</a></div>
    <div class="card p-6 mt-5 text-sm"><b>Customer messages stay safe.</b> <span class="muted">Customers book through your Junior Boss's page and the AI assistant answers them, so your child's personal number is never shared. On Junior Boss, anything that needs a person comes to your phone, not theirs.</span></div></section>
   <section class="max-w-5xl mx-auto px-5 py-12"><h2 class="display text-3xl">What age is right?</h2>
    <div class="grid md:grid-cols-3 gap-5 mt-6">
@@ -420,17 +443,25 @@ function customerMsgs(){const o=DB.operator,first="Jordan",sample={name:"Jordan 
   ["Can't make it / storm missed (text + email)",cantMsg(sample,"cancel")],
   ["Review request (Review Booster add-on)",`${o.business_name}: Thanks again for choosing us, ${first}! If we did a good job, would you leave us a quick Google review? It takes 30 seconds and helps a small local business a lot: ${o.review_link||"g.page/review"} Reply STOP to opt out.`],
   ["Reschedule (business call)",rescheduleMsg({contact:"Linda Park",property:"Medical office lot (60 spaces)",location:"Cincinnati, 45238",requested:slotAt(1,"13:30")},slotAt(2,"13:00"))],
+  ["Past due: day 1",`${o.business_name}: Hi ${first}, your balance of $65 for snow removal at 412 Elm St is past due. Pay here: ${BR.domain}/pay/demo. Questions? Just reply.`],
+  ["Past due: day 3",`${o.business_name}: Friendly reminder, ${first}: your $65 balance is still open. Pay in one tap: ${BR.domain}/pay/demo. Reply if you need a different arrangement.`],
+  ["Past due: day 5",`${o.business_name}: Hi ${first}, this is our last reminder about your $65 balance. Please pay today so we can keep you on our route: ${BR.domain}/pay/demo`],
   ["Business request received",`${o.business_name}: Thanks for requesting a call about your property! We'll confirm your time shortly. Our crew is out working, so our AI assistant helps us reply fast, and a real person approves every conversation.`]]}
 function cantMsg(j,kind){const o=DB.operator,first=(j.name||"").split(" ")[0];return kind==="delay"?`${o.business_name}: Hi ${first}, we're running behind because of the storm. New time for ${j.address}: later today. Reply here if that doesn't work.`:`${o.business_name}: Hi ${first}, we can't make it to ${j.address} this time (the storm didn't reach our ${DB.pricing.trigger_in||2}-inch start or our route changed). Your deposit is safe. Tap to choose: roll it to your next service (non-refundable once rolled) or get an automatic refund to your card: ${BR.domain}/q/${o.slug}/deposit`}
 function tabPreview(){const m=customerMsgs();
   $("#tab").innerHTML=`<div class="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
    <div><h2 class="font-bold text-lg">See what your customers see</h2><p class="muted text-sm mt-1">Every message the system sends for you, with your business name. Tap one to see it on the phone, or play the whole journey.</p>
     <div class="flex flex-wrap gap-2 mt-4"><button class="btn btn-orange !min-h-[42px] text-sm" onclick="playJourney()">▶ Play the whole customer journey</button><a href="#/q/${DB.operator.slug}" class="btn btn-ghost !min-h-[42px] text-sm">Try my quote page as a customer</a><button class="btn btn-ghost !min-h-[42px] text-sm" onclick="toast('Test texts sent to your cell')">Text these to my phone</button></div>
-    <div class="grid gap-2 mt-4">${m.map(([t,b],i)=>`<button class="card p-4 text-left" onclick="showMsg(${i})"><div class="font-bold text-sm">${t}</div><div class="muted text-sm mt-1 line-clamp-2">${b}</div></button>`).join("")}</div>
+    <p class="muted text-xs mt-3">Turn any message off to save on texts. Each switch tells you what your customers stop getting. Messages the law requires (first-reply AI notice, opt-out replies) always stay on.</p>
+    <div class="grid gap-2 mt-3">${m.map(([t,b],i)=>{const lock=MSG_LOCK.some(x=>t.startsWith(x)),off=!lock&&msgOff()[t];return `<div class="card p-4 flex gap-3 items-start ${off?"opacity-60":""}"><button class="text-left flex-1" onclick="showMsg(${i})"><div class="font-bold text-sm">${t}</div><div class="muted text-sm mt-1 line-clamp-2">${b}</div>${off?`<div class="text-xs mt-2" style="color:var(--yellow)">Off: ${msgWhy(t)}</div>`:""}</button>${lock?'<span class="chip whitespace-nowrap">Always on</span>':`<label class="flex items-center gap-2 text-xs whitespace-nowrap"><input type="checkbox" class="w-5 h-5" ${off?"":"checked"} onchange="toggleMsg(${i},this.checked)"> ${off?"Off":"On"}</label>`}</div>`}).join("")}</div>
     <div class="todo mt-4">IN THE REAL APP: "Text these to my phone" sends each message to the operator's cell from their business line (after texting is approved), so they get the exact customer experience.</div></div>
    <div class="rounded-[2rem] p-3 w-full max-w-[320px] mx-auto lg:sticky lg:top-16" style="background:#111;border:2px solid #333"><div class="rounded-[1.5rem] p-3 flex flex-col" style="background:#f2f2f7;min-height:520px;color:#111">
     <div class="text-center text-xs text-gray-500 mb-2">${DB.operator.business_name}</div><div id="sms" class="flex-1 grid gap-2 content-start text-[13px] overflow-auto" style="max-height:470px"></div><div id="smsBtns"></div></div></div></div>`;
   showMsg(0)}
+const MSG_LOCK=["First reply","Booking confirmed"];
+function msgOff(){DB.operator.msgOff=DB.operator.msgOff||{};return DB.operator.msgOff}
+function msgWhy(t){if(/Job done/.test(t))return "customers won't hear their job is finished or get your thank-you. This is part of the customer experience that brings them back.";if(/On the way/.test(t))return "customers won't know you're coming, so more cars stay in the driveway.";if(/reminder/i.test(t))return "more no-shows and blocked driveways.";if(/Review/.test(t))return "no review requests go out, so fewer new Google reviews.";if(/Past due/.test(t))return "you'll chase this balance yourself.";if(/alert/i.test(t))return "opted-in customers won't hear about storms or offers, so fewer repeat bookings.";return "customers won't get this message."}
+function toggleMsg(i,on){const t=customerMsgs()[i][0];if(!on){if(!confirm(`Turn off "${t}"? ${msgWhy(t)[0].toUpperCase()+msgWhy(t).slice(1)}`)){tabPreview();return}msgOff()[t]=true}else delete msgOff()[t];save();toast(on?"Turned on":"Turned off. Your monthly report will show how it affects your customers.");tabPreview()}
 function showMsg(i){$("#sms").innerHTML="";const[t,b]=customerMsgs()[i];const l=document.createElement("div");l.className="text-[10px] text-gray-500 text-center";l.textContent=t;$("#sms").appendChild(l);smsBubble("in",b)}
 function playJourney(){const m=customerMsgs().filter(x=>!/Reschedule|Business request|before texting|Can't make it/.test(x[0]));$("#sms").innerHTML="";let i=0;const step=()=>{if(!$("#sms")||i>=m.length)return;const l=document.createElement("div");l.className="text-[10px] text-gray-500 text-center mt-1";l.textContent=m[i][0];$("#sms").appendChild(l);smsBubble("in",m[i][1]);i++;setTimeout(step,1300)};step()}
 
@@ -460,7 +491,7 @@ const POSTS=[
   body:`<p>Snow season ends. Your customers don't. When spring comes, your PlowCall account switches to MowCall with one tap.</p>
   <h3>What stays the same</h3><p>Your customer list, your QR codes, your dashboard, your AI assistant and your phone number.</p>
   <h3>What changes</h3><p>Your services and prices switch to mowing, cleanups and yard work. Storm alerts become rain-delay alerts. Seasonal snow memberships become weekly or every-other-week mowing plans.</p>
-  <h3>Your plan moves with you</h3><p>Slow stretch between seasons? Drop to Pay as you go or Junior Boss. Busy again? Go back to Monthly. Change anytime, month to month.</p>`},
+  <h3>Your plan moves with you</h3><p>Slow stretch between seasons? Drop to Junior Boss. Busy again? Go back to Monthly. Change anytime, month to month.</p>`},
  {slug:"ai-honest",tag:"How it works",title:"Why we tell your customers you use AI",excerpt:"Being upfront builds trust, keeps you safe and still gets the job booked.",
   body:`<p>Every customer gets one clear message the first time they reach you: you're out working with your hands full, so an AI assistant helps you reply fast, and a real person monitors and approves every conversation.</p>
   <h3>It builds trust</h3><p>People don't mind AI. They mind being tricked. Saying it upfront and following through with fast, accurate answers makes you look more professional, not less.</p>
@@ -481,18 +512,21 @@ function suSave(f){new FormData(f).forEach((v,k)=>{if(typeof v==="string")SU.d[k
 function suBack(){if(SU.step<=1){location.hash=BR.key==="mow"?"#/mow?pricing":"#/?pricing";return}SU.step--;window.scrollTo(0,0);startStep()}
 function startPage(){
   const q=new URLSearchParams(location.hash.split("?")[1]||"");const k=PLANS[q.get("plan")]?q.get("plan"):"solo";
-  if(SU.plan!==k){SU={step:1,plan:k,billing:"monthly",d:{}}}
+  if(SU.plan!==k){SU={step:1,plan:k,billing:q.get("billing")==="yearly"?"yearly":"monthly",brand:false,d:{}}}
   startStep();
 }
 function suSteps(){const names=["Your business","Your links","Checkout","Your account"];return `<div class="flex gap-1 mt-2">${names.map((n,i)=>`<div class="flex-1"><div class="h-1.5 rounded-full" style="background:${i<SU.step?"var(--orange)":"var(--muted)"}"></div><div class="text-[11px] muted mt-1 hidden sm:block">${n}</div></div>`).join("")}</div>`}
-function dueToday(){const p=PLANS[SU.plan];if(SU.billing==="season"&&p.season)return {today:p.season,lines:[[`${p.name} season prepay (Nov–Mar)`,p.season],["One-time setup","Free"]],next:null};
-  return {today:p.price+(p.setup||0),lines:[[`${p.name}, first month`,p.price],...(p.setup?[["One-time setup",p.setup]]:[])],next:p.price}}
+function needsPhone(k){return k==="solo"||k==="crew"}
+function dueToday(){const p=PLANS[SU.plan],yr=SU.billing==="yearly",bl=SU.brand&&!needsPhone(SU.plan);
+  const lines=[[yr?`${p.name}, 12 months (PlowCall + MowCall)`:`${p.name}, first month`,yr?p.price*12:p.price],...(yr?[["1 month free",-p.price]]:[]),["Setup","Free"],...(bl?[["Custom Brand Launch, first half",BRAND_LAUNCH/2]]:[])];
+  const today=(yr?p.year:p.price)+(bl?BRAND_LAUNCH/2:0);
+  return {today,lines,next:yr?null:p.price,yr,bl,bonus:yr&&needsPhone(SU.plan)}}
 function fmtDate(d){return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})}
 function startStep(){
-  const p=PLANS[SU.plan],phone=SU.plan!=="starter",d=SU.d;
+  const p=PLANS[SU.plan],phone=needsPhone(SU.plan),d=SU.d;
   const back=`<button type="button" class="btn btn-ghost" onclick="suBack()">← Back</button>`;
   const planBox=`<div class="card p-5"><div class="flex justify-between items-baseline"><div><div class="muted text-xs">Your plan</div><div class="font-bold text-lg">${p.name}</div></div><div><span class="display text-2xl">$${p.price}</span><span class="muted">/mo</span></div></div>
-    <div class="flex justify-between items-center mt-2 text-sm"><span class="muted">${p.setup?`+ $${p.setup} one-time setup`:"No setup fee"}</span><a href="#${BR.key==="mow"?"/mow":"/"}?pricing" class="underline ice">Change plan</a></div>${p.kids?`<a href="#/kids" class="underline ice text-sm mt-2 inline-block">How Junior Boss works for parents →</a>`:""}</div>`;
+    <div class="flex justify-between items-center mt-2 text-sm"><span class="muted">No setup fee${p.year?` · or $${p.year.toLocaleString()}/yr`:""}</span><a href="#${BR.key==="mow"?"/mow":"/"}?pricing" class="underline ice">Change plan</a></div>${p.kids?`<a href="#/kids" class="underline ice text-sm mt-2 inline-block">How Junior Boss works for parents →</a>`:""}</div>`;
   let body="";
   if(SU.step===1) body=`${planBox}
    <h1 class="display text-3xl mt-8">Tell us about your business</h1><p class="muted mt-2">Two quick steps, then checkout. Prices, service areas and payments come after, inside your dashboard.</p>
@@ -511,21 +545,25 @@ function startStep(){
     <label class="text-sm">Facebook page<span class="muted"> (optional)</span>${suField("fb","https://facebook.com/yourbusiness","url")}</label>
     <label class="text-sm">Instagram<span class="muted"> (optional)</span>${suField("ig","https://instagram.com/yourbusiness","url")}</label>
     <label class="text-sm">Google Business Profile<span class="muted"> (optional)</span>${suField("gbp","Link to your Google Business Profile","url")}</label>
+    ${!phone?`<label class="choice flex gap-3 items-start ${SU.brand?"on":""}"><input type="checkbox" class="mt-1 w-5 h-5" ${SU.brand?"checked":""} onchange="SU.brand=this.checked;this.closest('label').classList.toggle('on',this.checked)"><span><b>Add Custom Brand Launch ($${BRAND_LAUNCH} one time)</b><span class="muted text-sm block">Your logo and colors on your pages and app. $${BRAND_LAUNCH/2} today, $${BRAND_LAUNCH/2} when you approve your design. Skip it and you start on our clean design with your business name. Included free on Monthly Solo and Crew.</span></span></label>`:`<p class="muted text-xs">Custom branding is included on ${p.name}. We send you the design to approve before launch.</p>`}
     ${suField("ref","Referral code (if someone sent you)")}
     <div class="flex gap-3 justify-between mt-2">${back}<button class="btn btn-orange">Next: checkout →</button></div></form>`;
   if(SU.step===3){const t=dueToday(),nx=new Date(Date.now()+30*864e5);
    body=`<h1 class="display text-3xl">Checkout</h1>
-   ${p.season?`<div class="grid grid-cols-2 gap-2 mt-6"><button type="button" class="choice ${SU.billing==="monthly"?"on":""}" onclick="SU.billing='monthly';startStep()"><b>Pay monthly</b><div class="muted text-xs">$${p.price}/mo, cancel anytime</div></button><button type="button" class="choice ${SU.billing==="season"?"on":""}" onclick="SU.billing='season';startStep()"><b>Prepay the season</b><div class="muted text-xs">$${p.season}, setup free</div></button></div>`:""}
-   <div class="card p-6 mt-6"><div class="grid gap-2 text-sm">${t.lines.map(l=>`<div class="flex justify-between"><span>${l[0]}</span><span>${typeof l[1]==="number"?"$"+l[1]:l[1]}</span></div>`).join("")}</div>
-    <div class="mt-4 p-4 rounded-xl flex justify-between items-baseline" style="background:color-mix(in oklab,var(--orange) 16%,var(--card))"><b class="text-lg">Due today</b><span class="display text-3xl orange">$${t.today}</span></div>
-    ${t.next?`<div class="mt-3 p-4 rounded-xl flex justify-between items-baseline" style="background:var(--muted)"><span><b>Next payment</b><span class="muted text-sm block">${fmtDate(nx)}, then every month</span></span><span class="display text-2xl">$${t.next}</span></div>
-    <p class="muted text-xs mt-3">Today you pay $${t.today}${p.setup?` (your first month plus the one-time $${p.setup} setup)`:" for your first month"}. Your next charge is $${t.next} on ${fmtDate(nx)}. Cancel anytime before then and you won't be charged again.</p>`
-    :`<p class="muted text-xs mt-3">Today you pay $${t.today} for the whole season (November through March). Nothing else is due this season. Full refund within 7 days; after that, unused months roll over to your next season.</p>`}</div>
+   <div class="grid grid-cols-2 gap-2 mt-6"><button type="button" class="choice ${!t.yr?"on":""}" onclick="SU.billing='monthly';startStep()"><b>Pay monthly</b><div class="muted text-xs">$${p.price}/mo, cancel anytime</div></button><button type="button" class="choice ${t.yr?"on":""}" onclick="SU.billing='yearly';startStep()"><b>Pay yearly</b><div class="muted text-xs">$${p.year.toLocaleString()}/yr, 1 month free, both seasons</div></button></div>
+   <div class="card p-6 mt-6"><div class="grid gap-2 text-sm">${t.lines.map(l=>`<div class="flex justify-between"><span>${l[0]}</span><span>${typeof l[1]==="number"?(l[1]<0?"−$"+(-l[1]).toLocaleString():"$"+l[1].toLocaleString()):l[1]}</span></div>`).join("")}</div>
+    <div class="mt-4 p-4 rounded-xl flex justify-between items-baseline" style="background:color-mix(in oklab,var(--orange) 16%,var(--card))"><b class="text-lg">Due today</b><span class="display text-3xl orange">$${t.today.toLocaleString()}</span></div>
+    ${t.next?`<div class="mt-3 p-4 rounded-xl flex justify-between items-baseline" style="background:var(--muted)"><span><b>Next payment</b><span class="muted text-sm block">${fmtDate(nx)}, then every month</span></span><span class="display text-2xl">$${t.next}</span></div>`
+    :`<div class="mt-3 p-4 rounded-xl flex justify-between items-baseline" style="background:var(--muted)"><span><b>Renews</b><span class="muted text-sm block">${fmtDate(new Date(Date.now()+365*864e5))}. We remind you 30 days before.</span></span><span class="display text-2xl">$${p.year.toLocaleString()}</span></div>`}
+    ${t.bl?`<div class="mt-3 p-4 rounded-xl flex justify-between items-baseline" style="background:var(--muted)"><span><b>When you approve your design</b><span class="muted text-sm block">Custom Brand Launch, second half</span></span><span class="display text-2xl">$${BRAND_LAUNCH/2}</span></div>`:""}
+    <p class="muted text-xs mt-3">Today you pay $${t.today.toLocaleString()}. ${t.yr?`That covers PlowCall and MowCall for 12 months. Full refund within 7 days, then you keep access all year.`:`Your next charge is $${t.next} on ${fmtDate(nx)}. Cancel anytime before then and you won't be charged again.`} No setup fee.</p>
+    ${t.bonus?`<p class="text-sm mt-3"><b class="orange">Bonus:</b> Review Booster free for 3 months, then $48/mo only if you keep it.</p>`:""}
+    <p class="text-sm mt-3"><b>Live in 24 hours, or your first month is free.</b> <span class="muted">Founding Operator price lock included.</span></p></div>
    <div class="card p-5 mt-4 grid gap-3"><div class="font-bold">Pay with</div><label class="choice flex gap-2"><input type="radio" name="pm" checked> Bank account (preferred)</label><label class="choice flex gap-2"><input type="radio" name="pm"> Card</label>
     <div class="todo">IN THE REAL APP: secure checkout here (bank account first, card accepted). Show the same "Due today" and "Next payment" lines on the payment screen and the receipt.</div></div>
    <form id="suf" class="mt-4 grid gap-3"><label class="flex gap-3 text-sm muted items-start"><input type="checkbox" required class="mt-1 w-5 h-5"><span>I agree to the Terms [waiting on attorney]. I'm 18 or older, or a parent or guardian signing up for my child's business.</span></label>
-    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" name="aff" checked class="mt-1 w-5 h-5"><span>Make me an affiliate too. I'll earn one month of my referral's plan for every operator I refer, paid after their 3rd monthly payment clears (or right away on a season prepay).</span></label>
-    <div class="flex gap-3 justify-between mt-2">${back}<button class="btn btn-orange text-lg">Pay $${t.today} today</button></div></form>`}
+    <label class="flex gap-3 text-sm muted items-start"><input type="checkbox" name="aff" checked class="mt-1 w-5 h-5"><span>Make me an affiliate too. I'll earn one month of my referral's plan for every operator I refer on Junior Boss Plus or above, plus half of any Custom Brand Launch. Paid after their 3rd monthly payment clears, or right away on a yearly plan.</span></label>
+    <div class="flex gap-3 justify-between mt-2">${back}<button class="btn btn-orange text-lg">Pay $${t.today.toLocaleString()} today</button></div></form>`}
   if(SU.step===4) body=`<div class="card p-5 text-sm" style="border-color:var(--green,#22c55e)"><b>Payment received. Thank you!</b> <span class="muted">Your receipt is on its way to ${d.email||"your email"}.</span></div>
    <h1 class="display text-3xl mt-8">Create your operator account</h1><p class="muted mt-2">This is how you'll log in to your dashboard.</p>
    <form id="suf" class="card p-5 grid gap-3 mt-6">${suField("email","Email","email",1)}<input class="input" type="password" placeholder="Create a password" required minlength="8">
@@ -561,35 +599,54 @@ const STATUSES=["New","Quoted","Deposit Paid","Booked","Done","Cancelled"];
 let jobFilter="All";
 function dashboard(tab){
   const o=DB.operator;
-  $("#app").innerHTML=`${header(`<div class="flex items-center gap-3"><span class="text-sm muted hidden sm:inline">${o.business_name}</span><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
+  $("#app").innerHTML=`${header(`<div class="flex items-center gap-3">${seasonSwitch()}<span class="text-sm muted hidden lg:inline">${o.business_name}</span><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a><a href="#/login" class="btn btn-ghost text-sm min-h-[40px]">Log out</a></div>`)}
   <main class="max-w-5xl mx-auto px-4 py-6">
     <nav class="scroll-x flex gap-2 pb-2">${(obDone()<OB.length?[["setup",`Finish setup (${obDone()}/${OB.length})`],...TABS]:[...TABS,["setup","Setup"]]).map(t=>`<a href="#/dashboard/${t[0]}" class="tab ${t[0]===tab?"on":""}">${t[1]}</a>`).join("")}</nav>
     <div id="tab" class="mt-5"></div></main>
   <button onclick="talkDlg()" class="btn btn-orange fixed bottom-5 right-5 z-40 shadow-lg rounded-full">🎙️ Talk to your AI</button>`;
   ({setup:tabSetup,jobs:tabJobs,inbox:tabInbox,pricing:tabPricing,areas:tabAreas,partners:tabPartners,link:tabLink,preview:tabPreview,feedback:tabFeedback,affiliate:tabAffiliate,settings:tabSettings,plan:tabPlan}[tab]||tabJobs)();
 }
-function planLabel(){const k=DB.operator.plan||"starter";return ({starter:"Junior Boss · $48",starterplus:"Junior Boss Plus · $118",payg:"Pay as you go · $78",solo:"Monthly Solo · $148",crew:"Monthly Crew · $398"})[k]||"Junior Boss · $48"}
+function planLabel(){const k=DB.operator.plan||"starter",p=PLANS[k]||PLANS.starter,yr=DB.operator.billing==="yearly";return `${p.name} · $${yr?p.year.toLocaleString()+"/yr":p.price+"/mo"}`}
+/* ---------- SEASON SWITCH (one account, PlowCall <-> MowCall) ---------- */
+function seasonOf(){return DB.operator.season||"plow"}
+function seasonSwitch(){const s=seasonOf();return `<div class="inline-flex rounded-full p-1 text-xs" style="background:var(--muted)">${[["plow","❄️ PlowCall"],["both","Both"],["mow","🌱 MowCall"]].map(([k,l])=>`<button class="px-3 py-1.5 rounded-full font-bold" style="${s===k?"background:var(--orange);color:#111":""}" onclick="setSeason('${k}')">${l}</button>`).join("")}</div>`}
+function setSeason(k){const o=DB.operator;if(k!=="plow"&&!o.mowReady){mowWizard(k);return}o.season=k;save();setBrand(k==="mow"?"mow":"plow");toast(k==="both"?"Running PlowCall and MowCall together":`Switched to ${k==="mow"?"MowCall":"PlowCall"}. Same customers, same number.`);route()}
+function mowWizard(k){partnerDlg(`<div class="flex justify-between items-start"><h3 class="display text-2xl">Turn on MowCall</h3><button onclick="jobdlg.close()" class="text-2xl muted px-2">×</button></div>
+  <p class="muted text-sm mt-2">Same account, same customers, same phone number. Three quick things and you're mowing:</p>
+  <ol class="grid gap-3 mt-4 text-sm list-decimal pl-5"><li><b>Lawn prices.</b> Small, medium and large yard, plus edging and cleanup. Or tap "Tell your AI" and say them.</li><li><b>Recurring plans.</b> Weekly or every other week, billed per visit or flat monthly.</li><li><b>Your lawn service agreement.</b> Customers sign it once, and it renews yearly for you.</li></ol>
+  <label class="flex gap-3 text-sm items-start mt-4"><input id="mwText" type="checkbox" checked class="mt-1 w-5 h-5"><span>Text my past customers who opted in to offers: "We're mowing now. Book your spring service." <span class="muted block text-xs">Only to customers who checked the offers box. Sent 9am–8pm their time, never more than 3 a day.</span></span></label>
+  <div class="grid gap-2 mt-5"><button class="btn btn-orange" onclick="DB.operator.mowReady=true;save();jobdlg.close();setSeason('${k}');talkDlg(true)">Tell my AI my lawn prices</button><button class="btn btn-ghost" onclick="DB.operator.mowReady=true;save();jobdlg.close();setSeason('${k}')">I'll set them on the Pricing tab</button></div>
+  <div class="todo mt-3">IN THE REAL APP: switching changes the operator's quote page, customer app, AI script and message templates. The customer list, phone line, QR code and billing stay the same. Monthly plans cover whichever side is on; yearly covers both.</div>`)}
+function shoulderCard(){const m=new Date().getMonth(),s=seasonOf();if(!((m===10||m===2)&&s!=="both"))return "";const z=(DB.operator.service_zip_codes||[])[0]||"your area";const toMow=m===2;
+  return `<div class="card p-5 mb-4" style="border-color:var(--orange)"><div class="font-bold">${toMow?"🌱 Grass is waking up near "+z:"❄️ First snow is in the forecast near "+z}</div>
+   <p class="muted text-sm mt-1">${toMow?"Your AI checked the forecast for your service ZIP codes. Want to run MowCall and PlowCall together until the last snow?":"Your AI checked the forecast for your service ZIP codes. Want to run PlowCall and MowCall together for leaf cleanup and the first storms?"}</p>
+   <div class="flex flex-wrap gap-2 mt-3"><button class="btn btn-orange text-sm" onclick="setSeason('both')">Run both</button><button class="btn btn-ghost text-sm" onclick="this.closest('.card').remove()">Not yet</button></div>
+   <p class="muted text-xs mt-2">Based on your service ZIP codes. Want tips based on where you are? Turn on location in Settings (optional).</p></div>`}
+/* ---------- MONTHLY AI REPORT (Monthly Solo and Crew) ---------- */
+function reportCard(){const k=DB.operator.plan||"starter";if(k!=="solo"&&k!=="crew")return "";const done=DB.jobs.filter(j=>j.status==="Done").length,booked=DB.jobs.length;
+  return `<div class="card p-5 mb-4"><div class="flex justify-between items-baseline"><div class="font-bold">Your monthly report</div><span class="muted text-xs">${new Date(new Date().getFullYear(),new Date().getMonth()-1,1).toLocaleDateString("en-US",{month:"long"})}</span></div>
+   <div class="grid grid-cols-3 gap-2 mt-3 text-center">${[["Requests",booked],["Jobs done",done],["Answered by AI","96%"]].map(([l,v])=>`<div class="rounded-xl p-3" style="background:var(--muted)"><div class="display text-xl">${v}</div><div class="muted text-xs">${l}</div></div>`).join("")}</div>
+   <ul class="grid gap-1 text-sm mt-3 list-disc pl-5"><li>3 quotes didn't book. Following up within an hour books more of them.</li><li>Most requests come in 6–8am on storm days. Your AI handled them while you plowed.</li><li>${new Date().getMonth()>=8||new Date().getMonth()<=1?"Spring is coming: turn on MowCall in March to keep these same customers all year.":"Snow season is coming: turn on PlowCall in November to keep these same customers all year."}</li></ul></div>`}
 function tabPlan(){
-  const o=DB.operator,cur=o.plan||"starter",mow=BR.key==="mow";
-  const opts=[["starter","Junior Boss",48,mow?"Up to 35 active recurring customers. No business line.":"Up to 100 jobs a month. No business line."],
-   ["starterplus","Junior Boss Plus",118,mow?"Up to 80 active recurring customers. Same setup as Junior Boss, no business line or phone AI.":"Up to 250 jobs a month. Same setup as Junior Boss, no business line or phone AI."],
-   ["payg","Pay as you go",78,"Your own business line. AI texts 8¢, AI call minutes 38¢."],
-   ["solo","Monthly Solo",148,"Business line, 500 AI texts + 100 AI call minutes a month, no customer limit."],
-   ["crew","Monthly Crew",398,"3 trucks, 1,500 AI texts + 300 AI call minutes, business call calendar."]];
-  const curName=(opts.find(x=>x[0]===cur)||opts[0])[1];
+  const o=DB.operator,cur=o.plan||"starter",yr=o.billing==="yearly";
+  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync."],["crew","3 trucks with their own logins, business call calendar, priority support."]];
+  const renew=new Date(o.renews||Date.now()+200*864e5);
   $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
   <div class="grid gap-5">
-   <div class="card p-6"><h2 class="font-bold text-lg">Your plan</h2><p class="muted text-sm mt-1">You're on <b>${curName}</b>. Switch anytime as your season changes. Moving down takes effect next month.</p>
-    <div class="grid gap-2 mt-4">${opts.map(([k,n,pr,d])=>`<button class="choice ${k===cur?"on":""}" onclick="DB.operator.plan='${k}';save();toast('Plan set to ${n} (preview only, no charge)');tabPlan()"><div class="flex justify-between gap-3"><b>${n}</b><b>$${pr}/mo</b></div><div class="muted text-sm mt-1">${d}</div>${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`).join("")}</div></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Your plan</h2><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>, billed ${yr?"yearly":"monthly"}. One account covers PlowCall and MowCall. Switch anytime. Moving down takes effect next month.</p>
+    <div class="seg mt-4"><button class="${!yr?"on":""}" onclick="DB.operator.billing='monthly';save();tabPlan()">Monthly</button><button class="${yr?"on":""}" onclick="DB.operator.billing='yearly';save();tabPlan()">Yearly · 1 month free</button></div>
+    <div class="grid gap-2 mt-4">${opts.map(([k,d])=>{const p=PLANS[k];return `<button class="choice ${k===cur?"on":""}" onclick="DB.operator.plan='${k}';save();toast('Plan set to ${p.name} (preview only, no charge)');tabPlan()"><div class="flex justify-between gap-3"><b>${p.name}</b><b>$${yr?p.year.toLocaleString()+"/yr":p.price+"/mo"}</b></div><div class="muted text-sm mt-1">${d}</div>${yr&&(k==="solo"||k==="crew")?'<div class="text-xs mt-1 orange">Yearly bonus: Review Booster free for 3 months</div>':""}${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`}).join("")}</div></div>
+   ${cur==="starter"||cur==="starterplus"?`<div class="card p-6"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Custom Brand Launch</h2><b>$${BRAND_LAUNCH} one time</b></div><p class="muted text-sm mt-1">Your logo and colors on your quote page and customer app. $${BRAND_LAUNCH/2} today, $${BRAND_LAUNCH/2} when you approve your design. Included free on Monthly Solo and Crew.</p><button class="btn btn-ghost w-full mt-4" onclick="toast('Custom Brand Launch added (preview only, no charge)')">Add Custom Brand Launch</button></div>`:""}
    <div class="card p-6"><h2 class="font-bold text-lg">Usage packs</h2><p class="muted text-sm mt-1">For a busy month. Good for the current month only.</p>
-    <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],[mow?"Busy Season Pack: +1,000 texts and +200 minutes":"Storm Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
-    <p class="muted text-xs mt-2">Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute.</p></div></div>
+    <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Storm or Busy Season Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
+    <details class="mt-3 text-xs muted"><summary class="cursor-pointer">How AI use is counted</summary><p class="mt-2">Monthly Solo includes 500 AI texts and 100 AI call minutes a month (Crew: 1,500 and 300). One AI text is one AI reply up to 320 characters. Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute. Texts and calls you send yourself are always included.</p></details></div></div>
   <div class="grid gap-5">
    <div class="card p-6"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>$48/mo</b></div>
     <p class="muted text-sm mt-1">Your AI asks every customer for a Google review after every completed job, by text and email, then reminds them once. Unhappy replies come to your Inbox so you can make it right. No monthly limit.</p>
     <button class="btn btn-ghost w-full mt-4" onclick="toast('Review Booster added (preview only, no charge)')">Add Review Booster</button></div>
+   ${yr?`<div class="card p-6"><h2 class="font-bold text-lg">Your renewal</h2><p class="muted text-sm mt-1">Your yearly plan renews <b>${fmtDate(renew)}</b>. 30 days before, we text and email you to ask how it's going (1 to 10, and what we can do better) and invite you to leave us a review. Then a reminder with a one-tap cancel. You're never surprised.</p></div>`:""}
    <div class="card p-6"><h2 class="font-bold text-lg">Your own App Store and Google Play listing</h2>
-    <p class="muted text-sm mt-1">Every plan already includes your branded customer app through an install link. A store listing is optional. Apple and Google charge their own yearly developer fees, paid in your business name.</p>
+    <p class="muted text-sm mt-1">Every plan already includes your customer app through an install link. A store listing is optional. Apple and Google charge their own yearly developer fees, paid in your business name.</p>
     <button class="btn btn-ghost w-full mt-4" onclick="toast('We will send you add-on pricing.')">Get add-on pricing</button></div>
   </div></div>`;
 }
@@ -649,7 +706,8 @@ function tabJobs(){
   const list=DB.jobs.filter(j=>jobFilter==="All"||j.status===jobFilter).sort((a,b)=>new Date(b.created)-new Date(a.created));
   const month=DB.jobs.filter(j=>{const d=new Date(j.created),n=new Date();return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}).length;
   const isStarter=(DB.operator.plan||"starter")==="starter";
-  const upsell=isStarter&&month>=80?`<div class="card p-4 mb-4 flex flex-wrap items-center justify-between gap-3"><div class="text-sm"><b>${month} of 100 jobs this month on Junior Boss.</b> <span class="muted">${month>=100?"New requests still come in and get answered. Booking past 100 needs a bigger plan.":"Junior Boss covers up to 100 jobs a month."}</span></div><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a></div>`:"";
+  const custN=new Set(DB.jobs.filter(j=>j.status!=="Cancelled").map(j=>(j.address||j.name||"").toLowerCase())).size,capN=(DB.operator.plan||"starter")==="starterplus"?60:25,onCap=["starter","starterplus"].includes(DB.operator.plan||"starter");
+  const upsell=(onCap&&custN>=capN*0.8?`<div class="card p-4 mb-4 flex flex-wrap items-center justify-between gap-3"><div class="text-sm"><b>${custN} of ${capN} customers on ${PLANS[DB.operator.plan||"starter"].name}.</b> <span class="muted">${custN>=capN?"New requests still come in and get answered. Booking new customers past "+capN+" needs a bigger plan.":"Same limit on PlowCall and MowCall, because it's the same houses."}</span></div><a href="#/dashboard/plan" class="btn btn-orange text-sm min-h-[40px]">Upgrade</a></div>`:"")+shoulderCard()+reportCard();
   $("#tab").innerHTML=`${upsell}
   <div class="card p-5"><div class="flex justify-between items-baseline"><h2 class="font-bold">Last 30 days</h2><span class="muted text-sm">${recent.length} requests</span></div>
     <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-4">${byStatus.map(([s,n])=>`<div class="rounded-xl p-3 text-center" style="background:var(--muted)"><div class="display text-2xl">${n}</div><div class="text-xs muted">${s}</div></div>`).join("")}</div>
@@ -908,7 +966,7 @@ function setFinal(id){const p=DB.partners.find(x=>x.id===id),base=new Date(apptT
 
 /* ---------- FEEDBACK ---------- */
 function tabAffiliate(){const a=DB.affiliate,url=location.origin+location.pathname+"?ref="+a.code+"#/";const paid=a.referrals.filter(r=>/Paid out/.test(r.status)).reduce((t,r)=>t+r.payout,0),pend=a.referrals.filter(r=>!/Paid out/.test(r.status)).reduce((t,r)=>t+r.payout,0);
-  $("#tab").innerHTML=`<div class="card p-6"><h2 class="font-bold text-lg">Your referral link</h2><p class="muted text-sm mt-1">Share it with other operators. When they sign up, you earn one month of their plan after their 3rd monthly payment clears, or right away on a season prepay.</p>
+  $("#tab").innerHTML=`<div class="card p-6"><h2 class="font-bold text-lg">Your referral link</h2><p class="muted text-sm mt-1">Share it with other operators. When they sign up, you earn one month of their plan (Junior Boss Plus and above) after their 3rd monthly payment clears, or right away on a yearly plan, plus half of any Custom Brand Launch.</p>
   <div class="flex gap-2 mt-3"><input class="input text-sm" readonly value="${url}"><button class="btn btn-ghost" onclick="navigator.clipboard&&navigator.clipboard.writeText('${url}');toast('Link copied')">Copy</button></div>
   <div class="grid grid-cols-3 gap-3 mt-5">${[["Referrals",a.referrals.length],["Paid to you",money(paid)],["On the way",money(pend)]].map(([l,v])=>`<div class="rounded-xl p-3 text-center" style="background:var(--muted)"><div class="display text-2xl">${v}</div><div class="text-xs muted">${l}</div></div>`).join("")}</div></div>
   <div class="grid gap-3 mt-4">${a.referrals.map(r=>`<div class="card p-4 flex justify-between gap-3 items-start"><div><div class="font-bold">${r.name}</div><div class="muted text-sm">${r.plan} · ${r.status}</div></div><b>${money(r.payout)}</b></div>`).join("")}</div>
@@ -936,12 +994,15 @@ function tabSettings(){
     ${[["AI texts",312,500],["AI call minutes",64,100]].map(([l,u,m])=>`<div class="mt-4"><div class="flex justify-between text-sm"><span>${l}</span><span class="muted">${u} of ${m} this month</span></div><div class="h-2 rounded-full mt-1" style="background:var(--muted)"><div class="h-2 rounded-full" style="width:${u/m*100}%;background:var(--orange)"></div></div></div>`).join("")}
     <a href="#/dashboard/plan" class="btn btn-orange w-full mt-5">Upgrade</a>
     <p class="muted text-xs mt-2">Plans, usage packs and add-ons all live on your Plan &amp; add-ons page.</p></div>
+   <div class="card p-6"><h2 class="font-bold text-lg">Language and location</h2>
+    <label class="flex gap-3 items-start text-sm mt-3"><input type="checkbox" class="mt-1 w-5 h-5" ${DB.operator.spanish!==false?"checked":""} onchange="DB.operator.spanish=this.checked;save()"><span><b>Spanish on my quote page and AI replies</b><span class="muted block">Customers tap English or Español. Your AI answers in the language they write in.</span></span></label>
+    <label class="flex gap-3 items-start text-sm mt-3"><input type="checkbox" class="mt-1 w-5 h-5" ${DB.operator.useLocation?"checked":""} onchange="DB.operator.useLocation=this.checked;save()"><span><b>Use my phone's location for season tips (optional)</b><span class="muted block">Off by default. Your AI already uses your service ZIP codes to check the weather and tell you when to switch between PlowCall and MowCall.</span></span></label></div>
    <div class="card p-6"><h2 class="font-bold text-lg">Phone and texting status</h2><p class="muted text-sm mt-1">Carriers approve business texting, usually within 2 business days and up to 7. Your AI works the whole time.</p>
     ${trackerRow("Business line and AI calls","Live",true)}${trackerRow("Texting: business registration","Approved",true)}${trackerRow("Texting: campaign review","In review, usually 2 business days",false)}${trackerRow("Texting live","We'll text you the moment it's on",false)}
     <div class="mt-4 p-3 rounded-xl text-sm" style="background:var(--muted)"><b>Until texting is live:</b> your AI calls customers for appointment reminders and on-the-way notices, and sends everything else (confirmations, prices, thank-yous) by email. Once texting is on, texts take over and calls stay for reminders and on-the-way only.</div></div>
    <div class="card p-6"><h2 class="font-bold text-lg">Billing</h2><p class="muted text-sm mt-1">Update your card, download receipts, switch plans or cancel, anytime.</p>
     <button class="btn btn-ghost w-full mt-3" onclick="toast('Opens your secure billing page')">Manage billing</button>
-    <ul class="muted text-xs mt-3 grid gap-1 list-disc pl-5"><li>Monthly plans: cancel anytime. You keep everything until the end of the month you paid for.</li><li>Season prepay: full refund within 7 days of signing up. After that, unused months roll over to your next season (MowCall in spring, PlowCall in winter), with the same customers and the same account.</li><li>Your customer list is always yours to export, and you can take your business number with you.</li></ul></div>
+    <ul class="muted text-xs mt-3 grid gap-1 list-disc pl-5"><li>Monthly plans: cancel anytime. You keep everything until the end of the month you paid for.</li><li>Yearly: full refund within 7 days. After that you keep full access all year, and we remind you 30 days before it renews.</li><li>Your customer list is always yours to export, and you can take your business number with you.</li></ul></div>
    <div class="card p-6"><h2 class="font-bold text-lg">Appearance</h2><div class="seg mt-3">${[["dark","Dark"],["light","Light"],["system","Match my phone"]].map(([k,l])=>`<button class="${th===k?"on":""}" onclick="setTheme('${k}')">${l}</button>`).join("")}</div></div>
    <div class="card p-6 grid gap-4"><h2 class="font-bold text-lg">Business info</h2>
     ${f("business_name","Business name")}${f("owner_name","Owner name")}${f("phone","Business phone")}${f("email","Email")}${f("home_base","Home base (city, state)")}${f("slug","Link name (your-site.com/q/...)")}
@@ -969,25 +1030,26 @@ function tabSettings(){
 }
 
 /* ============ HOMEOWNER QUOTE PAGE ============ */
-let Q={};
+let Q={},QL="en";
+function tr(en,es){return QL==="es"?es:en}
 function quotePage(){
   const o=DB.operator;Q={step:1,timing:null,date:"",kind:null};
   $("#app").innerHTML=`<header class="border-b" style="border-color:var(--border)"><div class="max-w-xl mx-auto px-5 py-5"><div class="display text-2xl">${o.business_name}</div><div class="flex items-center gap-2 mt-1"><a href="tel:${o.phone}" class="ice text-sm">${o.phone}</a>${o.insured?`<span class="pill st-Booked text-xs">✓ Insured</span>`:""}${o.review_link?`<a class="text-xs underline muted" href="${o.review_link}" target="_blank">See our reviews</a>`:""}</div>${o.gallery?`<div class="flex gap-2 mt-3">${Array.from({length:o.gallery},(_,i)=>`<div class="w-20 h-14 rounded-lg flex items-center justify-center text-[10px] muted" style="background:var(--muted)">Job photo ${i+1}</div>`).join("")}</div>`:""}</div></header>
-  <main class="max-w-xl mx-auto px-5 py-8"><div id="qs"></div><p class="text-center text-xs muted mt-12">Powered by ${BR.name} · Boss Growth Machine</p></main>`;
+  <main class="max-w-xl mx-auto px-5 py-8">${o.spanish!==false?`<div class="flex justify-end mb-4"><div class="inline-flex rounded-xl overflow-hidden border" style="border-color:var(--input)">${[["en","English"],["es","Español"]].map(([k,l])=>`<button class="px-3 py-2 text-sm font-bold" style="${QL===k?"background:var(--orange);color:#111":""}" onclick="QL='${k}';quotePage()">${l}</button>`).join("")}</div></div>`:""}<div id="qs"></div><p class="text-center text-xs muted mt-12">Powered by ${BR.name} · Boss Growth Machine</p></main>`;
   qStep();
 }
 function steps(n){return `<div class="flex gap-1 mb-6">${[1,2,3,4,5].map(i=>`<div class="h-1.5 flex-1 rounded-full" style="background:${i<=n?"var(--orange)":"var(--muted)"}"></div>`).join("")}</div>`}
 function qStep(){
   const o=DB.operator,p=DB.pricing,el=$("#qs");
-  if(Q.step===1){el.innerHTML=`${steps(1)}<h1 class="display text-3xl">When do you need us?</h1><div class="grid gap-3 mt-6">
-    <button class="choice ${Q.timing==="Plow Now"?"on":""}" onclick="Q.timing='Plow Now';qStep()"><div class="font-bold text-lg">Plow Now</div><div class="muted text-sm">As soon as a truck can get there${p.rush?` (+${money(p.rush)} rush fee)`:""}</div></button>
-    <button class="choice ${Q.timing==="Scheduled"?"on":""}" onclick="Q.timing='Scheduled';qStep()"><div class="font-bold text-lg">Schedule Ahead</div><div class="muted text-sm">Pick a day</div></button></div>
+  if(Q.step===1){el.innerHTML=`${steps(1)}<h1 class="display text-3xl">${tr("When do you need us?","¿Cuándo nos necesita?")}</h1><div class="grid gap-3 mt-6">
+    <button class="choice ${Q.timing==="Plow Now"?"on":""}" onclick="Q.timing='Plow Now';qStep()"><div class="font-bold text-lg">${tr("Plow Now","Ahora mismo")}</div><div class="muted text-sm">${tr("As soon as a truck can get there","Lo antes posible")}${p.rush?` (+${money(p.rush)} rush fee)`:""}</div></button>
+    <button class="choice ${Q.timing==="Scheduled"?"on":""}" onclick="Q.timing='Scheduled';qStep()"><div class="font-bold text-lg">${tr("Schedule Ahead","Programar")}</div><div class="muted text-sm">${tr("Pick a day","Elija un día")}</div></button></div>
     ${Q.timing==="Scheduled"?`<input type="date" class="input mt-4" value="${Q.date}" onchange="Q.date=this.value">`:""}
-    <button class="btn btn-orange w-full mt-6" ${!Q.timing?"disabled":""} onclick="if(Q.timing==='Scheduled'&&!Q.date){toast('Pick a date');return}Q.step=2;qStep()">Next</button>`;}
-  else if(Q.step===2){el.innerHTML=`${steps(2)}<h1 class="display text-3xl">Who is this for?</h1><div class="grid gap-3 mt-6">
-    <button class="choice" onclick="Q.kind='home';Q.step=3;qStep()"><div class="font-bold text-lg">My home</div><div class="muted text-sm">Driveway, walkway, steps</div></button>
-    <button class="choice" onclick="Q.kind='biz';Q.step=3;qStep()"><div class="font-bold text-lg">A business or commercial property</div><div class="muted text-sm">Parking lots, offices, apartment complexes</div></button></div>
-    <button class="btn btn-ghost w-full mt-4" onclick="Q.step=1;qStep()">Back</button>`;}
+    <button class="btn btn-orange w-full mt-6" ${!Q.timing?"disabled":""} onclick="if(Q.timing==='Scheduled'&&!Q.date){toast('Pick a date');return}Q.step=2;qStep()">${tr("Next","Siguiente")}</button>`;}
+  else if(Q.step===2){el.innerHTML=`${steps(2)}<h1 class="display text-3xl">${tr("Who is this for?","¿Para quién es?")}</h1><div class="grid gap-3 mt-6">
+    <button class="choice" onclick="Q.kind='home';Q.step=3;qStep()"><div class="font-bold text-lg">${tr("My home","Mi casa")}</div><div class="muted text-sm">${tr("Driveway, walkway, steps","Entrada, acera, escalones")}</div></button>
+    <button class="choice" onclick="Q.kind='biz';Q.step=3;qStep()"><div class="font-bold text-lg">${tr("A business or commercial property","Un negocio o propiedad comercial")}</div><div class="muted text-sm">${tr("Parking lots, offices, apartment complexes","Estacionamientos, oficinas, apartamentos")}</div></button></div>
+    <button class="btn btn-ghost w-full mt-4" onclick="Q.step=1;qStep()">${tr("Back","Atrás")}</button>`;}
   else if(Q.step===3&&Q.kind==="biz"){
     const days=[];for(let d=new Date(),i=0;days.length<10&&i<30;i++){d=new Date();d.setDate(d.getDate()+1+i);const dn=d.toLocaleDateString("en-US",{weekday:"short"});if(o.partner_days.includes(dn))days.push(d)}
     el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Book a quick call</h1><p class="muted mt-2">Commercial properties get a custom quote on a short call with ${o.business_name}.</p>
@@ -999,21 +1061,21 @@ function qStep(){
     <select class="input" name="time" required>${slotOptions().map(t=>`<option value="${t}">${t12(t)}</option>`).join("")}</select></div></div>
     <textarea class="input" name="notes" rows="2" placeholder="Anything we should know?"></textarea>
     ${consentBoxes(o)}
-    <button class="btn btn-orange">Request this call</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">Back</button></form>`;
+    <button class="btn btn-orange">Request this call</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">${tr("Back","Atrás")}</button></form>`;
     $("#bizf").onsubmit=e=>{e.preventDefault();const fd=new FormData(e.target),f=Object.fromEntries(fd);const[h,m]=f.time.split(":");const when=new Date(f.day+"T00:00");when.setHours(+h,+m);
       DB.partners.unshift({id:Date.now(),company:f.company,contact:f.contact,phone:f.phone,email:f.email,can_text:!!fd.get("can_text"),property:f.property,location:f.location,notes:f.notes,created:new Date().toISOString(),requested:when.toISOString(),status:"requested",log:[[new Date().toISOString(),"Request received from the quote page. Thank-you message sent automatically."]]});save();
       el.innerHTML=`${steps(5)}<div class="card p-8 text-center"><div class="display text-3xl">Request sent!</div><p class="muted mt-3">You asked for a call on</p><p class="font-bold text-lg mt-1">${fmtDT(when.toISOString())}</p><p class="muted mt-3">${o.business_name} will confirm the time with you shortly.</p>
       <div class="todo mt-6 text-left">IN THE REAL APP: a thank-you text and email go out right away, and this shows up red on the operator's partner calendar until they confirm it.</div><a href="#/dashboard/partners" class="btn btn-ghost mt-6">See it on the operator's calendar →</a></div>`;};}
-  else if(Q.step===3){el.innerHTML=`${steps(3)}<h1 class="display text-3xl">Your details</h1>
-    <form id="homef" class="grid gap-4 mt-6"><input class="input" name="name" placeholder="Full name" required>
-    <div class="grid grid-cols-2 gap-3"><input class="input" name="phone" placeholder="Phone" required><input class="input" name="email" type="email" placeholder="Email"></div>
-    <input class="input" name="address" placeholder="Service address" required><input class="input" name="zip" placeholder="ZIP code" inputmode="numeric" pattern="\\d{5}" required>
-    <div><div class="text-sm mb-2">Driveway size</div><div class="grid grid-cols-3 gap-2">${[["1-car","one_car"],["2-car","two_car"],["3+ car / long","three_car"]].map(([l,k],i)=>`<label><input type="radio" name="size" value="${l}" class="peer hidden" ${i===1?"checked":""}><span class="choice block text-center peer-checked:border-[var(--orange)] peer-checked:bg-[color-mix(in_oklab,var(--orange)_10%,var(--card))] !p-3"><b>${l}</b><br><span class="muted text-xs">${money(p[k])}</span></span></label>`).join("")}</div></div>
-    <div><div class="text-sm mb-2">Add-ons</div><label class="flex justify-between card p-4 mb-2"><span><input type="checkbox" name="addons" value="Walkway" class="mr-2 w-4 h-4">Walkway / sidewalk</span><span class="muted">+${money(p.walkway)}</span></label>
+  else if(Q.step===3){el.innerHTML=`${steps(3)}<h1 class="display text-3xl">${tr("Your details","Sus datos")}</h1>
+    <form id="homef" class="grid gap-4 mt-6"><input class="input" name="name" placeholder="${tr("Full name","Nombre completo")}" required>
+    <div class="grid grid-cols-2 gap-3"><input class="input" name="phone" placeholder="${tr("Phone","Teléfono")}" required><input class="input" name="email" type="email" placeholder="${tr("Email","Correo")}"></div>
+    <input class="input" name="address" placeholder="${tr("Service address","Dirección del servicio")}" required><input class="input" name="zip" placeholder="${tr("ZIP code","Código postal")}" inputmode="numeric" pattern="\\d{5}" required>
+    <div><div class="text-sm mb-2">${tr("Driveway size","Tamaño de la entrada")}</div><div class="grid grid-cols-3 gap-2">${[["1-car","one_car"],["2-car","two_car"],["3+ car / long","three_car"]].map(([l,k],i)=>`<label><input type="radio" name="size" value="${l}" class="peer hidden" ${i===1?"checked":""}><span class="choice block text-center peer-checked:border-[var(--orange)] peer-checked:bg-[color-mix(in_oklab,var(--orange)_10%,var(--card))] !p-3"><b>${l}</b><br><span class="muted text-xs">${money(p[k])}</span></span></label>`).join("")}</div></div>
+    <div><div class="text-sm mb-2">${tr("Add-ons","Extras")}</div><label class="flex justify-between card p-4 mb-2"><span><input type="checkbox" name="addons" value="Walkway" class="mr-2 w-4 h-4">Walkway / sidewalk</span><span class="muted">+${money(p.walkway)}</span></label>
     <label class="flex justify-between card p-4"><span><input type="checkbox" name="addons" value="Salt / de-ice" class="mr-2 w-4 h-4">Salt / de-ice</span><span class="muted">+${money(p.salt)}</span></label></div>
-    <label class="grid gap-1"><span class="text-sm">Anything the driver should know?</span><textarea class="input" name="notes" rows="3" placeholder="Cars in the driveway, gate code, where to pile the snow, anything in front of the house..."></textarea></label>
+    <label class="grid gap-1"><span class="text-sm">${tr("Anything the driver should know?","¿Algo que el conductor deba saber?")}</span><textarea class="input" name="notes" rows="3" placeholder="Cars in the driveway, gate code, where to pile the snow, anything in front of the house..."></textarea></label>
     ${consentBoxes(o)}${waiverBox(o)}
-    <button class="btn btn-orange">See my price</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">Back</button></form>`;
+    <button class="btn btn-orange">${tr("See my price","Ver mi precio")}</button><button type="button" class="btn btn-ghost" onclick="Q.step=2;qStep()">${tr("Back","Atrás")}</button></form>`;
     $("#homef").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);const size=f.get("size"),addons=f.getAll("addons");
       const base={"1-car":p.one_car,"2-car":p.two_car,"3+ car / long":p.three_car}[size];
       const lines=[[size+" driveway",base,"base"]];addons.forEach(a=>lines.push([a,a==="Walkway"?p.walkway:p.salt,a==="Walkway"?"walkway":"salt"]));if(Q.timing==="Plow Now"&&p.rush)lines.push(["Plow Now rush fee",p.rush,"rush"]);
@@ -1022,11 +1084,11 @@ function qStep(){
       const zip=f.get("zip");const outside=!o.service_zip_codes.includes(zip);
       Q.job={id:Date.now(),type:Q.timing,date:Q.timing==="Scheduled"?Q.date:"",name:f.get("name"),phone:f.get("phone"),email:f.get("email"),address:f.get("address"),zip,size,addons,total,deposit,status:"New",created:new Date().toISOString(),outside,notes:f.get("notes"),sms:!!f.get("sms"),aicalls:!!f.get("aicalls"),waiver:true};
       Q.lines=lines;DB.jobs.unshift(Q.job);save();Q.step=4;qStep();};}
-  else if(Q.step===4){const j=Q.job,p=DB.pricing;el.innerHTML=`${steps(4)}<h1 class="display text-3xl">Your price</h1>
+  else if(Q.step===4){const j=Q.job,p=DB.pricing;el.innerHTML=`${steps(4)}<h1 class="display text-3xl">${tr("Your price","Su precio")}</h1>
     <div class="card p-6 mt-6">${Q.lines.map(l=>`<div class="flex justify-between py-2"><span>${l[0]}</span><span>${money(l[1])}</span></div>`).join("")}
     <div class="flex justify-between pt-4 mt-2 border-t text-xl font-bold" style="border-color:var(--border)"><span>Total</span><span>${money(j.total)}</span></div>
-    <p class="muted text-xs mt-1">This price is held for you for 24 hours.</p>
-    <div class="flex justify-between mt-4 p-4 rounded-xl" style="background:color-mix(in oklab,var(--orange) 15%,var(--card))"><span class="font-bold">Deposit due now</span><span class="display text-2xl orange">${money(j.deposit)}</span></div>
+    <p class="muted text-xs mt-1">${tr("This price is held for you for 24 hours.","Este precio se mantiene por 24 horas.")}</p>
+    <div class="flex justify-between mt-4 p-4 rounded-xl" style="background:color-mix(in oklab,var(--orange) 15%,var(--card))"><span class="font-bold">${tr("Deposit due now","Depósito a pagar ahora")}</span><span class="display text-2xl orange">${money(j.deposit)}</span></div>
     <p class="muted text-sm mt-3">${j.type==="Scheduled"?"Scheduled for "+j.date:"Plow Now: you're added to today's route"}. Balance due after service.</p>
     <p class="muted text-xs mt-2">${BR.key!=="mow"?`We plow at ${p.trigger_in||2}+ inches. Cancel free until we're on the way`:`Cancel free with ${p.mow_notice_hrs||24} hours' notice`}; after that a ${money(p.trip_fee)} trip fee comes out of your deposit. If we can't make it, you choose a rollover or a full refund.</p></div>
     ${j.outside?`<div class="card p-4 mt-4" style="border-color:var(--yellow)"><b class="text-[var(--yellow)]">Heads up:</b> ZIP ${j.zip} is outside ${o.business_name}'s usual area. Your request is saved, and they'll confirm if they can serve you.</div>`:""}
@@ -1064,7 +1126,10 @@ function qStep(){
     <button class="btn btn-ghost w-full mt-4" onclick="Q.step=5;qStep()">Keep my booking</button>`;}
 }
 function depositChoice(k){const j=Q.job;j.status="Cancelled";j.deposit_choice=k;save();$("#qs").innerHTML=`<div class="card p-8 text-center"><div class="display text-3xl">${k==="roll"?"Rolled over!":"Refund on its way"}</div><p class="muted mt-3">${k==="roll"?`Your deposit is saved for your next service with ${DB.operator.business_name}.`:"Your refund was sent automatically. No call needed."}</p></div><div class="todo mt-4">IN THE REAL APP: the refund runs automatically through the operator's deposit account, and the operator's dashboard shows the job as cancelled with the customer's choice.</div>`}
-function consentBoxes(o){return `<div class="grid gap-3 text-sm">
+function consentBoxes(o){if(QL==="es")return `<div class="grid gap-3 text-sm">
+  <label class="flex gap-3 items-start"><input type="checkbox" name="sms" class="mt-1 w-5 h-5"><span><b>Avisos del servicio.</b> Acepto que ${o.business_name} me envíe mensajes de texto automáticos y me haga llamadas con voz generada por IA o pregrabada al número que ingresé, para confirmaciones, recordatorios de citas y avisos de que van en camino sobre mi servicio.</span></label>
+  <label class="flex gap-3 items-start"><input type="checkbox" name="aicalls" class="mt-1 w-5 h-5"><span><b>Ofertas y alertas de tormenta.</b> Acepto que ${o.business_name} me envíe mensajes de texto de mercadeo automáticos y me haga llamadas de mercadeo con voz generada por IA o pregrabada al número que ingresé, incluyendo alertas de tormenta y ofertas de servicios futuros.</span></label>
+  <p class="muted text-xs leading-relaxed">Marcar cualquiera de las casillas es opcional y no es condición para comprar nada. La frecuencia de mensajes varía. Pueden aplicar tarifas de mensajes y datos. Responda STOP a cualquier texto para darse de baja, o HELP para ayuda. En una llamada, diga "deje de llamar". También puede darse de baja llamando al ${o.phone}. Nunca vendemos ni compartimos su número ni su consentimiento con terceros para su mercadeo. [Traducción pendiente de revisión legal]</p></div>`;return `<div class="grid gap-3 text-sm">
   <label class="flex gap-3 items-start"><input type="checkbox" name="sms" class="mt-1 w-5 h-5"><span><b>Service updates.</b> I agree that ${o.business_name} may send automated text messages and make calls using an AI-generated or prerecorded voice to the phone number I entered, for confirmations, appointment reminders and on-the-way notices about my service.</span></label>
   <label class="flex gap-3 items-start"><input type="checkbox" name="aicalls" class="mt-1 w-5 h-5"><span><b>Offers and storm alerts.</b> I agree that ${o.business_name} may send automated marketing text messages and make marketing calls using an AI-generated or prerecorded voice to the phone number I entered, including storm alerts and offers for future service.</span></label>
   <p class="muted text-xs leading-relaxed">Checking either box is optional and is not a condition of buying anything. Message frequency varies. Message and data rates may apply. Reply STOP to any text to opt out, or HELP for help. On a call, say "stop calling." You can also opt out by calling ${o.phone}. We never sell or share your mobile number or opt-in information with third parties for their marketing. See our <a class="underline" href="#/privacy">Privacy Policy</a> and <a class="underline" href="#/terms">Terms</a>.</p></div>`}
@@ -1082,7 +1147,8 @@ function waiverText(o){const snow=BR.key!=="mow",p=DB.pricing;return snow?[
  "Rain and wet ground can move your service a day or two for safety and lawn health.",
  "If something is damaged, send photos within 24 hours of service so we can make it right.",
  `Cancel free with ${p.mow_notice_hrs||24} hours' notice. After that, a $${p.trip_fee} trip fee comes out of your deposit. If we can't make it, you choose a rollover or a full refund.`]}
-function waiverBox(o){return `<details class="card p-4 text-sm"><summary class="cursor-pointer font-bold">${o.business_name} service terms and liability waiver</summary><ol class="list-decimal pl-5 grid gap-2 mt-3 muted">${waiverText(o).map(t=>`<li>${t}</li>`).join("")}</ol></details>
+function waiverBox(o){if(QL==="es"){const p=DB.pricing;return `<details class="card p-4 text-sm"><summary class="cursor-pointer font-bold">Términos del servicio y exención de responsabilidad de ${o.business_name}</summary><ol class="list-decimal pl-5 grid gap-2 mt-3 muted">${[`${o.business_name} quita la nieve de las áreas que eligió cuando la nevada llega a ${p.trigger_in||2} pulgadas o más, según las condiciones y la seguridad.`,"Marque los bordes de la entrada, bordillos, jardines, rociadores y todo lo que quede bajo la nieve. No somos responsables por daños a objetos ocultos o sin marcar.","La nieve y el hielo pueden volver después de que nos vayamos. El recongelamiento y la nieve que dejan los quitanieves de la ciudad están fuera de nuestro control.","Si algo se daña, envíe fotos dentro de las 24 horas del servicio para arreglarlo.",`Cancele gratis hasta que vayamos en camino. Después, se descuenta un cargo de viaje de $${p.trip_fee} de su depósito. Si no podemos ir, usted elige pasarlo al próximo servicio o un reembolso completo.`].map(t=>`<li>${t}</li>`).join("")}</ol><p class="muted text-xs mt-2">[Traducción pendiente de revisión legal]</p></details>
+  <label class="flex gap-3 text-sm items-start"><input type="checkbox" name="waiver" required class="mt-1 w-5 h-5"><span>Acepto los términos del servicio y la exención de responsabilidad de ${o.business_name}.</span></label>`}return `<details class="card p-4 text-sm"><summary class="cursor-pointer font-bold">${o.business_name} service terms and liability waiver</summary><ol class="list-decimal pl-5 grid gap-2 mt-3 muted">${waiverText(o).map(t=>`<li>${t}</li>`).join("")}</ol></details>
   <label class="flex gap-3 text-sm items-start"><input type="checkbox" name="waiver" required class="mt-1 w-5 h-5"><span>I agree to ${o.business_name}'s service terms and liability waiver.</span></label>`}
 function savedNumber(o){return `<div class="card p-6 mt-4 text-sm flex gap-4 items-start"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0" style="background:var(--orange)">📇</div><div class="flex-1"><div class="font-bold">Save our number so you never miss us</div><p class="muted mt-1">We call and text from <b>${o.phone}</b> for reminders and "on the way" notices. Save it as <b>${o.business_name}</b> so your phone doesn't block it or send it to spam.</p><button class="btn btn-ghost w-full mt-3" onclick="dlVcard()">Save ${o.business_name} to my contacts</button><p class="muted text-xs mt-2">iPhone: tap the button, then Create New Contact. Android: tap it, then Save. Also check that unknown-caller silencing isn't on for this number.</p></div></div>`}
 function dlVcard(){const o=DB.operator;const v=`BEGIN:VCARD\nVERSION:3.0\nFN:${o.business_name}\nORG:${o.business_name}\nTEL;TYPE=WORK,VOICE:${o.phone}\nEMAIL:${o.email||""}\nNOTE:Snow and lawn service. Reminders and on-the-way calls come from this number.\nEND:VCARD`;const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([v],{type:"text/vcard"}));a.download=o.business_name.replace(/[^a-z0-9]+/gi,"-")+".vcf";a.click();toast("Contact card downloaded")}
