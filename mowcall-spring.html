@@ -397,6 +397,9 @@ function sendTerms(id,to,how){const c=cust(id),b=DB.op.business,L=c.lang==="es";
 function addSample(){const p=PLANS[DB.op.plan];if(p.cap&&activeCount()>=p.cap){toast(`You're at your ${p.name} limit. New recurring requests wait in your Inbox.`);return}DB.extraActive++;save();toast("Sample customer added");route()}
 
 /* ===================== 3. SETTINGS ===================== */
+const SERVICES=[["Mowing","Instant price by yard size, weekly or every other week"],["Edging and trimming","Add-on per visit"],["Hedge and shrub trimming","Instant price per visit"],["Bed care and weeding","Instant price, one-time or recurring"],["Mulch","Instant price per yard"],["Aeration and overseeding","Instant price per square foot"],["Spring and fall cleanup","Instant price by yard size"],["Leaf removal","Instant price by yard size"],["Gutter cleaning","Instant price by home size"],["Pressure washing","Instant price per square foot"],["Irrigation start-up and winterization","Instant price per visit"],["Holiday lighting","Instant price, booked in the fall"],["Pet waste pickup","Instant price, weekly"],["Hardscaping, installs and tree work","Quick call with you, no instant price"]];
+const DEF_SVC=[0,1,2,6,7];
+function toggleSvc(i){const a=DB.op.svc||DEF_SVC.slice();DB.op.svc=a.includes(i)?a.filter(x=>x!==i):[...a,i];save();route()}
 function viewSettings(){const o=DB.op;
  const num=(k,v,step="1",w="6rem")=>`<input class="input !min-h-[42px] inline-block" style="width:${w}" type="number" min="0" step="${step}" value="${v}" onchange="setNum('${k}',this.value)">`;
  const ex=priceFor({front:2500,back:4500});
@@ -408,7 +411,10 @@ function viewSettings(){const o=DB.op;
    <label class="text-sm muted">Expires <input class="input !min-h-[42px] mt-1" type="date" value="${c.exp}" onchange="DB.op.creds.${k}.exp=this.value;save();route()"></label>
    <button class="btn btn-sm ${c.proof?"btn-ghost":"btn-orange"}" onclick="DB.op.creds.${k}.proof=!DB.op.creds.${k}.proof;save();route()">${c.proof?"✓ Proof uploaded (sample) · remove":"Upload proof (certificate or license)"}</button></div>`:""}
   </div>`};
- return shell("settings",`
+ return shell("settings",`<div class="card p-5 mb-4"><div class="display text-lg">Services you offer</div><p class="muted text-sm mt-1">Pick what you sell. Each one shows up on your quote page with the right kind of price.</p>
+ <div class="grid sm:grid-cols-2 gap-2 mt-3">${SERVICES.map(([n,how],i)=>`<label class="choice flex gap-3 items-start ${(DB.op.svc||DEF_SVC).includes(i)?"on":""}"><input type="checkbox" class="mt-1 w-5 h-5" ${(DB.op.svc||DEF_SVC).includes(i)?"checked":""} onchange="toggleSvc(${i})"><span><b>${n}</b><span class="muted text-xs block">${how}</span></span></label>`).join("")}</div>
+ <p class="muted text-xs mt-2">Fertilizing and weed or pest spraying need a state license, so they'll come later as an add-on.</p></div>
+
  <div class="grid md:grid-cols-2 gap-4 items-start">
   <div class="card p-5"><div class="display text-lg">Your mowing prices</div>
    <p class="muted text-sm mt-1">Customers outline their own front yard, backyard and side yards on a satellite map. We measure each area and price it with your numbers.</p>

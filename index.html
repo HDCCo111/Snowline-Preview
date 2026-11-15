@@ -160,8 +160,8 @@ const BRANDS={
    ["Same account runs your lawn season","✓|MowCall","✓","✓","✗|snow only","✓"]]},
   faq:[["What is the QR code for?","It goes on your truck or signs. Customers scan it, get a price and book without calling you."],["Will customers know it's AI?","Yes. Every customer is told up front that you use an AI assistant so you can drive safe, and that a person on your team monitors and approves every conversation."],["Can I use it with one truck?","Yes. It works for a solo operator or a fleet."],["How do customers pay?","They accept the quote and pay a deposit through your own payment link, so the money goes straight to you."],["What about spring?","The same account switches to MowCall for mowing and yard work, so your customers stay with you all year."],["I'm just starting out. Can I still use it?","Yes. The Junior Boss plan is built for side hustles and first-timers, no business phone line or EIN needed. Under 18? A parent or guardian signs up and holds the account. See our Junior Boss page for parents."],["Can I change plans when the season changes?","Yes, anytime, month to month. Busy winter? Go Monthly. Slow stretch? Drop to Junior Boss. We'd rather you never pay for more than you use."]]},
  mow:{key:"mow",name:"MowCall",domain:"mowcall.com",who:"lawn care and landscaping crews",
-  headline:"Keep the mower running. Your AI handles every customer.",
-  sub:"One QR code, one phone number, one inbox. Quotes, deposits and recurring mows get booked while you work.",
+  headline:"For lawn care and landscaping pros. Your AI handles every customer.",
+  sub:"Mow, trim, mulch, clean up. One QR code, one phone number, one inbox. Quotes, deposits and recurring service get booked while you work. MowCall opens early spring 2027.",
   how:[["They reach out","Customers scan the QR code on your trailer, call, DM you or email."],["AI answers fast","Your AI assistant answers every channel in seconds and sorts homeowners from businesses."],["Quote, accept, deposit","Homeowners get an instant price for their yard size and services, then pay a deposit."],["On your route","The job lands on your dashboard, in the right area, on the right day."]],
   features:[["Rain-delay alerts","Customers get a heads-up when weather pushes their mow, automatically.",1],["One-time or recurring","Weekly and every-other-week mowing, or one-time cleanups."],["Service areas on a map","Circle the neighborhoods you want. Crews stay close together."],["Business call calendar","Commercial requests land on a calendar you confirm or reschedule."],["Season plans","Lock customers in for the whole season.",1],["Done text + thank-you email","When you mark a job done, the customer gets a text and an email thanking them and asking how you did. Your AI only calls for reminders and on-the-way notices."],["Your QR code","Put it on the trailer. Scan, price, book."],["One inbox","QR, phone, DMs and email all land in one place."]],
   cab:["Built for the field","The AI answers calls and texts for you, so you don't stop the mower to grab your phone. Stay on the job, keep the route moving."],
@@ -185,6 +185,7 @@ function route(){
   captureRef();
   const h=(location.hash||"#/").slice(1).split("?")[0];
   window.scrollTo(0,0);
+  if(h.startsWith("/mow/")&&TRADES[h.split("/")[2]]){setBrand("mow");return tradePage(h.split("/")[2])}
   if(h.startsWith("/mow")){setBrand("mow");return landing()}
   if(!h.startsWith("/dashboard")&&!h.startsWith("/q/")&&h!=="/login"&&h!=="/signup"&&h!=="/start"&&h!=="/kids"&&!h.startsWith("/blog"))setBrand("plow");
   if(h.startsWith("/q/")) return quotePage();
@@ -206,7 +207,7 @@ function header(right){return `<header class="border-b" style="border-color:var(
   <a href="#${BR.key==="mow"?"/mow":"/"}" class="flex items-center gap-2"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--ice)" stroke-width="2">${BR.key==="mow"?ICON_MOW:ICON_TRUCK}</svg>
   <span class="font-bold text-lg">${BR.name}</span><span class="muted text-xs hidden sm:inline">by Boss Growth Machine</span></a><div class="flex items-center gap-2">${right||""}<button aria-label="Menu" aria-expanded="false" class="btn btn-ghost min-h-[44px] w-[44px] !px-0" onclick="toggleMenu(this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div></div>
   <nav id="sitemenu" class="hidden border-t" style="border-color:var(--border);background:var(--card)"><div class="max-w-6xl mx-auto px-5 py-4 grid gap-1 sm:grid-cols-2 lg:grid-cols-3 text-base">${MENU().map(m=>`<a href="${m[1]}" onclick="closeMenu()" class="px-3 py-3 rounded-xl hover:brightness-125 flex justify-between items-center" style="background:var(--muted)"><span><b>${m[0]}</b><span class="muted text-sm block">${m[2]}</span></span><span class="muted">→</span></a>`).join("")}</div></nav></header>`}
-function MENU(){return [["PlowCall","#/","Snow removal software"],["MowCall","#/mow","Lawn care software"],["Pricing","#"+(BR.key==="mow"?"/mow":"/")+"?pricing","Plans from $48/mo"],["Junior Boss","#/kids","For parents: your kid's first business"],["Field Guide","#/blog","Straight answers for operators"],["Operator login","#/login","Already have an account?"]]}
+function MENU(){return [["PlowCall","#/","Snow removal software"],["MowCall","#/mow","Lawn care and landscaping software"],["Lawn Care","#/mow/lawn-care","Recurring mowing routes"],["Landscaping Maintenance","#/mow/landscaping","Beds, hedges, mulch and more"],["Seasonal Cleanup & Leaves","#/mow/cleanup","Spring, fall and leaf season"],["Pricing","#"+(BR.key==="mow"?"/mow":"/")+"?pricing","Plans from $48/mo"],["Junior Boss","#/kids","For parents: your kid's first business"],["Field Guide","#/blog","Straight answers for operators"],["Operator login","#/login","Already have an account?"]]}
 function toggleMenu(b){const m=$("#sitemenu");if(!m)return;const open=m.classList.toggle("hidden")===false;b.setAttribute("aria-expanded",open)}
 function closeMenu(){const m=$("#sitemenu");if(m)m.classList.add("hidden")}
 function footer(){return `<footer class="border-t mt-20" style="border-color:var(--border)"><div class="max-w-6xl mx-auto px-5 py-8 flex flex-wrap gap-4 justify-between text-sm muted">
@@ -280,6 +281,31 @@ function calcPlan(n){n=+n;const t=+(($("#trucksR")||{}).value||1);const o=$("#ca
   else msg=`<b>Monthly Solo</b> at $148/mo. No customer limit.`;
   o.innerHTML=`${n} customers and ${t} truck${t>1?"s":""}. Your best fit: ${msg}`}
 
+/* ---------- MOWCALL TRADE PAGES ---------- */
+const TRADES={
+ "lawn-care":{title:"MowCall for Lawn Care",hero:"Weekly routes that run themselves.",sub:"Customers outline their yard on the map, get an instant price, sign your agreement and book weekly or every-other-week mowing. You mow. Your AI handles the rest.",
+  services:[["Mowing","Weekly or every other week, priced by yard size"],["Edging and trimming","Add-on to every visit"],["Aeration and overseeding","Priced per square foot, booked in the fall"],["Rain delays","One tap moves the route and texts every customer"]],
+  why:["Autopay after each visit or one flat monthly price, by bank account by default","On-the-way and done texts with a photo","Pause for vacation or drought without losing the customer","Spanish quote page and AI replies"]},
+ "landscaping":{title:"MowCall for Landscaping Maintenance",hero:"Every bed, hedge and yard of mulch, quoted and booked.",sub:"For landscapers who keep properties looking sharp all season. Instant prices for routine work, and a quick call for bigger jobs.",
+  services:[["Hedge and shrub trimming","Per visit or on a schedule"],["Bed care and weeding","Recurring or one-time"],["Mulch","Priced per yard, delivered and spread"],["Bigger projects","Hardscaping, installs and tree work book a quick call with you instead of an instant price"]],
+  why:["One service menu: you pick what you offer and how it's priced","Commercial properties land on your call calendar","Signed service agreement on every booking, renewed yearly","Credentials and insurance badge on your quote page"]},
+ "cleanup":{title:"MowCall for Seasonal Cleanup & Leaves",hero:"Spring and fall rush, without the phone tag.",sub:"Cleanups are where the money is and where calls get missed. MowCall books them while you work, then turns those customers into weekly mowing and winter plowing.",
+  services:[["Spring cleanup","Beds, debris, first cut"],["Fall and leaf cleanup","Priced by yard size"],["Gutter cleaning","Seasonal add-on"],["Holiday lighting","Bridges November into PlowCall season"]],
+  why:["Season alerts to opted-in past customers","Same customers carry over to PlowCall in winter","Tall-grass and first-cut fees shown up front","Deposits lock in your spot on the schedule"]}};
+function tradePage(k){const t=TRADES[k];
+  $("#app").innerHTML=`${header()}<main class="snow-bg"><section class="max-w-5xl mx-auto px-5 pt-16 pb-10">
+   <p class="ice text-sm font-bold tracking-widest uppercase">${t.title}</p>
+   <h1 class="display text-4xl md:text-6xl mt-4 leading-[1.05]">${t.hero}</h1>
+   <p class="muted text-lg mt-6 max-w-2xl">${t.sub}</p>
+   <div class="flex flex-wrap gap-3 mt-8"><a href="#/mow?pricing" class="btn btn-orange text-lg px-8">See pricing</a><a href="mowcall-spring.html" class="btn btn-ghost text-lg">See the app</a></div>
+   <p class="muted text-sm mt-4">MowCall opens early spring 2027. Same account as PlowCall: one switch, same customers.</p></section></main>
+  <section class="max-w-5xl mx-auto px-5 py-12"><h2 class="display text-3xl">What you can sell</h2>
+   <div class="grid sm:grid-cols-2 gap-5 mt-6">${t.services.map(([a,b])=>`<div class="card p-6"><h3 class="font-bold text-lg">${a}</h3><p class="muted text-sm mt-2">${b}</p></div>`).join("")}</div></section>
+  <section class="max-w-5xl mx-auto px-5 py-12"><h2 class="display text-3xl">Why it works</h2>
+   <ul class="grid sm:grid-cols-2 gap-3 mt-6">${t.why.map(w=>`<li class="card p-4 text-sm flex gap-2"><span class="orange">✓</span>${w}</li>`).join("")}</ul>
+   <div class="flex flex-wrap gap-2 mt-8">${Object.entries(TRADES).filter(([x])=>x!==k).map(([x,v])=>`<a href="#/mow/${x}" class="btn btn-ghost text-sm">${v.title.replace("MowCall for ","")} →</a>`).join("")}</div></section>
+  ${footer()}`}
+
 /* ---------- LANDING ---------- */
 let slideIdx=0,slideTimer=null;
 function heroSlides(){const B=BR;const imgs=B.key==="mow"?[["img/mow-1.jpg","Landscaper on his zero-turn mower smiling at a new booking on his phone"],["img/mow-2.jpg","Landscaper in a backyard tapping Done on his phone to send the customer a finished-job photo"]]:[["img/plow-1.jpg","Plow operator smiling at a new booking on his phone beside his truck"],["img/plow-2.jpg","Plow operator clearing a driveway at night with his job list on the dashboard"]];return [
@@ -301,6 +327,7 @@ function landing(){
   </section></main>
   <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">How it works</h2>
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-8">${B.how.map((s,i)=>`<div class="card p-6"><div class="display text-3xl orange">0${i+1}</div><h3 class="font-bold mt-4">${s[0]}</h3><p class="muted mt-2 text-sm">${s[1]}</p></div>`).join("")}</div></section>
+  ${BR.key==="mow"?`<section class="max-w-5xl mx-auto px-5 pt-16"><h2 class="display text-3xl">Built for every kind of yard pro</h2><div class="grid md:grid-cols-3 gap-5 mt-6">${Object.entries(TRADES).map(([k,t])=>`<a href="#/mow/${k}" class="card p-6 block hover:brightness-110"><div class="font-bold text-lg">${t.title.replace("MowCall for ","")}</div><p class="muted text-sm mt-2">${t.hero}</p><span class="orange text-sm font-bold mt-3 inline-block">See how →</span></a>`).join("")}</div></section>`:""}
   <section id="demo" class="max-w-4xl mx-auto px-5 py-16"><div class="card p-6 md:p-10" id="demobox">${demoGate()}</div></section>
   <section class="max-w-4xl mx-auto px-5 pb-8"><div class="card p-6 md:p-10" id="seasonDemo">${seasonDemo()}</div></section>
   <section class="max-w-6xl mx-auto px-5 py-16"><h2 class="display text-3xl md:text-4xl">What you get</h2>
