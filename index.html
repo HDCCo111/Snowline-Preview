@@ -229,16 +229,16 @@ function capLine(){return BR.key==="mow"?"Up to 35 active recurring customers":"
 function capFix(t){return String(t).replace("__CAP__",capLine()).replace("__CAPLOW__",BR.key==="mow"?"up to 35 active recurring customers":"up to 100 jobs a month")}
 const PLANS={
  starter:{name:"Junior Boss",tag:"Side hustle, first business, or a kid running their own business",kids:true,price:48,setup:0,
-  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","__CAP__"],
+  bullets:["Your QR code, quote page and dashboard","Instant prices and deposits","Your own customer app (install link)","AI answers your website chat and email","Customers reach you through your quote page and app; calls and texts go to your own phone until you add a business line","No business phone line or EIN needed","Best route order + Google Maps directions","Signed service agreement, renewed yearly for you","CSV export anytime","__CAP__"],
   fine:"Under 18? A parent or guardian signs up and holds the account."},
  payg:{name:"Pay as you go",tag:"1 truck, a smaller customer list",price:78,setup:148,
   bullets:["Everything in Junior Boss","Your own business phone number","AI answers calls, texts and DMs","AI text reply: 8¢ · AI call minute: 38¢","Regular texts and calls included","Upgrade to Monthly anytime"],
   fine:"Calls work the day your line is set up. Texting turns on after carrier approval."},
  solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,setup:298,season:698,best:true,
-  bullets:["Everything in Pay as you go","500 AI texts + 100 AI call minutes included","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-storm alerts","Custom branding, approved by you","Second truck? Add one for $148/mo"],
+  bullets:["Everything in Pay as you go","500 AI texts + 100 AI call minutes included","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-storm alerts","Custom branding, approved by you","QuickBooks Online sync","Second truck or crew login? $148/mo each (own login + 500 AI texts + 100 AI minutes)"],
   fine:"Season prepay Nov–Mar: $698 and setup is free."},
  crew:{name:"Monthly Crew",tag:"3 trucks included",price:398,setup:298,season:1898,
-  bullets:["Everything in Monthly Solo","3 trucks and drivers included","1,500 AI texts + 300 AI call minutes included","+$148/mo per extra truck (adds 500 AI texts + 100 AI minutes)","Business call calendar for commercial work","Priority support","Extra AI use billed at Pay-as-you-go rates"],
+  bullets:["Everything in Monthly Solo","3 trucks included, each with its own crew login","1,500 AI texts + 300 AI call minutes included","+$148/mo per extra truck or login (adds 500 AI texts + 100 AI minutes)","Business call calendar for commercial work","Priority support","Extra AI use billed at Pay-as-you-go rates"],
   fine:"Season prepay Nov–Mar: $1,898 and setup is free."}
 };
 let planTab="monthly";

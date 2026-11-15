@@ -81,6 +81,7 @@
     <a href="#/plan" class="underline">4. Plan &amp; add-ons</a>
     <a href="#/quote" class="underline">5. Homeowner quote</a>
     <a href="#/texts" class="underline">6. Customer texts</a>
+    <a href="#/sign?c=4" class="underline">7. Agreement renewal (customer)</a>
     <a href="index.html#/mow" class="underline">MowCall landing page</a>
     <button onclick="resetDemo()" class="underline">Reset sample data</button>
   </div>
@@ -100,6 +101,8 @@ const esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat"];
 const DAY_ES={Mon:"lunes",Tue:"martes",Wed:"miércoles",Thu:"jueves",Fri:"viernes",Sat:"sábado"};
 const DAY_EN={Mon:"Monday",Tue:"Tuesday",Wed:"Wednesday",Thu:"Thursday",Fri:"Friday",Sat:"Saturday"};
+const DAYMS=864e5,ago=d=>new Date(Date.now()-d*DAYMS).toISOString();
+const WAIVER_VER="mow-terms-2026-1";
 function toast(m){const t=$("#toast");t.innerHTML=`<div class="card px-4 py-3 text-sm font-semibold shadow-xl">${m}</div>`;clearTimeout(t._h);t._h=setTimeout(()=>t.innerHTML="",3500)}
 function openDlg(html){$("#dlgBody").innerHTML=html;$("#dlg").showModal()}
 function closeDlg(){$("#dlg").close()}
@@ -109,29 +112,29 @@ const MOWERS={push:{label:"21-inch push mower",min:7},walk:{label:"36–48-inch 
 const SEED={
  op:{business:"Sean's Lawn & Snow",plan:"starter",payMode:"choose",
      rate:6.8,minimum:48,firstCut:28,tallFee:28,tallInches:6,mower:"zero",setupMin:10,floorOn:false,floorRate:68,
-     spanish:true,notice:24,
+     spanish:true,notice:24,home:[40.0996,-83.1141],qbo:false,team:[{name:"Mike Torres",phone:"(614) 555-0142"}],
      creds:{
       insured:{on:true,detail:"$1,000,000 general liability",exp:"2027-04-30",proof:true},
       licensed:{on:true,detail:"Ohio business license",exp:"2027-12-31",proof:true},
       bonded:{on:false,detail:"",exp:"",proof:false}}},
  customers:[
-  {id:1,name:"Dana Price",addr:"412 Oak Ridge Dr",zones:{front:2400,back:4100},freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Gate code 4417. Friendly dog (Bo), keep gate shut.",status:"active"},
-  {id:2,name:"Luis Ramírez",addr:"88 Willow Ct",zones:{front:3800,back:7900,side:900},freq:"weekly",day:"Tue",pay:"monthly",lang:"es",notes:"Perro en el patio de atrás. Bolsas de basura en la acera los martes.",status:"active"},
-  {id:3,name:"Marcy Hill",addr:"1503 Birch Ln",zones:{front:1900},freq:"biweekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Front yard only. Side gate sticks.",status:"active"},
-  {id:4,name:"Greg & Tasha Moore",addr:"27 Cedar Pt",zones:{front:3100,back:5200},freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"",status:"active"},
-  {id:5,name:"Rosa Delgado",addr:"640 Maple Ave",zones:{back:4600},freq:"biweekly",day:"Tue",pay:"monthly",lang:"es",notes:"Solo el patio de atrás. Mover la manguera antes de cortar.",status:"active"},
-  {id:6,name:"Ken Whitfield",addr:"9 Pine Hollow",zones:{front:5200,back:8800},freq:"weekly",day:"Wed",pay:"per_visit",lang:"en",notes:"Paused for vacation until the 20th.",status:"paused"}
+  {id:1,name:"Dana Price",addr:"412 Oak Ridge Dr",zones:{front:2400,back:4100},freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Gate code 4417. Friendly dog (Bo), keep gate shut.",status:"active",lat:40.1052,lng:-83.1010,waiver:{signed:"Dana Price",at:ago(351),version:WAIVER_VER}},
+  {id:2,name:"Luis Ramírez",addr:"88 Willow Ct",zones:{front:3800,back:7900,side:900},freq:"weekly",day:"Tue",pay:"monthly",lang:"es",notes:"Perro en el patio de atrás. Bolsas de basura en la acera los martes.",status:"active",lat:40.0921,lng:-83.1265,waiver:{signed:"Luis Ramírez",at:ago(372),version:WAIVER_VER},renew:{sent:ago(7),reminders:0}},
+  {id:3,name:"Marcy Hill",addr:"1503 Birch Ln",zones:{front:1900},freq:"biweekly",day:"Tue",pay:"per_visit",lang:"en",notes:"Front yard only. Side gate sticks.",status:"active",lat:40.1110,lng:-83.1190,waiver:{signed:"Marcy Hill",at:ago(120),version:WAIVER_VER}},
+  {id:4,name:"Greg & Tasha Moore",addr:"27 Cedar Pt",zones:{front:3100,back:5200},freq:"weekly",day:"Tue",pay:"per_visit",lang:"en",notes:"",status:"active",lat:40.0958,lng:-83.1032,waiver:{signed:"Tasha Moore",at:ago(200),version:"mow-terms-2025-1"}},
+  {id:5,name:"Rosa Delgado",addr:"640 Maple Ave",zones:{back:4600},freq:"biweekly",day:"Tue",pay:"monthly",lang:"es",notes:"Solo el patio de atrás. Mover la manguera antes de cortar.",status:"active",lat:40.1031,lng:-83.1302,waiver:{signed:"Rosa Delgado",at:ago(380),version:WAIVER_VER},renew:{sent:ago(22),reminders:1}},
+  {id:6,name:"Ken Whitfield",addr:"9 Pine Hollow",zones:{front:5200,back:8800},freq:"weekly",day:"Wed",pay:"per_visit",lang:"en",notes:"Paused for vacation until the 20th.",status:"paused",lat:40.0880,lng:-83.1120,waiver:{signed:"Ken Whitfield",at:ago(60),version:WAIVER_VER}}
  ],
  extraActive:25,
  route:{day:"Tue",stops:[1,2,3,4,5],state:{}},
- texts:[]
+ texts:[],viewAs:"owner",crewIdx:0
 };
 let DB;
-function load(){try{DB=JSON.parse(localStorage.getItem("mowcall_demo_v2"))}catch(e){}if(!DB)DB=JSON.parse(JSON.stringify(SEED))}
-function save(){try{localStorage.setItem("mowcall_demo_v2",JSON.stringify(DB))}catch(e){}}
-function resetDemo(){try{localStorage.removeItem("mowcall_demo_v2")}catch(e){}load();resetQuote();toast("Sample data reset");route(true)}
+function load(){try{DB=JSON.parse(localStorage.getItem("mowcall_demo_v3"))}catch(e){}if(!DB)DB=JSON.parse(JSON.stringify(SEED))}
+function save(){try{localStorage.setItem("mowcall_demo_v3",JSON.stringify(DB))}catch(e){}}
+function resetDemo(){try{localStorage.removeItem("mowcall_demo_v3")}catch(e){}load();waiverSweep();resetQuote();toast("Sample data reset");route(true)}
 
-const PLANS={starter:{name:"Starter",price:48,cap:35},starterplus:{name:"Starter Plus",price:118,cap:80},payg:{name:"Pay as you go",price:78,cap:null},solo:{name:"Monthly Solo",price:148,cap:null},crew:{name:"Monthly Crew",price:398,cap:null}};
+const PLANS={starter:{name:"Junior Boss",price:48,cap:35},starterplus:{name:"Junior Boss Plus",price:118,cap:80},payg:{name:"Pay as you go",price:78,cap:null},solo:{name:"Monthly Solo",price:148,cap:null},crew:{name:"Monthly Crew",price:398,cap:null}};
 const activeCount=()=>DB.customers.filter(c=>c.status==="active").length+DB.extraActive;
 const cust=id=>DB.customers.find(c=>c.id===id);
 const FREQ={weekly:"Weekly",biweekly:"Every other week",once:"One time"};
@@ -174,7 +177,9 @@ const T={
   omw:(n,b)=>`Hi ${n}, ${b} is on the way. About 15 minutes out. Please make sure the gate is unlocked and pets are inside.`,
   done:(n,b,a,l)=>`Done! Your lawn at ${a} is mowed and edged. See the photo: ${l} . ${b}`,
   skip:(n,b)=>`Hi ${n}, we skipped your mow today because the ground was too wet. You won't be charged for today. See you next visit. ${b}`,
-  paid:(a)=>`Payment received: ${a} by bank (ACH). Thank you!`
+  paid:(a)=>`Payment received: ${a} by bank (ACH). Thank you!`,
+  renew:(n,b,l,t)=>`Hi ${n}, it's ${b}. ${t?"We updated our service agreement.":"It's been a year since you signed our service agreement."} Please review and sign when you have a minute: ${l} . Your mowing and payments keep going as usual.`,
+  remind:(n,b,l)=>`Hi ${n}, quick reminder from ${b}: please sign this year's service agreement when you can: ${l} . Nothing changes with your service.`
  },
  es:{
   aiNote:b=>`${b} usa un asistente de IA para enviar mensajes y contestar llamadas, así el equipo puede seguir trabajando. Una persona de nuestro equipo revisa cada conversación.`,
@@ -182,7 +187,9 @@ const T={
   omw:(n,b)=>`Hola ${n}, ${b} va en camino. Llegamos en unos 15 minutos. Por favor deje la reja abierta y las mascotas adentro.`,
   done:(n,b,a,l)=>`¡Listo! Su césped en ${a} ya está cortado y bordeado. Vea la foto: ${l} . ${b}`,
   skip:(n,b)=>`Hola ${n}, hoy no cortamos su césped porque el suelo estaba muy mojado. No se le cobrará por hoy. Nos vemos en la próxima visita. ${b}`,
-  paid:(a)=>`Pago recibido: ${a} por banco (ACH). ¡Gracias!`
+  paid:(a)=>`Pago recibido: ${a} por banco (ACH). ¡Gracias!`,
+  renew:(n,b,l,t)=>`Hola ${n}, le escribe ${b}. ${t?"Actualizamos nuestro acuerdo de servicio.":"Ya pasó un año desde que firmó nuestro acuerdo de servicio."} Por favor revíselo y fírmelo cuando tenga un minuto: ${l} . Su servicio y sus pagos siguen igual.`,
+  remind:(n,b,l)=>`Hola ${n}, un recordatorio de ${b}: por favor firme el acuerdo de servicio de este año cuando pueda: ${l} . Su servicio no cambia.`
  }
 };
 function logText(c,kind,body){DB.texts.unshift({to:c.name,lang:c.lang,kind,body,at:new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})});DB.texts=DB.texts.slice(0,30);save()}
@@ -192,6 +199,9 @@ const first=n=>String(n).split(" ")[0];
 /* ===================== OPERATOR SHELL ===================== */
 const TABS=[["route","Today's route"],["customers","Customers"],["settings","Settings"],["plan","Plan & add-ons"],["quote","Homeowner quote"],["texts","Customer texts"]];
 function shell(tab,inner){
+ if(DB.viewAs==="crew"){const m=DB.op.team[DB.crewIdx]||{name:"Crew member"};
+  return `<div class="card p-3 mb-4 text-sm flex flex-wrap justify-between items-center gap-2" style="border-color:var(--yellow)"><span><b>Crew view:</b> what ${esc(m.name)} sees on their own login. No prices, payments, customer list, exports or settings.</span><button class="btn btn-sm btn-ghost" onclick="DB.viewAs='owner';save();location.hash='#/plan'">Back to owner view</button></div>
+  <div class="mb-4"><div class="text-xs muted">MowCall · ${esc(m.name)}</div><div class="display text-2xl">${esc(DB.op.business)}</div></div>${inner}`}
  return `<div class="flex items-center justify-between gap-3 mb-4">
   <div><div class="text-xs muted">MowCall · operator view</div><div class="display text-2xl">${esc(DB.op.business)}</div></div>
   <a href="#/plan" class="btn btn-sm btn-orange">Upgrade</a></div>
@@ -203,22 +213,24 @@ function capLine(){const p=PLANS[DB.op.plan],n=activeCount();
 
 /* ===================== 1. TODAY'S ROUTE ===================== */
 function viewRoute(){
- const r=DB.route,stops=r.stops.map(cust).filter(c=>c&&c.status==="active"),st=id=>r.state[id]||"scheduled";
- const badge={scheduled:["Scheduled","p-muted"],omw:["On the way","p-yellow"],done:["Done · billed","p-green"],skipped:["Skipped · not billed","p-ice"],missed:["Missed · reschedule","p-red"],moved:["Moved (rain)","p-ice"]};
+ const r=DB.route,crew=DB.viewAs==="crew",stops=r.stops.map(cust).filter(c=>c&&c.status==="active"),st=id=>r.state[id]||"scheduled";
+ const badge={scheduled:["Scheduled","p-muted"],omw:["On the way","p-yellow"],done:[crew?"Done":"Done · billed","p-green"],skipped:[crew?"Skipped":"Skipped · not billed","p-ice"],missed:["Missed · reschedule","p-red"],moved:["Moved (rain)","p-ice"]};
  const doneCount=stops.filter(c=>st(c.id)==="done").length;
  const earned=stops.filter(c=>st(c.id)==="done"&&c.pay==="per_visit").reduce((s,c)=>s+visitPrice(c),0);
  const totalMin=stops.reduce((s,c)=>s+priceFor(c.zones).mins,0);
- return shell("route",`${capLine()}
+ return shell("route",`${crew?"":capLine()}
  <div class="card p-5">
   <div class="flex flex-wrap items-center justify-between gap-3">
-   <div><div class="display text-xl">${DAY_EN[r.day]}'s route</div><div class="muted text-sm">${stops.length} stops · about ${Math.round(totalMin/60*10)/10} hours on site · ${doneCount} done · ${money(earned)} charged by autopay so far</div></div>
-   <button class="btn btn-red" onclick="rainDlg()">🌧 Rain delay: move today</button>
+   <div><div class="display text-xl">${DAY_EN[r.day]}'s route</div><div class="muted text-sm">${stops.length} stops · about ${Math.round(totalMin/60*10)/10} hours on site · about ${routeMiles(stops).toFixed(1)} miles of driving · ${doneCount} done${crew?"":` · ${money(earned)} charged by autopay so far`}</div></div>
+   ${crew?"":`<button class="btn btn-red" onclick="rainDlg()">🌧 Rain delay: move today</button>`}
   </div>
+  <div class="flex flex-wrap gap-2 mt-3">${crew?"":`<button class="btn btn-sm btn-ghost" onclick="bestOrder()">↕ Best order</button>`}${mapsLinks(stops)}</div>
   <div class="grid gap-3 mt-4">
   ${stops.map((c,i)=>{const s=st(c.id),[bt,bc]=badge[s],pr=priceFor(c.zones);return `<div class="card p-4" style="background:var(--bg)">
    <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${i+1}. ${esc(c.name)} ${c.lang==="es"?'<span class="pill p-muted">ES</span>':""}</div>
-    <div class="muted text-sm">${esc(c.addr)} · ${Object.keys(c.zones).map(z=>ZN[z]).join(" + ")} · ${fmt(pr.sqft)} sq ft · ${FREQ[c.freq]}</div>
-    <div class="text-sm mt-1">${c.pay==="monthly"?`Flat monthly ${money(monthlyFor(c))}/mo`:`${money(pr.total)}/visit, autopay`} · about ${Math.round(pr.mins)} min (${money(pr.hourly)}/hr)</div></div>
+    <div class="muted text-sm">${esc(c.addr)} · ${Object.keys(c.zones).map(z=>ZN[z]).join(" + ")} · ${fmt(pr.sqft)} sq ft${crew?"":` · ${FREQ[c.freq]}`}</div>
+    ${crew?`<div class="text-sm mt-1">About ${Math.round(pr.mins)} min</div>`:`<div class="text-sm mt-1">${c.pay==="monthly"?`Flat monthly ${money(monthlyFor(c))}/mo`:`${money(pr.total)}/visit, autopay`} · about ${Math.round(pr.mins)} min (${money(pr.hourly)}/hr)</div>`}
+    ${!crew&&needsSign(c)?`<div class="mt-2">${wPill(c)}</div>`:""}</div>
     <span class="pill ${bc} self-start">${bt}</span></div>
    ${c.notes?`<div class="text-sm mt-2"><span class="muted">Property notes:</span> ${esc(c.notes)}</div>`:""}
    <div class="flex flex-wrap gap-2 mt-3">
@@ -228,10 +240,79 @@ function viewRoute(){
     <button class="btn btn-sm btn-ghost" ${["done","skipped","moved","missed"].includes(s)?"disabled":""} onclick="act(${c.id},'missed')">Missed</button>
    </div></div>`}).join("")}
   </div>
-  <p class="muted text-xs mt-4"><b>Skipped</b> = weather or ground made it unsafe; no charge and the plan keeps going. <b>Missed</b> = we didn't make it; it goes back on the schedule. Only <b>Done</b> triggers autopay for per-visit customers.</p>
-  <div class="todo mt-3">Real build: these buttons send an event to Boss Growth Machine, which sends the text in the customer's language (consent, opt-outs and 9am–8pm quiet hours apply) and runs the ACH charge. Lovable only adds the buttons and the webhook.</div>
+  <p class="muted text-xs mt-4"><b>Best order</b> puts stops in the shortest driving order from your shop, using our own math (no map fees). <b>Open in Google Maps</b> gives turn-by-turn directions through every stop in that order, free, in groups of up to 10 stops. ${crew?"":"Only <b>Done</b> triggers autopay for per-visit customers. A yearly agreement renewal never holds up a visit or a payment."}</p>
+  ${crew?"":`<div class="todo mt-3">Real build: these buttons send an event to Boss Growth Machine, which sends the text in the customer's language (consent, opt-outs and 9am–8pm quiet hours apply) and runs the ACH charge. Lovable only adds the buttons and the webhook.</div>`}
  </div>`);
 }
+/* --- route order: nearest-next-stop from the shop; straight-line miles x 1.3 for roads --- */
+function hav(a,b){const R=3958.8,r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]),h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+const ll=c=>[c.lat||DB.op.home[0],c.lng||DB.op.home[1]];
+function routeMiles(list){let p=DB.op.home,m=0;list.forEach(c=>{m+=hav(p,ll(c));p=ll(c)});return m*1.3}
+function bestOrder(){const r=DB.route,all=r.stops.map(cust).filter(Boolean),act_=all.filter(c=>c.status==="active"),before=routeMiles(act_);
+ let left=[...all],p=DB.op.home,out=[];while(left.length){left.sort((a,b)=>hav(p,ll(a))-hav(p,ll(b)));const n=left.shift();out.push(n);p=ll(n)}
+ r.stops=out.map(c=>c.id);const after=routeMiles(out.filter(c=>c.status==="active"));save();
+ toast(after<before-0.05?`Reordered. About ${(before-after).toFixed(1)} fewer miles today.`:"Already in the best order.");route()}
+function mapsLinks(stops){const pts=stops.filter(c=>!["done","skipped","moved"].includes(DB.route.state[c.id]||"scheduled")).map(ll);if(!pts.length)return "";
+ const out=[];let origin=DB.op.home;
+ for(let i=0;i<pts.length;i+=9){const chunk=pts.slice(i,i+9),dest=chunk[chunk.length-1],way=chunk.slice(0,-1);
+  const u=`https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${origin.join(",")}&destination=${dest.join(",")}${way.length?"&waypoints="+way.map(q=>q.join(",")).join("%7C"):""}`;
+  out.push(`<a class="btn btn-sm btn-ghost" target="_blank" rel="noopener" href="${u}">🧭 Open ${pts.length>9?`stops ${i+1}–${i+chunk.length}`:"route"} in Google Maps</a>`);origin=dest}
+ return out.join("")}
+
+/* --- yearly service agreement --- */
+function wStat(c){const w=c.waiver;if(!w)return{k:"none"};const due=new Date(new Date(w.at).getTime()+365*DAYMS),days=Math.ceil((due-Date.now())/DAYMS);
+ if(w.version!==WAIVER_VER)return{k:"terms",due,days};if(days<=0)return{k:"due",due,days};if(days<=30)return{k:"soon",due,days};return{k:"current",due,days}}
+const needsSign=c=>["none","due","terms"].includes(wStat(c).k);
+const renewLink=c=>`mowcall.com/s/${(c.id*104729).toString(36)}`;
+function wPill(c){const s=wStat(c),r=c.renew;
+ if(s.k==="current")return `<span class="pill p-green">Agreement current · renews ${s.due.toLocaleDateString()}</span>`;
+ if(s.k==="soon")return `<span class="pill p-yellow">Agreement renews in ${s.days} days</span>`;
+ const what=s.k==="terms"?"New agreement terms to sign":s.k==="none"?"No agreement on file":`Yearly agreement due ${Math.max(1,-s.days)} days ago`;
+ const step=!r?"link not sent yet":r.reminders>=2?"final reminder sent, ask at next visit":r.reminders===1?"link + 1 reminder sent":"link sent";
+ return `<span class="pill ${r&&r.reminders>=2?"p-red":"p-yellow"}">${what} · ${step}</span>`}
+// Runs daily in the real build (10am, quiet hours respected). Link at the 1-year mark or when terms change, reminders at day 7 and day 21. Never pauses service or payments.
+function waiverSweep(){let n=0;
+ DB.customers.forEach(c=>{if(c.status!=="active"||!needsSign(c))return;const L=T[c.lang],b=DB.op.business;
+  if(!c.renew){c.renew={sent:new Date().toISOString(),reminders:0};logText(c,"Agreement renewal",L.renew(first(c.name),b,renewLink(c),wStat(c).k==="terms"));n++;return}
+  const since=(Date.now()-new Date(c.renew.sent).getTime())/DAYMS;
+  if(since>=21&&c.renew.reminders<2){c.renew.reminders=2;logText(c,"Agreement final reminder",L.remind(first(c.name),b,renewLink(c)));n++}
+  else if(since>=7&&c.renew.reminders<1){c.renew.reminders=1;logText(c,"Agreement reminder",L.remind(first(c.name),b,renewLink(c)));n++}});
+ if(n)save();return n}
+function extraDlg(id){const c=cust(id),s=wStat(c),renew=needsSign(c)||s.k==="soon",L=c.lang==="es",base=visitPrice(c),o=DB.op;
+ const svc=[["extra",L?"Corte extra esta semana":"Extra mow this week",base],["tall",L?`Corte de pasto alto (más de ${o.tallInches} pulg.)`:`Tall-grass catch-up mow (over ${o.tallInches} in.)`,base+o.tallFee]];
+ openDlg(`<div class="muted text-xs">Customer view · ${esc(c.name)} books another service in your app</div>
+ <div class="display text-xl mt-1">${L?"Agregar un servicio":"Add a service"}</div>
+ <div class="grid gap-2 mt-4" id="xsvc">${svc.map(([k,l,pr],i)=>`<button class="choice ${i===0?"on":""}" data-p="${pr}" data-l="${esc(l)}" onclick="document.querySelectorAll('#xsvc .choice').forEach(x=>x.classList.remove('on'));this.classList.add('on')"><div class="flex justify-between gap-3"><b>${l}</b><b>${money(pr)}</b></div></button>`).join("")}</div>
+ ${renew?`<div class="card p-4 mt-4" style="background:var(--bg)"><div class="font-bold">${L?"Firme el acuerdo de servicio de este año":"Sign this year's service agreement"}</div>
+   <div class="muted text-xs mt-1">${L?"Es parte de esta misma reserva. Toma un minuto.":"Part of this same checkout. Takes a minute."}</div>
+   <ul class="text-sm mt-2 grid gap-1 list-disc pl-5">${waiverLines(c.lang).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+   <label class="flex gap-2 items-start mt-3 text-sm"><input type="checkbox" id="xag" class="mt-1"> <span>${L?"Leí y acepto el acuerdo de servicio.":"I've read and agree to the service agreement."}</span></label>
+   <input class="input mt-2" id="xnm" placeholder="${L?"Escriba su nombre completo para firmar":"Type your full name to sign"}"></div>`
+  :`<div class="text-sm mt-4">✓ ${L?"Acuerdo de servicio en archivo, firmado el":"Service agreement on file, signed"} ${new Date(c.waiver.at).toLocaleDateString()}. ${L?"No hay nada que firmar.":"Nothing to sign."}</div>`}
+ <div class="text-sm mt-3 muted">${L?"Se cobra por banco (ACH) después de la visita, como siempre.":"Charged by bank (ACH) after the visit, same as always."}</div>
+ <div class="flex gap-2 mt-5"><button class="btn btn-orange flex-1" onclick="bookExtra(${id},${renew})">${L?"Reservar":"Book it"}</button><button class="btn btn-ghost" onclick="closeDlg()">${L?"Cancelar":"Cancel"}</button></div>`)}
+function bookExtra(id,renew){const c=cust(id),L=c.lang==="es",sel=document.querySelector("#xsvc .choice.on");
+ if(renew){const ag=$("#xag").checked,nm=$("#xnm").value.trim();if(!ag||nm.length<3){toast(L?"Marque la casilla y escriba su nombre para firmar.":"Check the box and type your name to sign.");return}
+  c.waiver={signed:nm,at:new Date().toISOString(),version:WAIVER_VER,how:"checkout"};delete c.renew}
+ logText(c,"Extra service booked",L?`Reservado: ${sel.dataset.l}, ${money(sel.dataset.p)}. Le avisaremos cuando vayamos en camino. ${DB.op.business}`:`Booked: ${sel.dataset.l}, ${money(sel.dataset.p)}. We'll text when we're on the way. ${DB.op.business}`);
+ save();closeDlg();toast(renew?`${c.name} booked and renewed the agreement in the same checkout`:`${c.name} booked. Agreement already current.`);route()}
+let SG={lang:null,doneFor:null};
+function viewSign(){const id=Number(new URLSearchParams(location.hash.split("?")[1]||"").get("c"))||4,c=cust(id);if(!c)return `<p>Customer not found. <a class="underline" href="#/customers">Back</a></p>`;
+ const lang=SG.lang||c.lang,L=lang==="es",s=wStat(c),b=esc(DB.op.business);
+ const top=`<div class="card p-3 mb-4 text-sm flex flex-wrap justify-between gap-2 items-center" style="border-color:var(--yellow)"><span><b>Customer view:</b> the page ${esc(c.name)} opens from the renewal text (${renewLink(c)}).</span><a class="btn btn-sm btn-ghost" href="#/customers" onclick="SG={lang:null,doneFor:null}">Back to customers</a></div>`;
+ const toggle=DB.op.spanish?`<div class="inline-flex border rounded-xl overflow-hidden" style="border-color:var(--input)">${["en","es"].map(l=>`<button class="px-3 py-2 font-semibold ${lang===l?"btn-orange":""}" onclick="SG.lang='${l}';route()">${l==="en"?"English":"Español"}</button>`).join("")}</div>`:"";
+ if(SG.doneFor===id)return top+`<div class="card p-6 max-w-xl mx-auto text-center"><div class="display text-2xl">${L?"¡Firmado! Gracias.":"Signed. Thank you!"}</div><p class="muted mt-2">${L?"Le enviamos una copia por correo electrónico. Su servicio sigue igual.":"We emailed you a copy. Your service continues as scheduled."}</p></div>`;
+ if(!needsSign(c)&&s.k!=="soon")return top+`<div class="card p-6 max-w-xl mx-auto"><div class="display text-xl">${L?"Su acuerdo está al día":"Your agreement is up to date"}</div><p class="muted mt-2">${L?"No hay nada que firmar.":"Nothing to sign."}</p></div>`;
+ return top+`<div class="card p-6 max-w-xl mx-auto"><div class="flex justify-between items-start gap-3"><div><div class="text-xs muted">${b}</div><div class="display text-2xl">${L?"Su acuerdo de servicio anual":"Your yearly service agreement"}</div></div>${toggle}</div>
+  <p class="muted text-sm mt-2">${s.k==="terms"?(L?"Actualizamos nuestros términos. ":"We updated our terms. "):""}${L?"Toma un minuto. Su horario de corte y sus pagos no cambian.":"Takes about a minute. Your mowing schedule and payments don't change."}</p>
+  <ul class="text-sm mt-4 grid gap-2 list-disc pl-5">${waiverLines(lang).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+  <label class="flex gap-2 items-start mt-4 text-sm"><input type="checkbox" id="sgag" class="mt-1"> <span>${L?"Leí y acepto el acuerdo de servicio, y acepto firmar electrónicamente.":"I've read and agree to the service agreement, and I agree to sign electronically."}</span></label>
+  <input class="input mt-3" id="sgnm" placeholder="${L?"Escriba su nombre completo para firmar":"Type your full name to sign"}">
+  <button class="btn btn-orange w-full mt-4" onclick="doSign(${id})">${L?"Firmar":"Sign"}</button>
+  <p class="muted text-xs mt-3">${L?"Recibirá una copia por correo electrónico. Puede pedir una copia en papel en cualquier momento.":"You'll get a copy by email. You can ask for a paper copy anytime."}</p></div>`}
+function doSign(id){const c=cust(id),L=(SG.lang||c.lang)==="es",ag=$("#sgag").checked,nm=$("#sgnm").value.trim();
+ if(!ag||nm.length<3){toast(L?"Marque la casilla y escriba su nombre para firmar.":"Check the box and type your name to sign.");return}
+ c.waiver={signed:nm,at:new Date().toISOString(),version:WAIVER_VER,how:"renewal link",lang:SG.lang||c.lang};delete c.renew;SG.doneFor=id;save();route(true)}
 function act(id,kind){
  const c=cust(id),b=DB.op.business,L=T[c.lang];
  DB.route.state[id]=kind;
@@ -274,17 +355,20 @@ function viewCustomers(){
    <button class="btn btn-sm btn-ghost" onclick="addSample()">+ Add a sample customer</button>
   </div>
   ${p.cap?`<div class="meter mt-3"><div style="width:${Math.min(100,n/p.cap*100)}%"></div></div>`:""}
+  <div class="card p-3 mt-3 text-sm" style="background:var(--bg)"><b>Service agreements renew every year, automatically.</b> <span class="muted">At the 1-year mark (or when you update your terms) MowCall texts the customer a link in their language, then reminds them at 7 and 21 days. If they book anything in the meantime, signing is part of that checkout. Visits and payments never stop while it's pending. After the last reminder it shows here so you can ask in person.</span></div>
   <p class="muted text-xs mt-2">The limit counts <b>active recurring customers</b>, not visits. Paused customers and one-time jobs don't count. Sample data includes ${DB.extraActive} more active customers not listed.</p>
   <div class="grid gap-3 mt-4">${DB.customers.map(c=>{const pr=priceFor(c.zones);return `<div class="card p-4" style="background:var(--bg)">
    <div class="flex flex-wrap justify-between gap-2"><div><div class="font-bold">${esc(c.name)} ${c.lang==="es"?'<span class="pill p-muted">Español</span>':""}</div>
    <div class="muted text-sm">${esc(c.addr)} · ${FREQ[c.freq]} on ${DAY_EN[c.day]}s</div>
    <div class="text-sm mt-1">${pr.lines.map(l=>`${ZN[l.zone]} ${fmt(l.sqft)} sq ft`).join(" · ")}</div>
    <div class="text-sm mt-1">${PAY[c.pay]}: <b>${c.pay==="monthly"?money(monthlyFor(c))+"/mo":money(pr.total)+"/visit"}</b> · ACH · about ${Math.round(pr.mins)} min</div>
-   ${c.waiver?`<div class="text-xs muted mt-1">Waiver signed by ${esc(c.waiver.signed)} · ${new Date(c.waiver.at).toLocaleString()}</div>`:""}</div>
+   <div class="mt-2">${wPill(c)}</div>${c.waiver?`<div class="text-xs muted mt-1">Last signed by ${esc(c.waiver.signed)} · ${new Date(c.waiver.at).toLocaleDateString()}${c.waiver.how?` · ${c.waiver.how}`:""}</div>`:""}</div>
    <span class="pill ${c.status==="active"?"p-green":"p-yellow"} self-start">${c.status==="active"?"Active":"Paused"}</span></div>
    <div class="flex flex-wrap gap-2 mt-3">
     <button class="btn btn-sm btn-ghost" onclick="togglePause(${c.id})">${c.status==="active"?"Pause (vacation/drought)":"Resume"}</button>
     ${DB.op.payMode==="choose"?`<button class="btn btn-sm btn-ghost" onclick="togglePay(${c.id})">Switch to ${c.pay==="monthly"?"per-visit":"flat monthly"}</button>`:""}
+    <button class="btn btn-sm btn-ghost" onclick="extraDlg(${c.id})">See it as the customer: book another service</button>
+    ${needsSign(c)||wStat(c).k==="soon"?`<a class="btn btn-sm btn-ghost" href="#/sign?c=${c.id}" onclick="SG={lang:null,doneFor:null}">Open their renewal page</a>`:""}
    </div></div>`}).join("")}</div>
  </div>`);
 }
@@ -337,23 +421,33 @@ function viewSettings(){const o=DB.op;
    <div class="card p-5"><div class="display text-lg">Spanish</div>
     <button class="choice mt-3 ${o.spanish?"on":""}" onclick="DB.op.spanish=!DB.op.spanish;save();route()"><div class="font-bold">${o.spanish?"On":"Off"}: quote page, customer pages and AI replies in Spanish</div><div class="muted text-sm">Customers pick English or Español. Texts go out in the language they picked.</div></button>
    </div>
+   <div class="card p-5"><div class="display text-lg">Export and bookkeeping</div>
+    <p class="muted text-sm mt-1">Download your customers anytime. The file opens in Excel or Google Sheets and imports into QuickBooks. Visit and payment history export the same way in the full build.</p>
+    <button class="btn btn-ghost w-full mt-3" onclick="exportCSV()">⬇ Download customers (CSV)</button>
+    ${["solo","crew"].includes(o.plan)?`<button class="choice mt-3 ${o.qbo?"on":""}" onclick="DB.op.qbo=!DB.op.qbo;save();route()"><div class="font-bold">${o.qbo?"✓ QuickBooks Online connected":"Connect QuickBooks Online"}</div><div class="muted text-sm">${o.qbo?"New customers, invoices and payments go to QuickBooks automatically after each Done.":"Included with your plan. Sends customers, invoices and payments to QuickBooks automatically."}</div></button>`:""}
+   </div>
   </div>
  </div>`);
 }
+function exportCSV(){const rows=[["Name","Address","Areas","Sq ft","Frequency","Day","Payment","Price","Status","Language","Agreement last signed","Agreement renews"]];
+ DB.customers.forEach(c=>{const pr=priceFor(c.zones),s=wStat(c);rows.push([c.name,c.addr,Object.keys(c.zones).map(z=>ZN[z]).join(" + "),pr.sqft,FREQ[c.freq],DAY_EN[c.day],PAY[c.pay],c.pay==="monthly"?monthlyFor(c)+"/mo":pr.total+"/visit",c.status,c.lang,c.waiver?c.waiver.at.slice(0,10):"",s.due?s.due.toISOString().slice(0,10):""])});
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="mowcall-customers.csv";document.body.appendChild(a);a.click();a.remove();toast("Customers downloaded")}
 function setNum(k,v){DB.op[k]=Number(v);save();route()}
 
 /* ===================== 4. PLAN & ADD-ONS (the one place for upgrades) ===================== */
 function viewPlan(){
  const cur=DB.op.plan;
- const opts=[["starter","Up to 35 active recurring customers. No business line."],["starterplus","Up to 80 active recurring customers. Same setup as Starter, no business line or phone AI."],["payg","Your own business line. AI texts 8¢, AI call minutes 38¢."],["solo","Business line, 500 AI texts + 100 AI call minutes a month, no customer limit."],["crew","3 crews, 1,500 AI texts + 300 AI call minutes, business call calendar."]];
+ const opts=[["starter","Up to 35 active recurring customers. No business line."],["starterplus","Up to 80 active recurring customers. Same setup as Junior Boss, no business line or phone AI."],["payg","Your own business line. AI texts 8¢, AI call minutes 38¢."],["solo","Business line, 500 AI texts + 100 AI call minutes a month, no customer limit, QuickBooks Online sync. Crew logins $148/mo each."],["crew","3 trucks with 3 logins, 1,500 AI texts + 300 AI call minutes, business call calendar, QuickBooks Online sync. Extra logins $148/mo."]];
  return shell("plan",`<div class="grid lg:grid-cols-2 gap-4 items-start">
   <div class="grid gap-4">
-   <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month.</p>
+   <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month. Every plan includes route order, Google Maps directions, yearly agreement renewals and CSV export.</p>
     <div class="grid gap-2 mt-4">${opts.map(([k,d])=>`<button class="choice ${k===cur?"on":""}" onclick="DB.op.plan='${k}';save();toast('Plan set to ${PLANS[k].name} (preview only, no charge)');route()"><div class="flex justify-between gap-3"><b>${PLANS[k].name}</b><b>${money(PLANS[k].price)}/mo</b></div><div class="muted text-sm mt-1">${d}</div>${k===cur?'<div class="text-xs mt-2 orange font-bold">Current plan</div>':""}</button>`).join("")}</div></div>
    <div class="card p-5"><div class="display text-lg">Usage packs</div><p class="muted text-sm mt-1">For a busy month. Good for the current month only.</p>
     <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Busy Season Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div></div>
   </div>
   <div class="grid gap-4">
+   ${teamCard()}
    <div class="card p-5"><div class="flex justify-between items-baseline gap-3"><div class="display text-lg">Review Booster</div><b>$48/mo</b></div>
     <p class="muted text-sm mt-1">Your AI asks every customer for a Google review after every completed job, then reminds them once. Unhappy replies come to your Inbox so you can make it right. No monthly limit.</p>
     <button class="btn btn-ghost w-full mt-4" onclick="toast('Review Booster added (preview only, no charge)')">Add Review Booster</button></div>
@@ -362,6 +456,30 @@ function viewPlan(){
     <button class="btn btn-ghost w-full mt-4" onclick="toast('We will send you add-on pricing.')">Get add-on pricing</button></div>
   </div></div>`);
 }
+
+const SEATS={solo:1,crew:3};
+function teamCard(){const k=DB.op.plan,inc=SEATS[k],team=DB.op.team;
+ if(!inc)return `<div class="card p-5"><div class="display text-lg">Team logins</div><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Separate logins for crew members come with Monthly Solo and Monthly Crew.</p></div>`;
+ const people=1+team.length,extra=Math.max(0,people-inc),total=PLANS[k].price+extra*148;
+ return `<div class="card p-5"><div class="flex justify-between gap-3 items-baseline"><div class="display text-lg">Team logins</div><b class="text-sm">${people} login${people>1?"s":""} · ${inc} included</b></div>
+ <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${k==="solo"?"Monthly Solo includes 1 login (you).":"Monthly Crew includes 3 logins."} Each extra login is <b>$148/mo</b>, the same as adding another truck, because it comes with its own 500 AI texts and 100 AI call minutes.</p>
+ <div class="grid gap-2 mt-3"><div class="card p-3 text-sm" style="background:var(--bg)"><b>You</b> · Owner · full access · included</div>
+ ${team.map((m,i)=>`<div class="card p-3 text-sm flex flex-wrap justify-between gap-2 items-center" style="background:var(--bg)"><span><b>${esc(m.name)}</b> · Crew · ${esc(m.phone)} · ${i+2>inc?"$148/mo":"included"}</span><span class="flex gap-2"><button class="btn btn-sm btn-ghost" onclick="DB.viewAs='crew';DB.crewIdx=${i};save();location.hash='#/route'">See their view</button><button class="btn btn-sm btn-ghost" onclick="DB.op.team.splice(${i},1);save();route()">Remove</button></span></div>`).join("")}</div>
+ <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-2 mt-3"><input class="input" id="tmN" placeholder="Crew member's name"><input class="input" id="tmP" placeholder="Their own mobile number"><button class="btn btn-orange" onclick="addMember()">Add login</button></div>
+ <div class="text-sm mt-3">Your monthly total: <b>${money(total)}/mo</b>${extra?` (${money(PLANS[k].price)} plan + ${extra} × $148)`:""}</div>
+ ${k==="solo"&&people>=3?`<div class="text-sm mt-2 orange font-bold">Monthly Crew ($398) includes 3 logins and costs less than Solo with 2 extra logins ($444).</div>`:""}
+ <details class="mt-4 text-sm"><summary class="font-bold cursor-pointer">How team logins work</summary><ul class="list-disc pl-5 mt-2 grid gap-1 muted">
+  <li>One login = one named person with their own mobile number. Signing in needs a code texted to that number.</li>
+  <li>One phone at a time per login. Signing in on a second phone signs the first one out, and you get a text.</li>
+  <li>Crew logins see only the route you assign them: addresses, notes, On the way, Done + photo, Skip. No prices, payments, customer list, exports, settings or billing.</li>
+  <li>Same business name and branding on every login. One payout bank account and one customer list per account. A second business needs its own account.</li>
+  <li>Two Junior Boss accounts for one business (same bank account, tax ID or phone) to get around the customer limit are combined, and the plan that fits applies.</li>
+  <li>Swapping a login to a new person is fine for seasonal help. The old person is signed out right away. More than 3 swaps in 30 days gets a quick review.</li>
+  <li>AI texts and call minutes from every login count toward your account's monthly total.</li></ul></details></div>`}
+function addMember(){const n=$("#tmN").value.trim(),p=$("#tmP").value.trim(),d=p.replace(/\D/g,"");
+ if(n.length<2||d.length<10){toast("Add a name and their own 10-digit mobile number");return}
+ if(DB.op.team.some(m=>m.phone.replace(/\D/g,"")===d)){toast("That number already has a login. One login per person.");return}
+ DB.op.team.push({name:n,phone:p});save();toast(`${n} added. They get a text to set up their login (preview: nothing sent).`);route()}
 
 /* ===================== 5. HOMEOWNER QUOTE ===================== */
 let Q;
@@ -406,14 +524,16 @@ function waiverLines(lang){const b=DB.op.business,n=DB.op.notice;return lang==="
  "El precio se basa en las áreas que usted marcó. Si el área real es muy diferente, le avisaremos antes de cobrar cualquier cambio.",
  "La lluvia y el suelo mojado pueden mover su servicio uno o dos días por seguridad y por la salud del césped.",
  "Si algo se daña, envíe fotos dentro de las 24 horas después del servicio para que podamos arreglarlo.",
- `Cancele o pause gratis con ${n} horas de aviso.`]:[
+ `Cancele o pause gratis con ${n} horas de aviso.`,
+ "Este acuerdo se renueva una vez al año. Hasta que firme el nuevo, sigue vigente el último que firmó."]:[
  `${b} mows and services the areas you outlined, weather and ground conditions allowing.`,
  "Please pick up toys, hoses, pet waste and anything in the yard before we arrive. We are not responsible for items left in the lawn.",
  "Mark sprinkler heads, invisible dog fences and anything buried. We are not responsible for damage to unmarked or hidden items.",
  "Your price is based on the areas you outlined. If the real area is very different, we'll tell you before charging any change.",
  "Rain and wet ground can move your service a day or two for safety and lawn health.",
  "If something is damaged, send photos within 24 hours of service so we can make it right.",
- `Cancel or pause free with ${n} hours' notice.`]}
+ `Cancel or pause free with ${n} hours' notice.`,
+ "This agreement is renewed once a year. Until you sign the new one, the last one you signed stays in effect."]}
 
 /* --- geometry: geodesic area of a lat/lng ring, in square feet --- */
 function ringSqft(pts){if(pts.length<3)return 0;const R=6378137,rad=d=>d*Math.PI/180;let a=0;
@@ -530,14 +650,14 @@ function bookQuote(){const L=QT[Q.lang],o=DB.op,p=PLANS[o.plan];
  if(!Q.agree||Q.sign.trim().length<3){toast(L.needSign);return}
  if(Q.type==="home"&&Q.freq!=="once"){
   if(p.cap&&activeCount()>=p.cap){Q.step=5;route();toast("Operator note: you're at your plan limit, so this request waits in your Inbox.");return}
-  DB.customers.push({id:Date.now()%100000,name:Q.sign.trim(),addr:Q.addr||"(sample address)",zones:{...Q.zones},freq:Q.freq,day:"Wed",pay:Q.pay,lang:Q.lang,notes:[Q.gate&&`Gate ${Q.gate}`,Q.pets,Q.notes].filter(Boolean).join(". "),status:"active",waiver:{signed:Q.sign.trim(),at:new Date().toISOString(),version:"mow-waiver-preview-1"}});save()}
+  DB.customers.push({id:Date.now()%100000,name:Q.sign.trim(),addr:Q.addr||"(sample address)",zones:{...Q.zones},freq:Q.freq,day:"Wed",pay:Q.pay,lang:Q.lang,notes:[Q.gate&&`Gate ${Q.gate}`,Q.pets,Q.notes].filter(Boolean).join(". "),status:"active",waiver:{signed:Q.sign.trim(),at:new Date().toISOString(),version:WAIVER_VER},lat:Q.center[0],lng:Q.center[1]});save()}
  Q.step=5;route()}
 
 /* ===================== 6. CUSTOMER TEXTS ===================== */
 function viewTexts(){
  const b=DB.op.business;
- const lib=[["English",[["AI notice (once, up front)",T.en.aiNote(b)],["Rain delay",T.en.rain("Dana",b,"Wednesday")],["On the way",T.en.omw("Dana",b)],["Done + photo link",T.en.done("Dana",b,"412 Oak Ridge Dr",photoLink(1))],["Skipped (no charge)",T.en.skip("Dana",b)]]],
-  ["Español",[["Aviso de IA (una vez)",T.es.aiNote(b)],["Retraso por lluvia",T.es.rain("Luis",b,"miércoles")],["En camino",T.es.omw("Luis",b)],["Listo + foto",T.es.done("Luis",b,"88 Willow Ct",photoLink(2))],["Visita cancelada (sin cargo)",T.es.skip("Luis",b)]]]];
+ const lib=[["English",[["AI notice (once, up front)",T.en.aiNote(b)],["Rain delay",T.en.rain("Dana",b,"Wednesday")],["On the way",T.en.omw("Dana",b)],["Done + photo link",T.en.done("Dana",b,"412 Oak Ridge Dr",photoLink(1))],["Skipped (no charge)",T.en.skip("Dana",b)],["Yearly agreement link",T.en.renew("Dana",b,renewLink({id:1}),false)],["Agreement reminder",T.en.remind("Dana",b,renewLink({id:1}))]]],
+  ["Español",[["Aviso de IA (una vez)",T.es.aiNote(b)],["Retraso por lluvia",T.es.rain("Luis",b,"miércoles")],["En camino",T.es.omw("Luis",b)],["Listo + foto",T.es.done("Luis",b,"88 Willow Ct",photoLink(2))],["Visita cancelada (sin cargo)",T.es.skip("Luis",b)],["Acuerdo anual",T.es.renew("Luis",b,renewLink({id:2}),false)],["Recordatorio del acuerdo",T.es.remind("Luis",b,renewLink({id:2}))]]]];
  return shell("texts",`
  <div class="grid md:grid-cols-2 gap-4">
   ${lib.map(([lang,items])=>`<div class="card p-5"><div class="display text-lg">${lang}</div>
@@ -552,12 +672,13 @@ function viewTexts(){
 /* ===================== ROUTER ===================== */
 function route(top){
  const h=(location.hash||"#/route").slice(2).split("?")[0]||"route";
- const v={route:viewRoute,customers:viewCustomers,settings:viewSettings,plan:viewPlan,quote:viewQuote,texts:viewTexts}[h]||viewRoute;
+ const v=(DB.viewAs==="crew"&&h!=="route")?viewRoute:({route:viewRoute,customers:viewCustomers,settings:viewSettings,plan:viewPlan,quote:viewQuote,texts:viewTexts,sign:()=>shellless(viewSign())})[h]||viewRoute;
  if(MAP){try{MAP.remove()}catch(e){}MAP=null}
  $("#app").innerHTML=v();if(top===true)window.scrollTo(0,0);
  if(h==="quote"&&(Q.step===1||Q.step===2))initMap();
 }
-load();addEventListener("hashchange",()=>route(true));route(true);
+const shellless=x=>x;
+load();waiverSweep();addEventListener("hashchange",()=>route(true));route(true);
 </script>
 </body>
 </html>
