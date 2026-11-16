@@ -464,7 +464,7 @@ function setNum(k,v){DB.op[k]=Number(v);save();route()}
 /* ===================== 4. PLAN & ADD-ONS (the one place for upgrades) ===================== */
 function viewPlan(){
  const cur=DB.op.plan;
- const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. 2 logins: you + 1 helper."],["crew","5 logins (you + 4 crew), 1,000 AI texts + 200 AI minutes, business call calendar, priority support. Extra logins $28/mo."]];
+ const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. 2 logins: you + 1 helper."],["crew","5 logins (you + 4 crew), 1,000 AI texts + 200 AI minutes, business call calendar, support answers within 4 business hours, free 30-minute crew setup call. Extra logins $28/mo."]];
  return shell("plan",`<div class="grid lg:grid-cols-2 gap-4 items-start">
   <div class="grid gap-4">
    <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month. Every plan includes route order, Google Maps directions, yearly agreement renewals and CSV export.</p>

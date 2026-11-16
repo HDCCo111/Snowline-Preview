@@ -242,7 +242,7 @@ const PLANS={
   bullets:["Everything in Rising Boss","No customer limit","Your own business phone number","AI answers calls, texts and DMs","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-season alerts","Custom branding included, approved by you","Monthly AI report: how you did, what to fix, when to switch seasons","QuickBooks Online sync","2 logins: you + 1 helper"],
   fine:"Includes 500 AI texts and 100 AI call minutes a month."},
  crew:{name:"Monthly Crew",tag:"3+ people, one account",price:298,year:3278,
-  bullets:["Everything in Monthly Solo","5 logins: you + 4 crew (+$28/mo each after that)","Business call calendar for commercial work","Priority support","More AI for a big storm month: usage packs"],
+  bullets:["Everything in Monthly Solo","5 logins: you + 4 crew (+$28/mo each after that)","Business call calendar for commercial work","Front-of-the-line support: answers within 4 business hours","Free 30-minute crew setup call","More AI for a big storm month: usage packs"],
   fine:"Includes 1,000 AI texts and 200 AI call minutes a month."}
 };
 const BRAND_LAUNCH=148;
@@ -714,7 +714,7 @@ function reportCard(){const k=DB.operator.plan||"starter";if(k!=="solo"&&k!=="cr
    <ul class="grid gap-1 text-sm mt-3 list-disc pl-5"><li>3 quotes didn't book. Following up within an hour books more of them.</li><li>Most requests come in 6–8am on storm days. Your AI handled them while you plowed.</li><li>${new Date().getMonth()>=8||new Date().getMonth()<=1?"Spring is coming: turn on MowCall in March to keep these same customers all year.":"Snow season is coming: turn on PlowCall in November to keep these same customers all year."}</li></ul></div>`}
 function tabPlan(){
   const o=DB.operator,cur=o.plan||"starter",yr=o.billing==="yearly";
-  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync. 2 logins: you + 1 helper."],["crew","5 logins (you + 4 crew), 1,000 AI texts + 200 AI minutes, business call calendar, priority support."]];
+  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync. 2 logins: you + 1 helper."],["crew","5 logins (you + 4 crew), 1,000 AI texts + 200 AI minutes, business call calendar, support answers within 4 business hours, free 30-minute crew setup call."]];
   const renew=new Date(o.renews||Date.now()+200*864e5);
   $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
   <div class="grid gap-5">
