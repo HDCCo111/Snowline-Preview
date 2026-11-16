@@ -239,15 +239,15 @@ const PLANS={
   bullets:["Everything in Junior Boss","Up to 60 customers","Same setup, no business line or phone AI","Move up to Monthly Solo anytime"],
   fine:"Want your own logo and colors? Add Custom Brand Launch."},
  solo:{name:"Monthly Solo",tag:"1 truck, covered all month",price:148,year:1628,best:true,
-  bullets:["Everything in Rising Boss","No customer limit","Your own business phone number","AI answers calls, texts and DMs","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-season alerts","Custom branding included, approved by you","Monthly AI report: how you did, what to fix, when to switch seasons","QuickBooks Online sync","1 login: just you (crew logins come with Monthly Crew)"],
+  bullets:["Everything in Rising Boss","No customer limit","Your own business phone number","AI answers calls, texts and DMs","AI reminder and on-the-way calls, done text + thank-you email","Book-before-the-season alerts","Custom branding included, approved by you","Monthly AI report: how you did, what to fix, when to switch seasons","QuickBooks Online sync","2 logins: you + 1 helper"],
   fine:"Includes 500 AI texts and 100 AI call minutes a month."},
- crew:{name:"Monthly Crew",tag:"3 trucks included",price:398,year:4378,
-  bullets:["Everything in Monthly Solo","You + 3 crew logins included (+$28/mo each after that)","Business call calendar for commercial work","Priority support","More AI for a big storm month: usage packs"],
-  fine:"Includes 1,500 AI texts and 300 AI call minutes a month."}
+ crew:{name:"Monthly Crew",tag:"3+ people, one account",price:298,year:3278,
+  bullets:["Everything in Monthly Solo","5 logins: you + 4 crew (+$28/mo each after that)","Business call calendar for commercial work","Priority support","More AI for a big storm month: usage packs"],
+  fine:"Includes 1,000 AI texts and 200 AI call minutes a month."}
 };
 const BRAND_LAUNCH=148;
 let planTab="monthly";
-function fleetPrice(t){return t<=1?148:398+Math.max(0,t-4)*28}
+function fleetPrice(t){return t<=2?148:298+Math.max(0,t-5)*28}
 function planPrice(k,yr){const p=PLANS[k];return yr?p.year:p.price}
 function pricingSection(){
   const yr=planTab==="yearly";
@@ -278,7 +278,7 @@ function pricingSection(){
 }
 function refreshPricing(){const el=$("#pricing");if(el){el.outerHTML=pricingSection();calcPlan(20)}}
 function calcPlan(n){n=+n;const t=+(($("#trucksR")||{}).value||1);const o=$("#calcOut");if(!o)return;$("#jobsN").textContent=n;$("#trucksN").textContent=t;let msg;
-  if(t>1)msg=`<b>Monthly Crew</b> at $${fleetPrice(t)}/mo for ${t} trucks: you + 3 crew logins and 3× the AI${t>4?` (+ ${t-4} extra login${t-4>1?"s":""} at $28)`:""}.`;
+  if(t>2)msg=`<b>Monthly Crew</b> at $${fleetPrice(t)}/mo for ${t} trucks: 5 logins and 2× the AI${t>5?` (+ ${t-5} extra login${t-5>1?"s":""} at $28)`:""}.`;else if(t===2)msg=`<b>Monthly Solo</b> at $148/mo: 2 logins, you + 1 driver. Busy storm month? Add a usage pack.`;
   else if(n<=25)msg=`<b>Junior Boss</b> at $48/mo. Want the AI answering your calls and texts on a business line? That's Monthly Solo at $148.`;
   else if(n<=60)msg=`<b>Rising Boss</b> at $118/mo, or for $30 more, <b>Monthly Solo</b> adds your business line, phone AI and custom branding.`;
   else msg=`<b>Monthly Solo</b> at $148/mo. No customer limit.`;
@@ -514,7 +514,7 @@ const POSTS=[
   <h3>What age?</h3><p>10–12 for supervised shoveling with neighbors you know. 12+ for push mowers, per pediatric safety guidance. 16+ for riding mowers and snow blowers. <a class="underline ice" href="#/kids">See the full parents' guide →</a></p>`},
  {slug:"affiliate",tag:"Earn more",title:"Earn while you plow: how the affiliate program works",excerpt:"Refer other operators and earn a full month of their plan, every time.",
   body:`<p>Every PlowCall and MowCall account comes with an affiliate link. Share it with other operators, landscapers or side hustlers you know.</p>
-  <h3>What you earn</h3><p>One full month of whatever plan your referral signs up for: $48, $78, $148 or $398. Season prepays pay out right away.</p>
+  <h3>What you earn</h3><p>One full month of the plan your referral signs up for, on Rising Boss and above: $118, $148 or $298. Plus half of any Custom Brand Launch.</p>
   <h3>When you get paid</h3><p>After your referral's third monthly payment clears. That keeps the program fair and sustainable, and it means you're rewarded for referring operators who stick around.</p>
   <h3>Where to share</h3><p>Equipment dealers, salt suppliers, landscaping supply yards and local Facebook groups are where operators hang out. Tell them what it did for your phone during the last storm.</p>`},
  {slug:"winter-to-spring",tag:"All year",title:"From plow to mower: how your account switches seasons",excerpt:"Same customers, same app, new services. Here's what changes when the snow melts.",
@@ -664,15 +664,15 @@ function tabRoute(){const crew=DB.viewAs==="crew",list=routeJobs(),left=list.fil
  <div class="grid gap-3 mt-4">${list.length?list.map((j,i)=>`<div class="card p-4"><div class="flex justify-between gap-3 items-start"><div><div class="font-bold">${i+1}. ${j.name}</div><div class="muted text-sm">${j.address}, ${j.zip} · ${j.size}${j.addons.length?" · "+j.addons.join(", "):""}</div>${crew?"":`<div class="text-sm mt-1">${money(j.total)}${j.type==="Scheduled"&&j.date?" · scheduled "+j.date:""}</div>`}${j.notes?`<div class="text-sm mt-1"><span class="muted">Notes:</span> ${j.notes}</div>`:""}</div><span class="pill st-${j.status.replace(" ","")}">${j.status}</span></div>
   <div class="flex flex-wrap gap-2 mt-3"><button class="btn btn-ghost text-sm min-h-[40px]" ${j.otw||j.status==="Done"?"disabled":""} onclick="routeOTW(${j.id})">${j.otw?"✓ On the way sent":"On the way"}</button><button class="btn btn-orange text-sm min-h-[40px]" ${j.status==="Done"?"disabled":""} onclick="routeDone(${j.id})">${j.status==="Done"?"✓ Done":"Done + photo"}</button><a class="btn btn-ghost text-sm min-h-[40px]" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=${jobLL(j).join(",")}">Directions</a></div></div>`).join(""):`<p class="muted">No booked jobs right now.</p>`}</div>`}
 /* ---------- TEAM LOGINS (Monthly plans) ---------- */
-const LOGIN_PRICE=28,SEATS_P={crew:4};
+const LOGIN_PRICE=28,SEATS_P={solo:2,crew:5};
 function teamCardP(){const o=DB.operator,k=o.plan||"starter",inc=SEATS_P[k],team=o.team||(o.team=[]);
- if(!inc)return `<div class="card p-6"><h2 class="font-bold text-lg">Team logins</h2><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Crew logins come with Monthly Crew: you + 3 crew logins, then $28/mo per extra login.</p></div>`;
+ if(!inc)return `<div class="card p-6"><h2 class="font-bold text-lg">Team logins</h2><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Monthly Solo includes 2 logins (you + 1 helper). Monthly Crew includes 5, then $28/mo per extra login.</p></div>`;
  const people=1+team.length,extra=Math.max(0,people-inc),base=o.billing==="yearly"?Math.round(PLANS[k].year/12):PLANS[k].price;
  return `<div class="card p-6"><div class="flex justify-between gap-3 items-baseline"><h2 class="font-bold text-lg">Team logins</h2><b class="text-sm">${people} of ${inc} included${extra?` + ${extra} extra`:""}</b></div>
- <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${k==="solo"?"Monthly Solo is just you. Each crew login is":"Monthly Crew includes you + 3 crew logins. Each extra login is"} <b>$${LOGIN_PRICE}/mo</b>. AI texts and call minutes are shared across your account.</p>
+ <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${k==="solo"?"Monthly Solo includes 2 logins: you + 1 helper. Need a third person? That's a crew: Monthly Crew includes 5.":"Monthly Crew includes 5 logins: you + 4 crew. Each extra login is <b>$"+LOGIN_PRICE+"/mo</b>."} AI texts and call minutes are shared across your account.</p>
  <div class="grid gap-2 mt-3"><div class="rounded-xl p-3 text-sm" style="background:var(--muted)"><b>You</b> · Owner · full access</div>
  ${team.map((m,i)=>`<div class="rounded-xl p-3 text-sm flex flex-wrap justify-between gap-2 items-center" style="background:var(--muted)"><span><b>${m.name}</b> · Crew · ${m.phone} · ${i+2>inc?"$"+LOGIN_PRICE+"/mo":"included"}</span><span class="flex gap-2"><button class="btn btn-ghost text-sm min-h-[36px]" onclick="DB.viewAs='crew';DB.crewIdx=${i};save();location.hash='#/dashboard/route'">See their view</button><button class="btn btn-ghost text-sm min-h-[36px]" onclick="DB.operator.team.splice(${i},1);save();tabPlan()">Remove</button></span></div>`).join("")}</div>
- <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-2 mt-3"><input class="input" id="tmN" placeholder="Crew member's name"><input class="input" id="tmP" placeholder="Their own mobile number"><button class="btn btn-orange" onclick="addMemberP()">Add login</button></div>
+ ${k==="solo"&&people>=inc?`<div class="text-sm mt-3 muted">Both Solo logins are in use. Three or more people is a crew: Monthly Crew includes 5 logins.</div>`:`<div class="grid sm:grid-cols-[1fr_1fr_auto] gap-2 mt-3"><input class="input" id="tmN" placeholder="Crew member's name"><input class="input" id="tmP" placeholder="Their own mobile number"><button class="btn btn-orange" onclick="addMemberP()">Add login</button></div>`}
  ${extra?`<div class="text-sm mt-3">Extra logins: <b>${extra} × $${LOGIN_PRICE} = $${extra*LOGIN_PRICE}/mo</b> on top of your plan.</div>`:""}
  <details class="mt-4 text-sm"><summary class="font-bold cursor-pointer">How team logins work</summary><ul class="list-disc pl-5 mt-2 grid gap-1 muted">
   <li>One login = one named person with their own mobile number. Signing in needs a code texted to that number.</li>
@@ -682,7 +682,7 @@ function teamCardP(){const o=DB.operator,k=o.plan||"starter",inc=SEATS_P[k],team
   <li>Two Junior Boss accounts for one business (same bank account, tax ID or phone) to get around the customer limit are combined, and the plan that fits applies.</li>
   <li>Swapping a login to a new person is fine for seasonal help. The old person is signed out right away. More than 3 swaps in 30 days gets a quick review.</li>
   <li>AI texts and call minutes from every login count toward your account's monthly total.</li></ul></details></div>`}
-function addMemberP(){const n=$("#tmN").value.trim(),p=$("#tmP").value.trim(),d=p.replace(/\D/g,"");
+function addMemberP(){if((DB.operator.plan==="solo")&&1+(DB.operator.team||[]).length>=2){toast("Monthly Solo includes 2 logins. Three or more people is Monthly Crew.");return}const n=$("#tmN").value.trim(),p=$("#tmP").value.trim(),d=p.replace(/\D/g,"");
  if(n.length<2||d.length<10){toast("Add a name and their own 10-digit mobile number");return}
  if((DB.operator.team||[]).some(m=>m.phone.replace(/\D/g,"")===d)||DB.operator.phone.replace(/\D/g,"")===d){toast("That number already has a login. One login per person.");return}
  DB.operator.team.push({name:n,phone:p});save();toast(`${n} added. They get a text to set up their login (preview: nothing sent).`);tabPlan()}
@@ -714,7 +714,7 @@ function reportCard(){const k=DB.operator.plan||"starter";if(k!=="solo"&&k!=="cr
    <ul class="grid gap-1 text-sm mt-3 list-disc pl-5"><li>3 quotes didn't book. Following up within an hour books more of them.</li><li>Most requests come in 6–8am on storm days. Your AI handled them while you plowed.</li><li>${new Date().getMonth()>=8||new Date().getMonth()<=1?"Spring is coming: turn on MowCall in March to keep these same customers all year.":"Snow season is coming: turn on PlowCall in November to keep these same customers all year."}</li></ul></div>`}
 function tabPlan(){
   const o=DB.operator,cur=o.plan||"starter",yr=o.billing==="yearly";
-  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync. 1 login: just you."],["crew","3 trucks, you + 3 crew logins, business call calendar, priority support."]];
+  const opts=[["starter","Up to 25 customers. Calls and texts go to your own phone."],["starterplus","Up to 60 customers. Same setup as Junior Boss."],["solo","No customer limit. Your own business line, phone AI, custom branding, monthly AI report and QuickBooks sync. 2 logins: you + 1 helper."],["crew","5 logins (you + 4 crew), 1,000 AI texts + 200 AI minutes, business call calendar, priority support."]];
   const renew=new Date(o.renews||Date.now()+200*864e5);
   $("#tab").innerHTML=`<div class="grid lg:grid-cols-2 gap-5 items-start">
   <div class="grid gap-5">
@@ -724,7 +724,7 @@ function tabPlan(){
    ${cur==="starter"||cur==="starterplus"?`<div class="card p-6"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Custom Brand Launch</h2><b>$${BRAND_LAUNCH} one time</b></div><p class="muted text-sm mt-1">Your logo and colors on your quote page and customer app. $${BRAND_LAUNCH/2} today, $${BRAND_LAUNCH/2} when you approve your design. Included free on Monthly Solo and Crew.</p><button class="btn btn-ghost w-full mt-4" onclick="toast('Custom Brand Launch added (preview only, no charge)')">Add Custom Brand Launch</button></div>`:""}
    <div class="card p-6"><h2 class="font-bold text-lg">Usage packs</h2><p class="muted text-sm mt-1">For a busy month. Good for the current month only.</p>
     <div class="grid gap-2 mt-3">${[["+500 AI texts","$48"],["+100 AI call minutes","$48"],["Storm or Busy Season Pack: +1,000 texts and +200 minutes","$148"]].map(([l,pr])=>`<button class="btn btn-ghost justify-between text-sm" onclick="toast('${l} added for this month (preview)')"><span>${l}</span><b>${pr}</b></button>`).join("")}</div>
-    <details class="mt-3 text-xs muted"><summary class="cursor-pointer">How AI use is counted</summary><p class="mt-2">Monthly Solo includes 500 AI texts and 100 AI call minutes a month (Crew: 1,500 and 300). One AI text is one AI reply up to 320 characters. Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute. Texts and calls you send yourself are always included.</p></details></div></div>
+    <details class="mt-3 text-xs muted"><summary class="cursor-pointer">How AI use is counted</summary><p class="mt-2">Monthly Solo includes 500 AI texts and 100 AI call minutes a month (Crew: 1,000 and 200). One AI text is one AI reply up to 320 characters. Without a pack, extra use bills at 8¢ per AI text and 38¢ per AI call minute. Texts and calls you send yourself are always included.</p></details></div></div>
   <div class="grid gap-5">
    ${teamCardP()}
    <div class="card p-6"><div class="flex justify-between items-baseline gap-3"><h2 class="font-bold text-lg">Review Booster</h2><b>$48/mo</b></div>
