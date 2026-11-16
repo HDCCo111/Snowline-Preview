@@ -464,7 +464,7 @@ function setNum(k,v){DB.op[k]=Number(v);save();route()}
 /* ===================== 4. PLAN & ADD-ONS (the one place for upgrades) ===================== */
 function viewPlan(){
  const cur=DB.op.plan;
- const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. crew logins $28/mo each."],["crew","3 trucks, you + 3 crew logins, business call calendar, priority support. Extra logins $28/mo."]];
+ const yr=DB.op.billing==="yearly",opts=[["starter","Up to 25 customers. Same limit on PlowCall, because it's the same houses."],["starterplus","Up to 60 customers. Same setup as Junior Boss, no business line or phone AI."],["solo","No customer limit. Business line, phone AI, custom branding, monthly AI report, QuickBooks Online sync. 1 login: just you."],["crew","3 trucks, you + 3 crew logins, business call calendar, priority support. Extra logins $28/mo."]];
  return shell("plan",`<div class="grid lg:grid-cols-2 gap-4 items-start">
   <div class="grid gap-4">
    <div class="card p-5"><div class="display text-lg">Your plan</div><p class="muted text-sm mt-1">You're on <b>${PLANS[cur].name}</b>. Switch anytime as your season changes. Moving down takes effect next month. Every plan includes route order, Google Maps directions, yearly agreement renewals and CSV export.</p>
@@ -485,9 +485,9 @@ function viewPlan(){
   </div></div>`);
 }
 
-const SEATS={solo:1,crew:4},LOGIN_PRICE=28;
+const SEATS={crew:4},LOGIN_PRICE=28;
 function teamCard(){const k=DB.op.plan,inc=SEATS[k],team=DB.op.team;
- if(!inc)return `<div class="card p-5"><div class="display text-lg">Team logins</div><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Crew logins come with Monthly Solo ($28/mo each) and Monthly Crew (3 included).</p></div>`;
+ if(!inc)return `<div class="card p-5"><div class="display text-lg">Team logins</div><p class="muted text-sm mt-1">${PLANS[k].name} has one working login: yours${k==="starter"?" (plus the parent's account-holder login when the operator is under 18)":""}. Crew logins come with Monthly Crew: you + 3 crew logins, then $28/mo per extra login.</p></div>`;
  const people=1+team.length,extra=Math.max(0,people-inc),total=PLANS[k].price+extra*LOGIN_PRICE;
  return `<div class="card p-5"><div class="flex justify-between gap-3 items-baseline"><div class="display text-lg">Team logins</div><b class="text-sm">${people} login${people>1?"s":""} · ${inc} included</b></div>
  <p class="muted text-sm mt-1">Each crew member gets their own login under your business name and branding. ${k==="solo"?"Monthly Solo is just you. Each crew login is":"Monthly Crew includes you + 3 crew logins. Each extra login is"} <b>$${LOGIN_PRICE}/mo</b>. AI texts and call minutes are shared across your account.</p>
