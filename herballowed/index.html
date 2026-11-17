@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Herb Allowed · Phase A Preview</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:oklch(0.97 0.005 90); --fg:oklch(0.18 0.02 150); --card:oklch(0.99 0.003 90);
+    --muted:oklch(0.50 0.03 150); --border:oklch(0.90 0.01 90);
+    --green:oklch(0.35 0.08 155); --green-l:oklch(0.55 0.10 155); --cream:oklch(0.96 0.02 85);
+    --gold:oklch(0.78 0.12 85); --sage:oklch(0.65 0.06 155); --dark:oklch(0.15 0.02 155);
+    --verified:oklch(0.45 0.12 155); --claimed:oklch(0.72 0.14 85); --unknown:oklch(0.60 0.02 90);
+  }
+  html,body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif}
+  h1,h2,h3,.display{font-family:'DM Serif Display',Georgia,serif}
+  .bg-dark{background:var(--dark)} .bg-green{background:var(--green)} .bg-gold{background:var(--gold)} .bg-cream{background:var(--cream)} .bg-card{background:var(--card)}
+  .text-gold{color:var(--gold)} .text-cream{color:var(--cream)} .text-sage{color:var(--sage)} .text-green{color:var(--green)} .text-muted{color:var(--muted)}
+  .border-soft{border-color:var(--border)}
+  .chip{display:inline-flex;align-items:center;gap:.35rem;border-radius:999px;padding:.2rem .65rem;font-size:.72rem;font-weight:600}
+  .chip-live{background:oklch(0.45 0.12 155 / 15%);color:var(--verified)}
+  .chip-soon{background:oklch(0.78 0.12 85 / 22%);color:oklch(0.45 0.10 85)}
+  .chip-info{background:oklch(0.60 0.02 90 / 18%);color:oklch(0.40 0.02 90)}
+  .chip-closed{background:oklch(0.577 0.245 27 / 12%);color:oklch(0.50 0.20 27)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:.65rem;padding:.7rem 1.1rem;font-weight:600;font-size:.92rem;transition:.15s}
+  .btn-green{background:var(--green);color:var(--cream)} .btn-green:hover{filter:brightness(1.15)}
+  .btn-gold{background:var(--gold);color:var(--dark)} .btn-gold:hover{filter:brightness(1.05)}
+  .btn-ghost{border:1px solid var(--border);background:var(--card)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:1rem}
+  .chg{display:inline-flex;align-items:center;justify-content:center;min-width:1.6rem;height:1.6rem;padding:0 .4rem;border-radius:999px;background:var(--gold);color:var(--dark);font-size:.72rem;font-weight:800;box-shadow:0 0 0 3px oklch(0.78 0.12 85 / 30%)}
+  .screen{display:none} .screen.active{display:block}
+  .navbtn.active{background:var(--gold);color:var(--dark)}
+  .opt{border:1px solid var(--border);border-radius:.7rem;padding:.7rem .9rem;cursor:pointer;background:var(--card);text-align:left;width:100%}
+  .opt.sel{border-color:var(--green);background:oklch(0.35 0.08 155 / 8%)}
+  .lane-tab.active{background:var(--green);color:var(--cream)}
+</style>
+</head>
+<body>
+
+<!-- PREVIEW BAR -->
+<div class="sticky top-0 z-50 bg-gold text-[13px]" style="color:var(--dark)">
+  <div class="mx-auto max-w-7xl px-3 py-2 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
+    <b class="mr-1">PREVIEW (free, no Lovable credits)</b>
+    <button class="navbtn rounded px-2 py-1" data-go="home">Home</button>
+    <button class="navbtn rounded px-2 py-1" data-go="vegas">Las Vegas</button>
+    <button class="navbtn rounded px-2 py-1" data-go="venue">Venue page</button>
+    <button class="navbtn rounded px-2 py-1" data-go="nj">New Jersey</button>
+    <button class="navbtn rounded px-2 py-1" data-go="explore">Explore</button>
+    <button class="navbtn rounded px-2 py-1" data-go="balance">Cannabis Balance</button>
+    <button class="navbtn rounded px-2 py-1" data-go="quiz">Balance Check</button>
+    <button class="navbtn rounded px-2 py-1" data-go="business">For Business</button>
+    <button class="navbtn rounded px-2 py-1" data-go="virginia">Virginia (Phase C)</button>
+    <button class="navbtn rounded px-2 py-1" data-go="changes">All changes + credits</button>
+  </div>
+</div>
+
+<!-- SITE HEADER -->
+<header class="bg-dark">
+  <div class="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
+    <a href="#home" class="flex items-center gap-2"><span class="text-2xl">🌿</span><span class="display text-xl text-cream">Herb Allowed</span></a>
+    <nav class="hidden md:flex gap-6 text-sm text-sage">
+      <a href="#explore">Explore</a><a href="#vegas">Cities</a><a href="#balance">Cannabis Balance</a><a href="#business">For Business</a>
+    </nav>
+    <a href="#home" onclick="openNews()" class="btn btn-gold text-xs py-2">Join The Allowed List</a>
+  </div>
+</header>
+
+<main>
+<!-- ============ HOME ============ -->
+<section id="s-home" class="screen">
+  <div class="bg-dark">
+    <div class="mx-auto max-w-5xl px-4 pt-14 pb-16 text-center">
+      <span class="chip chip-soon mb-5">21+ · Venue policies · Cannabis Balance</span>
+      <h1 class="text-4xl md:text-6xl text-cream leading-tight">Know what's allowed before you go.<br/><span class="text-gold">Stay balanced after.</span> <span class="chg align-middle">10</span></h1>
+      <p class="mx-auto mt-5 max-w-2xl text-sage">Every legal place to use cannabis in your city: licensed lounges, 420-friendly stays, tours and events. Plus honest balance tips and cannabis-friendly wellness, all checked against official sources.</p>
+      <div class="mx-auto mt-8 max-w-2xl flex rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+        <input class="flex-1 bg-transparent px-5 h-14 text-cream placeholder:text-sage/60 outline-none" placeholder="Try: Las Vegas, Atlantic City, Newark…" />
+        <a href="#explore" class="btn btn-gold m-2">Search</a>
+      </div>
+      <p class="mt-6 text-[11px] text-sage/70">Informational directory only. We don't sell, deliver or recommend cannabis products. Follow local law and venue rules. Never drive impaired.</p>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-6xl px-4 mt-12">
+    <div class="flex items-center gap-2"><h2 class="text-3xl">Where we're live</h2><span class="chg">2</span></div>
+    <p class="text-muted text-sm mt-1">Counts are real, approved listings only. No demo venues, no made-up numbers.</p>
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <a href="#vegas" class="card p-5 hover:shadow-lg transition">
+        <div class="flex justify-between items-start"><div><div class="text-2xl">🎰</div><h3 class="text-2xl mt-2">Las Vegas, NV</h3></div><span class="chip chip-live">● LIVE</span></div>
+        <p class="text-sm text-muted mt-2">3 licensed lounges open · more lanes filling now</p>
+        <div class="mt-3 h-2 rounded bg-black/5"><div class="h-2 rounded bg-green" style="width:15%"></div></div>
+        <p class="text-[11px] text-muted mt-1">3 of 20 verified listings goal</p>
+      </a>
+      <a href="#nj" class="card p-5 hover:shadow-lg transition">
+        <div class="flex justify-between items-start"><div><div class="text-2xl">🌊</div><h3 class="text-2xl mt-2">New Jersey</h3></div><span class="chip chip-soon">COMING SOON</span></div>
+        <p class="text-sm text-muted mt-2">Newark · Atlantic City · Merchantville. We're verifying in person.</p>
+        <span class="btn btn-ghost mt-4 text-xs py-2">Get notified when it's live</span>
+      </a>
+      <a href="#virginia" class="card p-5 hover:shadow-lg transition">
+        <div class="flex justify-between items-start"><div><div class="text-2xl">⚓</div><h3 class="text-2xl mt-2">Virginia</h3></div><span class="chip chip-soon">COMING 2027</span></div>
+        <p class="text-sm text-muted mt-2">Retail sales scheduled for July 1, 2027. Get the guide first.</p>
+        <span class="btn btn-ghost mt-4 text-xs py-2">Join the Virginia list</span>
+      </a>
+    </div>
+    <p class="text-xs text-muted mt-3">Only states that allow cannabis venues are shown. <span class="chg">7</span></p>
+  </div>
+
+  <div class="mx-auto max-w-6xl px-4 mt-14 grid gap-6 lg:grid-cols-2">
+    <div class="card p-7 bg-cream">
+      <div class="flex items-center gap-2"><h2 class="text-3xl">Cannabis Balance</h2><span class="chg">8</span></div>
+      <p class="mt-2 text-muted">THC keeps climbing. Balance is the flex. Know your ratio, use less THC, take breaks.</p>
+      <div class="mt-5 flex flex-wrap gap-3"><a href="#quiz" class="btn btn-green">Take the 2-minute Balance Check</a><a href="#balance" class="btn btn-ghost">Read the guides</a></div>
+    </div>
+    <div class="card p-7">
+      <h2 class="text-3xl">Own a venue?</h2>
+      <p class="mt-2 text-muted">List your policy free. Want the top of your city page? Featured is $48/month or $498/year.</p>
+      <div class="mt-5 flex flex-wrap gap-3"><a href="#business" class="btn btn-gold">See listing options</a><a href="#venue" class="btn btn-ghost">Claim a listing</a></div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER (change 1) -->
+  <div id="newsletter" class="bg-dark mt-16">
+    <div class="mx-auto max-w-2xl px-4 py-14 text-center">
+      <div class="flex justify-center items-center gap-2"><h2 class="text-3xl text-cream">Join The Allowed List</h2><span class="chg">1</span></div>
+      <p class="text-sage text-sm mt-2">If you're a stoner, you should know about Herb Allowed. New cities, new venues, one balance tip. Every Friday.</p>
+      <form onsubmit="return subNews(event)" class="mt-6 space-y-3 text-left">
+        <input id="nEmail" type="email" required placeholder="your@email.com" class="w-full h-12 rounded-lg bg-white/5 border border-white/15 px-4 text-cream placeholder:text-sage/60 outline-none" />
+        <label class="flex gap-2 text-xs text-sage"><input id="n21" type="checkbox" /> I am 21 or older.</label>
+        <label class="flex gap-2 text-xs text-sage"><input id="nOk" type="checkbox" /> Email me The Allowed List. Unsubscribe anytime.</label>
+        <button class="btn btn-gold w-full">Subscribe</button>
+        <p id="nMsg" class="text-center text-sm"></p>
+      </form>
+      <p class="text-[10px] text-sage/60 mt-3">Preview note: the live site saves each sign-up (email, page, time, both consents) and only shows success after the save works.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LAS VEGAS ============ -->
+<section id="s-vegas" class="screen">
+  <div class="bg-dark">
+    <div class="mx-auto max-w-6xl px-4 py-12">
+      <a href="#home" class="text-xs text-sage">← All cities</a>
+      <div class="flex flex-wrap items-center gap-3 mt-3"><h1 class="text-4xl md:text-5xl text-cream">Where can you actually smoke in Las Vegas?</h1><span class="chip chip-live">● LIVE</span><span class="chg">9</span></div>
+      <div class="mt-6 rounded-xl border border-white/10 bg-white/5 p-5 text-cream max-w-3xl">
+        <b class="text-gold">Quick answer</b>
+        <p class="mt-1 text-sm text-sage">You can buy legally, but public use is illegal and most Strip hotels ban cannabis, even in smoking rooms. Your legal options: a <b class="text-cream">licensed consumption lounge</b> or a <b class="text-cream">private residence that allows it</b>. Lounge rule: you buy on site, you use on site, nothing leaves.</p>
+        <p class="mt-3 text-[11px] text-sage/70">Last checked: November 2026 · Sources: Nevada Cannabis Compliance Board licensee list, lounge websites</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-6xl px-4 mt-8">
+    <div class="flex flex-wrap gap-2">
+      <button class="lane-tab btn btn-ghost text-sm py-2 active" data-lane="lounges">Licensed lounges (3)</button>
+      <button class="lane-tab btn btn-ghost text-sm py-2" data-lane="lodging">420-friendly stays (0)</button>
+      <button class="lane-tab btn btn-ghost text-sm py-2" data-lane="tours">Tours & events (0)</button>
+      <button class="lane-tab btn btn-ghost text-sm py-2" data-lane="health">Cannabis Balance & Health (0)</button>
+    </div>
+
+    <div class="lane mt-6" id="lane-lounges">
+      <div class="card p-4 mb-5 border-dashed" style="border-color:var(--gold)">
+        <div class="flex flex-wrap items-center justify-between gap-3"><div><span class="chip chip-soon">FEATURED SPOT</span><p class="text-sm mt-1">This top spot is open. Featured venues show here first for $48/month.</p></div><a href="#business" class="btn btn-gold text-xs py-2">Feature your venue</a></div>
+      </div>
+      <div class="grid gap-4 md:grid-cols-3">
+        <a href="#venue" class="card p-5 hover:shadow-lg"><span class="chip chip-info">Public info · not yet claimed</span><h3 class="text-xl mt-3">Society Elevated Lounge</h3><p class="text-xs text-muted">At The Grove dispensary</p><ul class="mt-3 text-sm space-y-1"><li>✅ Licensed on-site consumption</li><li>🛒 Buy on site (required)</li><li>🚫 No outside cannabis · no alcohol</li></ul></a>
+        <div class="card p-5"><span class="chip chip-info">Public info · not yet claimed</span><h3 class="text-xl mt-3">Dazed! Consumption Lounge</h3><p class="text-xs text-muted">At Planet 13 · west of the Strip</p><ul class="mt-3 text-sm space-y-1"><li>✅ Licensed on-site consumption</li><li>🛒 Buy on site (required)</li><li>🚫 No outside cannabis · no alcohol</li></ul></div>
+        <div class="card p-5"><span class="chip chip-info">Public info · not yet claimed</span><h3 class="text-xl mt-3">Sky High Lounge</h3><p class="text-xs text-muted">At NuWu Cannabis Marketplace · tribal land, near downtown</p><ul class="mt-3 text-sm space-y-1"><li>✅ On-site consumption (tribal)</li><li>🛒 Buy on site</li><li>📞 Call ahead for hours</li></ul></div>
+      </div>
+      <div class="mt-4 card p-4 flex flex-wrap items-center gap-3"><span class="chip chip-closed">CLOSED</span><span class="text-sm">Smoke and Mirrors (Thrive) closed in 2025. Hidden from listings. <span class="chg">4</span></span></div>
+      <p class="text-xs text-muted mt-3">About two dozen more lounges hold conditional state approval. We'll add each one when it opens.</p>
+    </div>
+
+    <div class="lane mt-6 hidden" id="lane-lodging"><div class="card p-8 text-center"><div class="text-3xl">🏠</div><h3 class="text-2xl mt-2">420-friendly stays are coming</h3><p class="text-muted text-sm mt-2 max-w-md mx-auto">We only list stays whose host confirms the policy in writing. Hosts: list your place free.</p><a href="#business" class="btn btn-green mt-4">List my stay free</a></div></div>
+    <div class="lane mt-6 hidden" id="lane-tours"><div class="card p-8 text-center"><div class="text-3xl">🚐</div><h3 class="text-2xl mt-2">Tours & events are coming</h3><p class="text-muted text-sm mt-2 max-w-md mx-auto">Licensed tours and real, dated events only. Organizers: post yours free.</p><a href="#business" class="btn btn-green mt-4">Add a tour or event</a></div></div>
+    <div class="lane mt-6 hidden" id="lane-health"><div class="card p-8 text-center"><div class="text-3xl">🌱</div><h3 class="text-2xl mt-2">Cannabis Balance & Health</h3><p class="text-muted text-sm mt-2 max-w-md mx-auto">Licensed medical cannabis clinics, herbalists, CBD shops and cannabis-friendly wellness spaces in Nevada. Product availability may change after Dec 11, 2026 federal hemp rules. We never sell or recommend products. <span class="chg">5</span> <span class="chg">7</span></p><a href="#business" class="btn btn-green mt-4">List my wellness space</a></div></div>
+
+    <div class="mt-10 grid gap-4 md:grid-cols-3">
+      <div class="card p-5"><b>🪪 21+ with ID</b><p class="text-sm text-muted mt-1">Every lounge checks. No exceptions.</p></div>
+      <div class="card p-5"><b>🚗 Never drive impaired</b><p class="text-sm text-muted mt-1">Use rideshare after any lounge visit.</p></div>
+      <div class="card p-5"><b>⚖️ Know your ratio</b><p class="text-sm text-muted mt-1"><a class="underline" href="#balance">Cannabis Balance guide →</a></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VENUE ============ -->
+<section id="s-venue" class="screen">
+  <div class="mx-auto max-w-4xl px-4 py-10">
+    <a href="#vegas" class="text-xs text-muted">← Las Vegas</a>
+    <div class="flex flex-wrap items-center gap-3 mt-3"><h1 class="text-4xl">Society Elevated Lounge</h1><span class="chip chip-info">Public info · not yet claimed</span></div>
+    <p class="text-muted mt-1">Las Vegas, NV · Connected to The Grove dispensary · <i>address confirmed at claim</i></p>
+    <div class="card mt-6 overflow-hidden">
+      <div class="bg-cream px-5 py-3 font-semibold">Venue policy</div>
+      <table class="w-full text-sm"><tbody>
+        <tr class="border-t border-soft"><td class="px-5 py-3">Cannabis use on site</td><td class="px-5 py-3 font-semibold text-green">Yes, state-licensed lounge</td></tr>
+        <tr class="border-t border-soft"><td class="px-5 py-3">Bring your own</td><td class="px-5 py-3 font-semibold">No. Buy at The Grove, use in the lounge</td></tr>
+        <tr class="border-t border-soft"><td class="px-5 py-3">Leftover cannabis</td><td class="px-5 py-3 font-semibold">Can't leave the lounge (Nevada law)</td></tr>
+        <tr class="border-t border-soft"><td class="px-5 py-3">Alcohol</td><td class="px-5 py-3 font-semibold">No</td></tr>
+        <tr class="border-t border-soft"><td class="px-5 py-3">Age</td><td class="px-5 py-3 font-semibold">21+ with valid photo ID</td></tr>
+        <tr class="border-t border-soft"><td class="px-5 py-3">Hours</td><td class="px-5 py-3 font-semibold">Sample layout: hours filled from the venue when claimed</td></tr>
+      </tbody></table>
+    </div>
+    <p class="text-[11px] text-muted mt-2">Last checked: November 2026 · Source: Nevada CCB licensee list and the venue's website</p>
+    <div class="mt-6 flex flex-wrap gap-3"><a href="#business" class="btn btn-green">Own this venue? Claim it free</a><button onclick="alert('Preview: opens the correction form (saved for admin review).')" class="btn btn-ghost">Report a correction</button></div>
+    <div class="card mt-8 p-5"><div class="flex items-center gap-2"><b>Reviews</b><span class="chg">6</span></div><p class="text-sm text-muted mt-1">No reviews yet. New reviews appear after our team checks them. No paid or incentivized reviews.</p></div>
+  </div>
+</section>
+
+<!-- ============ NEW JERSEY ============ -->
+<section id="s-nj" class="screen">
+  <div class="bg-dark">
+    <div class="mx-auto max-w-5xl px-4 py-14 text-center">
+      <span class="chip chip-soon">COMING SOON</span>
+      <h1 class="text-4xl md:text-5xl text-cream mt-4">Where can you legally smoke in New Jersey?</h1>
+      <p class="text-sage mt-4 max-w-2xl mx-auto">New Jersey approved its first cannabis consumption areas in July 2025. We're visiting each one in person, taking real photos and confirming every rule before we list it.</p>
+      <a href="#newsletter" onclick="go('home');setTimeout(()=>document.getElementById('newsletter').scrollIntoView(),50)" class="btn btn-gold mt-6">Tell me when NJ goes live</a>
+    </div>
+  </div>
+  <div class="mx-auto max-w-5xl px-4 mt-10">
+    <h2 class="text-2xl">Verifying now</h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+      <div class="card p-4"><b>SunnyTien</b><p class="text-xs text-muted">Atlantic City · first approved, July 2025</p></div>
+      <div class="card p-4"><b>High Rollers</b><p class="text-xs text-muted">Atlantic City</p></div>
+      <div class="card p-4"><b>URB'N Dispensary</b><p class="text-xs text-muted">Newark</p></div>
+      <div class="card p-4"><b>Gynsyng</b><p class="text-xs text-muted">Merchantville</p></div>
+    </div>
+    <div class="card mt-6 p-6 bg-cream"><b>📸 The Herb Allowed NJ Tour</b><p class="text-sm text-muted mt-1">Run an NJ lounge, stay, tour or cannabis-friendly wellness space? We're coming in person. Get listed free and be part of the launch.</p><a href="#business" class="btn btn-green mt-3 text-sm">Get on the tour</a></div>
+  </div>
+</section>
+
+<!-- ============ EXPLORE ============ -->
+<section id="s-explore" class="screen">
+  <div class="mx-auto max-w-6xl px-4 py-10">
+    <div class="flex items-center gap-2"><h1 class="text-4xl">Explore</h1><span class="chg">7</span></div>
+    <div class="mt-5 grid gap-6 lg:grid-cols-4">
+      <aside class="card p-5 space-y-5 text-sm">
+        <div><b>State</b><p class="text-[11px] text-muted">Only states that allow cannabis venues</p><div class="mt-2 flex flex-wrap gap-2"><span class="chip chip-live">Nevada · live</span><span class="chip chip-soon">New Jersey · soon</span></div></div>
+        <div><b>Where you can use it</b><div class="mt-2 space-y-1"><label class="flex gap-2"><input type="checkbox" checked>Licensed lounges</label><label class="flex gap-2"><input type="checkbox">420-friendly stays</label><label class="flex gap-2"><input type="checkbox">Tours & mobile lounges</label><label class="flex gap-2"><input type="checkbox">Events (BYOC)</label><label class="flex gap-2"><input type="checkbox">Private event spaces</label></div></div>
+        <div><b>Cannabis Balance & Health</b> <span class="chip chip-soon">NEW</span><div class="mt-2 space-y-1"><label class="flex gap-2"><input type="checkbox">Licensed medical cannabis clinic</label><label class="flex gap-2"><input type="checkbox">Herbalist / apothecary</label><label class="flex gap-2"><input type="checkbox">CBD / hemp shop</label><label class="flex gap-2"><input type="checkbox">Cannabis-friendly wellness space</label></div></div>
+      </aside>
+      <div class="lg:col-span-3">
+        <p class="text-sm text-muted">3 results · Nevada · Licensed lounges</p>
+        <div class="mt-3 grid gap-4 md:grid-cols-2">
+          <a href="#venue" class="card p-5"><h3 class="text-xl">Society Elevated Lounge</h3><p class="text-xs text-muted">Las Vegas</p><span class="chip chip-info mt-2">Public info</span></a>
+          <div class="card p-5"><h3 class="text-xl">Dazed! Consumption Lounge</h3><p class="text-xs text-muted">Las Vegas</p><span class="chip chip-info mt-2">Public info</span></div>
+          <div class="card p-5"><h3 class="text-xl">Sky High Lounge</h3><p class="text-xs text-muted">Las Vegas</p><span class="chip chip-info mt-2">Public info</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BALANCE HUB ============ -->
+<section id="s-balance" class="screen">
+  <div class="bg-cream">
+    <div class="mx-auto max-w-5xl px-4 py-14">
+      <div class="flex items-center gap-2"><h1 class="text-4xl md:text-5xl">Cannabis Balance</h1><span class="chg">8</span></div>
+      <p class="mt-3 text-lg text-muted max-w-2xl">Whether you smoke once a day or once a month: know your ratio, use less THC, take breaks.</p>
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <div class="card p-5"><div class="text-3xl display text-green">14:1 → 80:1</div><p class="text-sm text-muted mt-2">How far THC outpaced CBD in seized U.S. cannabis between 1995 and 2014 (ElSohly et al., 2016).</p></div>
+        <div class="card p-5"><div class="text-xl display">Does CBD cancel a high?</div><p class="text-sm text-muted mt-2">A 2022 trial found adding CBD didn't reduce THC's effects. Balanced products help mostly because each dose has less THC.</p></div>
+        <div class="card p-5"><div class="text-xl display">Take a break, keep the vibe</div><p class="text-sm text-muted mt-2">A tolerance break resets how much you need. Start with 48 hours, work up to 21 days.</p></div>
+      </div>
+      <a href="#quiz" class="btn btn-green mt-6">Take the Balance Check</a>
+    </div>
+  </div>
+  <div class="mx-auto max-w-5xl px-4 mt-10">
+    <h2 class="text-2xl">Guides</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-3">
+      <div class="card p-5"><span class="chip chip-live">Know Before You Go</span><h3 class="text-lg mt-2">Where can you smoke in Vegas when your hotel says no?</h3></div>
+      <div class="card p-5"><span class="chip chip-soon">Cannabis Balance</span><h3 class="text-lg mt-2">What your THC-to-CBD ratio actually means</h3></div>
+      <div class="card p-5"><span class="chip chip-info">Body Reset</span><h3 class="text-lg mt-2">Sleep, water, food: resetting after a heavy week</h3></div>
+    </div>
+    <div class="card mt-6 p-5 text-sm"><b>Need to talk to someone?</b> Call or text <b>988</b> any time, or call the SAMHSA National Helpline at <b>1-800-662-4357</b> (free, confidential, 24/7).</div>
+    <p class="text-[11px] text-muted mt-3">Education only, not medical advice. We don't sell or recommend products.</p>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section id="s-quiz" class="screen">
+  <div class="mx-auto max-w-2xl px-4 py-10">
+    <div class="flex items-center gap-2"><h1 class="text-4xl">Balance Check</h1><span class="chg">8</span></div>
+    <p class="text-muted mt-1 text-sm">6 questions · 2 minutes · private. Not a medical test.</p>
+    <div id="quizBox" class="mt-6"></div>
+  </div>
+</section>
+
+<!-- ============ BUSINESS ============ -->
+<section id="s-business" class="screen">
+  <div class="mx-auto max-w-5xl px-4 py-12">
+    <div class="flex items-center gap-2"><h1 class="text-4xl">List your venue</h1><span class="chg">3</span></div>
+    <p class="text-muted mt-2">Visitors check Herb Allowed to see what's allowed before they show up. Tell them, accurately.</p>
+    <div class="mt-8 grid gap-6 md:grid-cols-2">
+      <div class="card p-7"><h3 class="text-2xl">Free Listing</h3><div class="text-4xl display mt-2">$0</div><ul class="mt-4 space-y-2 text-sm"><li>✓ Your policy, hours, address and contact</li><li>✓ You approve it before it goes live</li><li>✓ Update it anytime</li></ul><button class="btn btn-ghost mt-6 w-full">Claim free</button></div>
+      <div class="card p-7" style="border:2px solid var(--gold)"><div class="flex justify-between items-center"><h3 class="text-2xl">Featured Venue</h3><span class="chip chip-soon">MOST POPULAR</span></div>
+        <div class="mt-2"><span class="text-4xl display">$48</span><span class="text-muted">/month</span></div><p class="text-sm text-muted">or <b>$498/year</b> (save $78)</p>
+        <ul class="mt-4 space-y-2 text-sm"><li>✓ Everything in Free</li><li>✓ Top of your city page + Featured badge</li><li>✓ Post your events at the top</li><li>✓ A mention in The Allowed List newsletter</li><li>✓ Monthly views report</li></ul>
+        <button class="btn btn-gold mt-6 w-full">Get Featured</button>
+        <p class="text-[10px] text-muted mt-2">Preview: checkout not connected. Processor approval needed before charging lounges.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIRGINIA ============ -->
+<section id="s-virginia" class="screen">
+  <div class="bg-dark"><div class="mx-auto max-w-4xl px-4 py-14">
+    <span class="chip chip-soon">COMING JULY 1, 2027</span>
+    <h1 class="text-4xl md:text-5xl text-cream mt-4">Virginia cannabis: what's allowed now, and what changes in 2027</h1>
+    <span class="chg">5</span>
+  </div></div>
+  <div class="mx-auto max-w-4xl px-4 mt-8 grid gap-4">
+    <div class="card p-5"><b>Allowed now</b><p class="text-sm text-muted mt-1">Adults 21+ can possess limited amounts and grow at home. Public use is illegal. No licensed stores or lounges yet.</p></div>
+    <div class="card p-5"><b>Coming</b><p class="text-sm text-muted mt-1">Licensed retail sales are scheduled to begin July 1, 2027. Hampton Roads listings go live the day stores open.</p></div>
+    <div class="card p-5 bg-cream"><b>Be first to know</b><p class="text-sm text-muted mt-1">Join the Virginia list for the launch guide.</p><a href="#home" onclick="setTimeout(()=>document.getElementById('newsletter').scrollIntoView(),50)" class="btn btn-green mt-3 text-sm">Join the Virginia list</a></div>
+    <p class="text-[11px] text-muted">Last checked: November 2026. Phase C: this page flips from "Coming soon" to "Live" on the go-live date (reminder set).</p>
+  </div>
+</section>
+
+<!-- ============ CHANGES + CREDITS ============ -->
+<section id="s-changes" class="screen">
+  <div class="mx-auto max-w-5xl px-4 py-10">
+    <h1 class="text-4xl">Phase A: every change, and what it costs</h1>
+    <p class="text-muted mt-2 text-sm">Gold numbers on each screen match this list. Edit anything here first. Lovable only runs after you approve the final version. Credit estimates use your HBN Credit Usage Tracker averages (new page 8.4, add-on 8.0, bug fix 2.7, plan check 1.6).</p>
+    <div class="card mt-6 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-cream"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Change</th><th class="text-left px-4 py-3">Batch</th><th class="text-right px-4 py-3">Credits</th></tr></thead>
+        <tbody>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">1</span></td><td class="px-4 py-3">Newsletter saves sign-ups, 21+ and consent checkboxes</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">4–6</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">2</span></td><td class="px-4 py-3">Hide demo venues; real counts; Coming soon / Live city cards</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">4–6</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">3</span></td><td class="px-4 py-3">Pricing: Free + Featured $48/mo or $498/yr</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">1–2</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">4</span></td><td class="px-4 py-3">Mark Smoke and Mirrors closed</td><td class="px-4 py-3">Claude (data)</td><td class="px-4 py-3 text-right">0</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">5</span></td><td class="px-4 py-3">Virginia guide update + hemp notice text</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">1–2</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">6</span></td><td class="px-4 py-3">Reviews hidden until approved</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">1–2</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">7</span></td><td class="px-4 py-3">Health categories + "Cannabis Balance & Health" filter; legal states only</td><td class="px-4 py-3">2</td><td class="px-4 py-3 text-right">5–8</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">8</span></td><td class="px-4 py-3">Cannabis Balance hub (database-backed) + Balance Check quiz. Articles written by Claude for free</td><td class="px-4 py-3">3</td><td class="px-4 py-3 text-right">14–20</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">9</span></td><td class="px-4 py-3">City page with 4 lanes, quick answer, 20-listing progress, Featured spot</td><td class="px-4 py-3">2</td><td class="px-4 py-3 text-right">8–10</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">10</span></td><td class="px-4 py-3">Home hero + section updates</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">2–3</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3">—</td><td class="px-4 py-3">Plan check before building (plan mode)</td><td class="px-4 py-3">0</td><td class="px-4 py-3 text-right">1–2</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3">—</td><td class="px-4 py-3">Test and fix round (2 rounds)</td><td class="px-4 py-3">4</td><td class="px-4 py-3 text-right">4–6</td></tr>
+          <tr class="border-t border-soft bg-cream font-semibold"><td class="px-4 py-3"></td><td class="px-4 py-3">TOTAL Phase A</td><td class="px-4 py-3">4 batches</td><td class="px-4 py-3 text-right">45–67</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs text-muted mt-3">Fits under your 100-credit daily cap in one day, or split over two. Free work done by Claude (0 credits): closed-venue data fix, Lovable project rules, all article and quiz text, venue seed lists.</p>
+  </div>
+</section>
+</main>
+
+<footer class="bg-dark mt-16"><div class="mx-auto max-w-7xl px-4 py-8 text-xs text-sage flex flex-wrap justify-between gap-3"><span>© Herb Allowed · 21+ · Informational directory</span><span>Preview only · sample screens · nothing is saved</span></div></footer>
+
+<script>
+const screens=['home','vegas','venue','nj','explore','balance','quiz','business','virginia','changes'];
+function go(id){ if(!screens.includes(id)) id='home';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
+  window.scrollTo(0,0); if(id==='quiz') renderQuiz(); }
+document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>{location.hash=b.dataset.go});
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+go(location.hash.slice(1)||'home');
+function openNews(){ setTimeout(()=>document.getElementById('newsletter').scrollIntoView({behavior:'smooth'}),60) }
+function subNews(e){ e.preventDefault(); const m=document.getElementById('nMsg');
+  if(!document.getElementById('n21').checked||!document.getElementById('nOk').checked){ m.style.color='var(--gold)'; m.textContent='Please confirm you are 21+ and agree to the emails.'; return false;}
+  m.style.color='var(--sage)'; m.textContent="You're on The Allowed List. 🌿 (Preview: nothing was saved.)"; return false; }
+document.querySelectorAll('.lane-tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.lane-tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  document.querySelectorAll('.lane').forEach(l=>l.classList.add('hidden')); document.getElementById('lane-'+t.dataset.lane).classList.remove('hidden'); });
+
+const Q=[
+ {q:'How often do you use cannabis?',o:['Once a month or less','Weekly','A few times a week','Daily','Several times a day'],p:[0,1,2,3,4]},
+ {q:'What do you mostly use?',o:['CBD only','Balanced (about 1:1 THC:CBD)','Mostly THC flower or edibles','High-THC vapes or concentrates'],p:[0,1,2,3]},
+ {q:'Do you know the THC:CBD ratio of what you use?',o:['Yes, always','Sometimes','No'],p:[0,1,2]},
+ {q:'When was your last tolerance break (2+ days)?',o:['In the last 3 months','3 to 12 months ago','Over a year ago','Never'],p:[0,1,2,3]},
+ {q:'How are your sleep and energy on days you skip it?',o:['Good','Mixed','Hard'],p:[0,1,2]},
+ {q:'Mostly, you use it to…',o:['Enjoy myself','Unwind after the day','Cope with something heavy'],p:[0,1,2]}
+];
+let ans=[];
+function renderQuiz(){ ans=[]; step(0); }
+function step(i){ const box=document.getElementById('quizBox');
+  if(i>=Q.length) return result();
+  const it=Q[i];
+  box.innerHTML=`<div class="card p-6"><p class="text-xs text-muted">Question ${i+1} of ${Q.length}</p><div class="h-1.5 rounded bg-black/5 mt-2"><div class="h-1.5 rounded bg-green" style="width:${(i/Q.length)*100}%"></div></div><h3 class="text-2xl mt-4">${it.q}</h3><div class="mt-4 space-y-2">${it.o.map((o,k)=>`<button class="opt" onclick="pick(${i},${k})">${o}</button>`).join('')}</div></div>`; }
+function pick(i,k){ ans[i]=k; step(i+1); }
+function result(){ const max=Q.reduce((s,x)=>s+Math.max(...x.p),0); const pts=ans.reduce((s,k,i)=>s+Q[i].p[k],0);
+  const score=Math.round(100-pts/max*100); let t,c,plan;
+  if(score>=75){t='Balanced';c='var(--verified)';plan=['Keep a 2-day break each month','Try a balanced product for a new routine','Share the Balance Check with a friend'];}
+  else if(score>=45){t='Leaning heavy';c='oklch(0.55 0.12 85)';plan=['Take a 48-hour break this week','Lower your dose by a third','Check the ratio on your next purchase','Swap one session for a walk or tea ritual'];}
+  else{t='Time to rebalance';c='oklch(0.55 0.18 27)';plan=['Plan a 7-day tolerance break','Use lower-THC or balanced products when you return','Protect your sleep: no use in the last hour before bed','Tell someone you trust what you\'re working on'];}
+  const cope=ans[5]===2;
+  document.getElementById('quizBox').innerHTML=`<div class="card p-6"><p class="text-xs text-muted">Your Balance Score</p><div class="display text-6xl mt-1" style="color:${c}">${score}</div><p class="text-xl mt-1">${t}</p>
+  <h3 class="text-lg mt-5">Your 7-day plan</h3><ul class="mt-2 space-y-1 text-sm">${plan.map(p=>`<li>✓ ${p}</li>`).join('')}</ul>
+  ${cope?`<div class="mt-5 rounded-lg p-4 bg-cream text-sm"><b>You don't have to carry it alone.</b> Call or text <b>988</b> any time, or call SAMHSA at <b>1-800-662-4357</b> (free, confidential, 24/7).</div>`:''}
+  <form onsubmit="event.preventDefault();this.innerHTML='<p class=&quot;text-sm text-green mt-4&quot;>Plan sent. (Preview: nothing was saved.)</p>'" class="mt-5 space-y-2"><p class="text-sm font-semibold">Email me my plan + Cannabis Balance 101 (5 short lessons)</p><input required type="email" placeholder="your@email.com" class="w-full h-11 rounded-lg border border-soft px-3"/><label class="flex gap-2 text-xs"><input required type="checkbox"> I am 21 or older and agree to receive emails.</label><button class="btn btn-green w-full">Send my plan</button></form>
+  <button onclick="renderQuiz()" class="text-xs underline text-muted mt-4">Retake</button><p class="text-[10px] text-muted mt-3">Education only, not medical advice.</p></div>`; }
+</script>
+</body>
+</html>
