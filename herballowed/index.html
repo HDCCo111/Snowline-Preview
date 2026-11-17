@@ -53,7 +53,8 @@
     <button class="navbtn rounded px-2 py-1" data-go="balance">Cannabis Balance</button>
     <button class="navbtn rounded px-2 py-1" data-go="quiz">Balance Check</button>
     <button class="navbtn rounded px-2 py-1" data-go="business">For Business</button>
-    <button class="navbtn rounded px-2 py-1" data-go="virginia">Virginia (Phase C)</button>
+    <button class="navbtn rounded px-2 py-1" data-go="states">Top 10 states</button>
+    <button class="navbtn rounded px-2 py-1" data-go="virginia">Virginia (later)</button>
     <button class="navbtn rounded px-2 py-1" data-go="changes">All changes + credits</button>
   </div>
 </div>
@@ -86,25 +87,15 @@
   </div>
 
   <div class="mx-auto max-w-6xl px-4 mt-12">
-    <div class="flex items-center gap-2"><h2 class="text-3xl">Where we're live</h2><span class="chg">2</span></div>
-    <p class="text-muted text-sm mt-1">Counts are real, approved listings only. No demo venues, no made-up numbers.</p>
+    <div class="flex items-center gap-2"><h2 class="text-3xl">Live in 5 states at launch</h2><span class="chg">2</span><span class="chg">11</span></div>
+    <p class="text-muted text-sm mt-1">Every listing comes from official state or city license lists and the venue's own site. No demo venues, no made-up numbers.</p>
     <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <a href="#vegas" class="card p-5 hover:shadow-lg transition">
-        <div class="flex justify-between items-start"><div><div class="text-2xl">🎰</div><h3 class="text-2xl mt-2">Las Vegas, NV</h3></div><span class="chip chip-live">● LIVE</span></div>
-        <p class="text-sm text-muted mt-2">3 licensed lounges open · more lanes filling now</p>
-        <div class="mt-3 h-2 rounded bg-black/5"><div class="h-2 rounded bg-green" style="width:15%"></div></div>
-        <p class="text-[11px] text-muted mt-1">3 of 20 verified listings goal</p>
-      </a>
-      <a href="#nj" class="card p-5 hover:shadow-lg transition">
-        <div class="flex justify-between items-start"><div><div class="text-2xl">🌊</div><h3 class="text-2xl mt-2">New Jersey</h3></div><span class="chip chip-soon">COMING SOON</span></div>
-        <p class="text-sm text-muted mt-2">Newark · Atlantic City · Merchantville. We're verifying in person.</p>
-        <span class="btn btn-ghost mt-4 text-xs py-2">Get notified when it's live</span>
-      </a>
-      <a href="#virginia" class="card p-5 hover:shadow-lg transition">
-        <div class="flex justify-between items-start"><div><div class="text-2xl">⚓</div><h3 class="text-2xl mt-2">Virginia</h3></div><span class="chip chip-soon">COMING 2027</span></div>
-        <p class="text-sm text-muted mt-2">Retail sales scheduled for July 1, 2027. Get the guide first.</p>
-        <span class="btn btn-ghost mt-4 text-xs py-2">Join the Virginia list</span>
-      </a>
+      <a href="#vegas" class="card p-5 hover:shadow-lg transition"><div class="flex justify-between items-start"><div><div class="text-2xl">🎰</div><h3 class="text-2xl mt-2">Nevada</h3></div><span class="chip chip-live">● LIVE</span></div><p class="text-sm text-muted mt-2">Las Vegas · Reno</p></a>
+      <a href="#states" class="card p-5 hover:shadow-lg transition"><div class="flex justify-between items-start"><div><div class="text-2xl">🌴</div><h3 class="text-2xl mt-2">California</h3></div><span class="chip chip-live">● LIVE</span></div><p class="text-sm text-muted mt-2">West Hollywood · San Francisco · Oakland · Palm Springs</p></a>
+      <a href="#nj" class="card p-5 hover:shadow-lg transition"><div class="flex justify-between items-start"><div><div class="text-2xl">🌊</div><h3 class="text-2xl mt-2">New Jersey</h3></div><span class="chip chip-live">● LIVE</span></div><p class="text-sm text-muted mt-2">Atlantic City · Newark · Merchantville</p></a>
+      <a href="#states" class="card p-5 hover:shadow-lg transition"><div class="flex justify-between items-start"><div><div class="text-2xl">🏔️</div><h3 class="text-2xl mt-2">Colorado</h3></div><span class="chip chip-live">● LIVE</span></div><p class="text-sm text-muted mt-2">Denver · Boulder · 420-friendly stays</p></a>
+      <a href="#states" class="card p-5 hover:shadow-lg transition"><div class="flex justify-between items-start"><div><div class="text-2xl">🚗</div><h3 class="text-2xl mt-2">Michigan</h3></div><span class="chip chip-live">● LIVE</span></div><p class="text-sm text-muted mt-2">Detroit area · Ann Arbor · Kalamazoo</p></a>
+      <a href="#states" class="card p-5 hover:shadow-lg transition bg-cream"><div class="text-2xl">🗺️</div><h3 class="text-2xl mt-2">5 more coming</h3><p class="text-sm text-muted mt-2">New York · Illinois · New Mexico · Massachusetts · Maryland</p><span class="btn btn-ghost mt-3 text-xs py-2">See the full top 10</span></a>
     </div>
     <p class="text-xs text-muted mt-3">Only states that allow cannabis venues are shown. <span class="chg">7</span></p>
   </div>
@@ -213,14 +204,14 @@
 <section id="s-nj" class="screen">
   <div class="bg-dark">
     <div class="mx-auto max-w-5xl px-4 py-14 text-center">
-      <span class="chip chip-soon">COMING SOON</span>
+      <span class="chip chip-live">● LIVE</span>
       <h1 class="text-4xl md:text-5xl text-cream mt-4">Where can you legally smoke in New Jersey?</h1>
-      <p class="text-sage mt-4 max-w-2xl mx-auto">New Jersey approved its first cannabis consumption areas in July 2025. We're visiting each one in person, taking real photos and confirming every rule before we list it.</p>
-      <a href="#newsletter" onclick="go('home');setTimeout(()=>document.getElementById('newsletter').scrollIntoView(),50)" class="btn btn-gold mt-6">Tell me when NJ goes live</a>
+      <p class="text-sage mt-4 max-w-2xl mx-auto">New Jersey approved its first cannabis consumption areas in July 2025. Listed now from the state's public records; we're visiting each one in person for real photos.</p>
+      <a href="#newsletter" onclick="go('home');setTimeout(()=>document.getElementById('newsletter').scrollIntoView(),50)" class="btn btn-gold mt-6">Get NJ updates</a>
     </div>
   </div>
   <div class="mx-auto max-w-5xl px-4 mt-10">
-    <h2 class="text-2xl">Verifying now</h2>
+    <h2 class="text-2xl">Approved consumption areas <span class="chip chip-info align-middle">Public info · photo tour coming</span></h2>
     <div class="mt-4 grid gap-3 sm:grid-cols-2">
       <div class="card p-4"><b>SunnyTien</b><p class="text-xs text-muted">Atlantic City · first approved, July 2025</p></div>
       <div class="card p-4"><b>High Rollers</b><p class="text-xs text-muted">Atlantic City</p></div>
@@ -237,7 +228,7 @@
     <div class="flex items-center gap-2"><h1 class="text-4xl">Explore</h1><span class="chg">7</span></div>
     <div class="mt-5 grid gap-6 lg:grid-cols-4">
       <aside class="card p-5 space-y-5 text-sm">
-        <div><b>State</b><p class="text-[11px] text-muted">Only states that allow cannabis venues</p><div class="mt-2 flex flex-wrap gap-2"><span class="chip chip-live">Nevada · live</span><span class="chip chip-soon">New Jersey · soon</span></div></div>
+        <div><b>State</b><p class="text-[11px] text-muted">Only states that allow cannabis venues</p><div class="mt-2 flex flex-wrap gap-2"><span class="chip chip-live">Nevada</span><span class="chip chip-live">California</span><span class="chip chip-live">New Jersey</span><span class="chip chip-live">Colorado</span><span class="chip chip-live">Michigan</span></div></div>
         <div><b>Where you can use it</b><div class="mt-2 space-y-1"><label class="flex gap-2"><input type="checkbox" checked>Licensed lounges</label><label class="flex gap-2"><input type="checkbox">420-friendly stays</label><label class="flex gap-2"><input type="checkbox">Tours & mobile lounges</label><label class="flex gap-2"><input type="checkbox">Events (BYOC)</label><label class="flex gap-2"><input type="checkbox">Private event spaces</label></div></div>
         <div><b>Cannabis Balance & Health</b> <span class="chip chip-soon">NEW</span><div class="mt-2 space-y-1"><label class="flex gap-2"><input type="checkbox">Licensed medical cannabis clinic</label><label class="flex gap-2"><input type="checkbox">Herbalist / apothecary</label><label class="flex gap-2"><input type="checkbox">CBD / hemp shop</label><label class="flex gap-2"><input type="checkbox">Cannabis-friendly wellness space</label></div></div>
       </aside>
@@ -293,14 +284,40 @@
   <div class="mx-auto max-w-5xl px-4 py-12">
     <div class="flex items-center gap-2"><h1 class="text-4xl">List your venue</h1><span class="chg">3</span></div>
     <p class="text-muted mt-2">Visitors check Herb Allowed to see what's allowed before they show up. Tell them, accurately.</p>
-    <div class="mt-8 grid gap-6 md:grid-cols-2">
-      <div class="card p-7"><h3 class="text-2xl">Free Listing</h3><div class="text-4xl display mt-2">$0</div><ul class="mt-4 space-y-2 text-sm"><li>✓ Your policy, hours, address and contact</li><li>✓ You approve it before it goes live</li><li>✓ Update it anytime</li></ul><button class="btn btn-ghost mt-6 w-full">Claim free</button></div>
+    <div class="mt-8 grid gap-6 md:grid-cols-3">
+      <div class="card p-7"><h3 class="text-2xl">Free Listing</h3><p class="text-xs text-muted">Lounges, 420-friendly stays, tours, events</p><div class="text-4xl display mt-2">$0</div><ul class="mt-4 space-y-2 text-sm"><li>✓ Your policy, hours, address and contact</li><li>✓ You approve it before it goes live</li><li>✓ Update it anytime</li></ul><button class="btn btn-ghost mt-6 w-full">Claim free</button></div>
       <div class="card p-7" style="border:2px solid var(--gold)"><div class="flex justify-between items-center"><h3 class="text-2xl">Featured Venue</h3><span class="chip chip-soon">MOST POPULAR</span></div>
         <div class="mt-2"><span class="text-4xl display">$48</span><span class="text-muted">/month</span></div><p class="text-sm text-muted">or <b>$498/year</b> (save $78)</p>
         <ul class="mt-4 space-y-2 text-sm"><li>✓ Everything in Free</li><li>✓ Top of your city page + Featured badge</li><li>✓ Post your events at the top</li><li>✓ A mention in The Allowed List newsletter</li><li>✓ Monthly views report</li></ul>
         <button class="btn btn-gold mt-6 w-full">Get Featured</button>
         <p class="text-[10px] text-muted mt-2">Preview: checkout not connected. Processor approval needed before charging lounges.</p></div>
+      <div class="card p-7"><h3 class="text-2xl">Health Hub Listing</h3><p class="text-xs text-muted">Medical cannabis clinics, herbalists, wellness spaces</p>
+        <div class="mt-2"><span class="text-4xl display">$28</span><span class="text-muted">/month</span></div><p class="text-sm text-muted">or <b>$288/year</b> <span class="chg">12</span></p>
+        <ul class="mt-4 space-y-2 text-sm"><li>✓ Listed in Cannabis Balance &amp; Health</li><li>✓ Shown on every city page in your state</li><li>✓ Add Featured anytime</li></ul>
+        <button class="btn btn-green mt-6 w-full">List my practice</button><p class="text-[10px] text-muted mt-2">Proposed price, your call.</p></div>
     </div>
+  </div>
+</section>
+
+
+<!-- ============ TOP 10 STATES ============ -->
+<section id="s-states" class="screen">
+  <div class="mx-auto max-w-5xl px-4 py-10">
+    <div class="flex items-center gap-2"><h1 class="text-4xl">Top 10 states by demand</h1><span class="chg">11</span></div>
+    <p class="text-muted mt-2 text-sm">Ranked by where people can legally use cannabis today (lounges, 420-friendly stays, tours), tourist traffic, and legal market size. Waves 1 and 2 load at launch; Coming soon states collect sign-ups.</p>
+    <div class="card mt-6 overflow-x-auto"><table class="w-full text-sm">
+      <thead class="bg-cream"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">State</th><th class="text-left px-4 py-3">Key cities</th><th class="text-left px-4 py-3">Why</th><th class="text-left px-4 py-3">Status</th></tr></thead>
+      <tbody><tr class="border-t border-soft"><td class="px-4 py-3">1</td><td class="px-4 py-3 font-semibold">Nevada</td><td class="px-4 py-3">Las Vegas, Reno</td><td class="px-4 py-3">#1 tourist need; hotels ban use; lounges open</td><td class="px-4 py-3"><span class="chip chip-live">Wave 1</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">2</td><td class="px-4 py-3 font-semibold">California</td><td class="px-4 py-3">West Hollywood, SF, Oakland, Palm Springs</td><td class="px-4 py-3">Most lounges in the U.S.; biggest market</td><td class="px-4 py-3"><span class="chip chip-live">Wave 1</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">3</td><td class="px-4 py-3 font-semibold">New Jersey</td><td class="px-4 py-3">Atlantic City, Newark</td><td class="px-4 py-3">Newest lounge state; casino tourism; drivable for you</td><td class="px-4 py-3"><span class="chip chip-live">Wave 1</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">4</td><td class="px-4 py-3 font-semibold">Colorado</td><td class="px-4 py-3">Denver, Boulder</td><td class="px-4 py-3">Original cannabis tourism; few lounges, lots of 420 stays</td><td class="px-4 py-3"><span class="chip chip-live">Wave 1</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">5</td><td class="px-4 py-3 font-semibold">Michigan</td><td class="px-4 py-3">Detroit area, Ann Arbor, Kalamazoo</td><td class="px-4 py-3">Big cheap market; strong culture; lounges open</td><td class="px-4 py-3"><span class="chip chip-live">Wave 1</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">6</td><td class="px-4 py-3 font-semibold">New York</td><td class="px-4 py-3">NYC</td><td class="px-4 py-3">Huge tourism; lounge licensing under way</td><td class="px-4 py-3"><span class="chip chip-info">Wave 2</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">7</td><td class="px-4 py-3 font-semibold">Illinois</td><td class="px-4 py-3">Chicago, Springfield</td><td class="px-4 py-3">Big tourism; BYO lounges outside Chicago</td><td class="px-4 py-3"><span class="chip chip-info">Wave 2</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">8</td><td class="px-4 py-3 font-semibold">New Mexico</td><td class="px-4 py-3">Albuquerque, Santa Fe, Las Cruces</td><td class="px-4 py-3">Licensed consumption areas; Texas visitors</td><td class="px-4 py-3"><span class="chip chip-info">Wave 2</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">9</td><td class="px-4 py-3 font-semibold">Massachusetts</td><td class="px-4 py-3">Boston, Haverhill</td><td class="px-4 py-3">Lounge rules in effect 2026; first openings pending</td><td class="px-4 py-3"><span class="chip chip-soon">Coming soon</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">10</td><td class="px-4 py-3 font-semibold">Maryland</td><td class="px-4 py-3">Baltimore, D.C. suburbs</td><td class="px-4 py-3">Up to 15 lounge licenses, none awarded yet</td><td class="px-4 py-3"><span class="chip chip-soon">Coming soon</span></td></tr>
+<tr class="border-t border-soft"><td class="px-4 py-3">—</td><td class="px-4 py-3 font-semibold">Virginia</td><td class="px-4 py-3">Hampton Roads</td><td class="px-4 py-3">Stores open July 1, 2027</td><td class="px-4 py-3"><span class="chip chip-soon">2027</span></td></tr></tbody></table></div>
   </div>
 </section>
 
@@ -338,13 +355,15 @@
           <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">8</span></td><td class="px-4 py-3">Cannabis Balance hub (database-backed) + Balance Check quiz. Articles written by Claude for free</td><td class="px-4 py-3">3</td><td class="px-4 py-3 text-right">14–20</td></tr>
           <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">9</span></td><td class="px-4 py-3">City page with 4 lanes, quick answer, 20-listing progress, Featured spot</td><td class="px-4 py-3">2</td><td class="px-4 py-3 text-right">8–10</td></tr>
           <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">10</span></td><td class="px-4 py-3">Home hero + section updates</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">2–3</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">11</span></td><td class="px-4 py-3">5 states live at launch: state + city pages from one template, state filter, top-10 page. Listing data loaded by Claude</td><td class="px-4 py-3">2</td><td class="px-4 py-3 text-right">6–10</td></tr>
+          <tr class="border-t border-soft"><td class="px-4 py-3"><span class="chg">12</span></td><td class="px-4 py-3">Health Hub paid listing tier on pricing page</td><td class="px-4 py-3">1</td><td class="px-4 py-3 text-right">1–2</td></tr>
           <tr class="border-t border-soft"><td class="px-4 py-3">—</td><td class="px-4 py-3">Plan check before building (plan mode)</td><td class="px-4 py-3">0</td><td class="px-4 py-3 text-right">1–2</td></tr>
           <tr class="border-t border-soft"><td class="px-4 py-3">—</td><td class="px-4 py-3">Test and fix round (2 rounds)</td><td class="px-4 py-3">4</td><td class="px-4 py-3 text-right">4–6</td></tr>
-          <tr class="border-t border-soft bg-cream font-semibold"><td class="px-4 py-3"></td><td class="px-4 py-3">TOTAL Phase A</td><td class="px-4 py-3">4 batches</td><td class="px-4 py-3 text-right">45–67</td></tr>
+          <tr class="border-t border-soft bg-cream font-semibold"><td class="px-4 py-3"></td><td class="px-4 py-3">TOTAL Phase A</td><td class="px-4 py-3">4 batches</td><td class="px-4 py-3 text-right">52–79</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="text-xs text-muted mt-3">Fits under your 100-credit daily cap in one day, or split over two. Free work done by Claude (0 credits): closed-venue data fix, Lovable project rules, all article and quiz text, venue seed lists.</p>
+    <p class="text-xs text-muted mt-3">Fits under your 100-credit daily cap in one day, or split over two. If Claude can't write the listings straight into the database, add 2–3 credits for a one-time import. Free work done by Claude (0 credits): closed-venue data fix, Lovable project rules, all article and quiz text, venue seed lists.</p>
   </div>
 </section>
 </main>
@@ -352,7 +371,7 @@
 <footer class="bg-dark mt-16"><div class="mx-auto max-w-7xl px-4 py-8 text-xs text-sage flex flex-wrap justify-between gap-3"><span>© Herb Allowed · 21+ · Informational directory</span><span>Preview only · sample screens · nothing is saved</span></div></footer>
 
 <script>
-const screens=['home','vegas','venue','nj','explore','balance','quiz','business','virginia','changes'];
+const screens=['home','vegas','venue','nj','explore','balance','quiz','business','states','virginia','changes'];
 function go(id){ if(!screens.includes(id)) id='home';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('s-'+id).classList.add('active');
